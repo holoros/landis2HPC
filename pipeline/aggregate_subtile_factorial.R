@@ -101,9 +101,13 @@ agg <- totals[, .(
   total_cells = sum(n_cells)
 ), by = .(owner, climate, year)]
 
-# Number of unique tiles available for this owner-climate combo
-agg[, complete_tiles := uniqueN(totals[owner == owner & climate == climate, tile]),
-    by = .(owner, climate)]
+# Number of unique tiles available for this owner-climate combo.
+# Bug fix: the prior `totals[owner == owner & climate == climate]` form
+# matched every row because `owner` on the right resolved to the column,
+# not the per-group value. Use a join via .EACHI scoping instead.
+complete_lookup <- totals[, .(complete_tiles = uniqueN(tile)),
+                          by = .(owner, climate)]
+agg <- complete_lookup[agg, on = .(owner, climate)]
 
 cat("\n  Aggregate by (owner, climate, year):\n")
 print(agg[order(owner, climate, year)], row.names = FALSE)
