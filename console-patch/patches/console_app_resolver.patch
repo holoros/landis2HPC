@@ -1,0 +1,67 @@
+diff --git a/Tool-Console/src/App.cs b/Tool-Console/src/App.cs
+index bbbe11c..bc483c5 100644
+--- a/Tool-Console/src/App.cs
++++ b/Tool-Console/src/App.cs
+@@ -4,6 +4,7 @@ using System;
+ using System.Configuration;
+ using System.IO;
+ using System.Reflection;
++using System.Runtime.Loader;
+ using System.Text;
+ 
+ using Landis.Core;
+@@ -19,8 +20,54 @@ namespace Landis
+ {
+     public static class App
+     {
++        // Patched: in .NET 8, Landis.Console.dll.config's <probing
++        // privatePath="8.0;extensions" /> is ignored, and Type.GetType cannot
++        // find types whose assemblies have not yet been loaded by the default
++        // AssemblyLoadContext (dotnet/runtime issue #103222). Register a
++        // Resolving handler so any plug-in assembly referenced by an
++        // AssemblyQualifiedName is located via assembly.GetType() against an
++        // explicitly-loaded Assembly instance.
++        private static readonly string[] PluginProbeSubdirs = new string[]
++        {
++            "",
++            "extensions",
++            Path.Combine("..", "extensions"),
++            "8.0",
++            Path.Combine("..", "8.0"),
++        };
++
++        private static Assembly ResolvePluginAssembly(AssemblyLoadContext context,
++                                                      AssemblyName name)
++        {
++            string simpleName = name.Name;
++            if (string.IsNullOrEmpty(simpleName))
++                return null;
++
++            string baseDir = AppContext.BaseDirectory;
++            foreach (string sub in PluginProbeSubdirs)
++            {
++                string candidate = Path.GetFullPath(
++                    Path.Combine(baseDir, sub, simpleName + ".dll"));
++                if (File.Exists(candidate))
++                {
++                    try
++                    {
++                        return context.LoadFromAssemblyPath(candidate);
++                    }
++                    catch
++                    {
++                        // Try the next probe location.
++                    }
++                }
++            }
++            return null;
++        }
++
+         public static int Main(string[] args)
+         {
++            // Install plug-in assembly resolver before any extension lookup.
++            AssemblyLoadContext.Default.Resolving += ResolvePluginAssembly;
++
+             try
+             {
+                 // The log4net section in the application's configuration file
