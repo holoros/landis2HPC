@@ -34,13 +34,15 @@ A subtle point: the calibration is sensitive to the definition of "untreated." O
 
 ## 4.5 Limitations and future directions
 
-Three limitations stand out.
+Four limitations stand out.
 
 First, the single-cell scenario architecture removes dispersal effects from the calibration, which is appropriate for parameter identification but means our calibrated parameters reflect a successional process without spatial seed competition. For projection studies at multi-cell scales, dispersal kernels need to be added to the model specification (LANDIS-II handles this natively); the question of whether such addition introduces new systematic biases requires its own validation, which we leave for future work.
 
 Second, the multi-cycle hindcast validation horizon is at most 20 years (the 2001-to-2022 window). Long-horizon (50- to 100-year) biomass trajectories produced by the calibrated model are extrapolative; they assume that the productivity parameters captured in our 20-year window apply throughout the century. Climate change makes this assumption increasingly tenuous. We discuss how the upcoming PERSEUS factorial study (Section 4.6) addresses this through explicit climate scenario integration.
 
 Third, the calibration is state-scoped. Our θ vectors for Maine, Georgia, and Washington are not directly portable to other states. The framework is portable — any state with an FIA tree-list can run the same calibration pipeline in a few thousand core-hours of compute — but the calibrated parameters themselves are not. We provide all code and per-state best-fit θ vectors as supplementary materials to encourage replication on additional states.
+
+Fourth, our Georgia Tier 2 attempt did not yield a credible per-species calibration. The per-plot LANDIS sub-pipeline succeeded for only a fraction of the 779-plot Georgia target subset (mean n = 10.3 paired observations per candidate, maximum n = 82, zero candidates with n ≥ 100). Production Georgia calibration in this release is therefore Tier 1 uniform θ = 0.30, which has a single free parameter and is robust under the validation framework. Identifying the root cause of the Georgia plot-pipeline failure (likely a plot-ID mapping issue specific to the Georgia per-plot scenario builder) and re-running Tier 2 with the v1.0 sample-size guard MIN_N_PAIRS = 300 is the highest-priority next step for the framework. The detailed failure-mode analysis is in our open-source repository at `docs/GA_T2_failure_memo.md`. The cross-state result — Maine Tier 2 per-species + Washington Tier 2 per-species + Georgia Tier 1 uniform — still demonstrates the directional asymmetry finding that anchors this paper.
 
 ## 4.6 Implications for the PERSEUS scenario factorial
 

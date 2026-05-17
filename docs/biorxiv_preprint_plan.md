@@ -56,19 +56,27 @@ The risk side is real but small: bioRxiv journals sometimes treat preprints with
 > parameters produce systematic biases that differ in direction by state
 > (Maine slight under-prediction, mean log-residual −0.064; Georgia strong
 > over-prediction, +0.65; Washington moderate over-prediction, +0.26).
-> Calibration improves per-cell log-likelihood by +0.59 (Maine, Tier 2
-> per-species CMA-ES), +5.26 (Georgia, Tier 1 uniform θ=0.30), and +0.31
-> (Washington, Tier 1 uniform θ=0.30 with active-growth constraint).
-> Calibration changes 100-year per-cell biomass asymptotes by 7%, 35%, and
-> 67% respectively — substantial implications for state-scale carbon
-> accounting. We identify a novel methodological pathology: at very low θ,
-> LANDIS-II produces near-zero growth across the projection horizon and the
-> likelihood minimum becomes a trivial fit, requiring an active-growth
-> fraction diagnostic to recognize and avoid. A six-test validation framework
-> (k-fold CV, time-out-of-sample, leave-one-ecoregion-out, cross-state,
-> bootstrap CI, IC perturbation) addresses standard overfitting concerns. The
-> framework, code, calibrated parameter vectors, and interactive Carbon Atlas
-> dashboard are released under MIT license at github.com/holoros/landis2HPC.
+> Production calibrations span the calibration ladder: Maine Tier 2 per-species
+> (26 parameters, LL = +34.2 over n = 612 paired plots), Georgia Tier 1 uniform
+> θ = 0.30 (LL = +5.26 over n = 218 paired plots), and Washington Tier 2
+> per-species (50 parameters, total LL = −174.4 over n = 805 paired plots,
+> per-plot LL = −0.217). Calibration changes 100-year per-cell biomass
+> asymptotes by 7%, 35%, and 67% respectively — substantial implications for
+> state-scale carbon accounting. We identify a three-mode calibration
+> degeneracy pathology novel to the forest landscape modeling literature:
+> (1) active-growth degeneracy, where very low θ produces near-zero growth
+> and a trivial fit at the initial condition; (2) empty-aggregator degeneracy,
+> where per-plot pipeline failures yield LL = 0 by default; and (3) sample-size
+> degeneracy, where few successful plot pairs yield trivially small LL
+> magnitudes that mislead total-LL optimizers. We propose three corresponding
+> guards (active-growth fraction ≥ 0.50, non-empty per_plot.csv, minimum
+> n_pairs ≥ 300) and recommend per-plot LL normalization as a complementary
+> safeguard. A six-test validation framework (k-fold CV, time-out-of-sample,
+> leave-one-ecoregion-out, cross-state, bootstrap CI, IC perturbation)
+> addresses standard overfitting concerns. The framework, code, calibrated
+> parameter vectors, three-mode pathology diagnostic, and interactive Carbon
+> Atlas dashboard are released under MIT license at github.com/holoros/landis2HPC
+> (v1.0 tag, 2026-05-17).
 
 ### Data availability statement
 
