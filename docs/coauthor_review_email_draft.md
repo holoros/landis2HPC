@@ -6,17 +6,21 @@
 
 **To:** Rob Scheller <rmschell@ncsu.edu>, Melissa Lucash <mlucash@uoregon.edu>, [GA/WA collaborators TBD]
 **Cc:** [CRSF colleagues, postdocs]
-**Subject:** PERSEUS multi-state LANDIS-II calibration — manuscript draft + GitHub release ready for your review
+**Subject:** PERSEUS multi-state LANDIS-II calibration — v1.0-rc1 ready for your review
 
 ---
 
 Rob, Melissa, all —
 
-I'm circulating the draft methods paper for the multi-state LANDIS-II calibration work we've been building since the SBW outbreak modeling threads from last year. The full draft, code, calibrated parameter vectors, validation framework, and an interactive Carbon Atlas are now public at:
+I'm circulating the draft methods paper for the multi-state LANDIS-II calibration work we've been building since the SBW outbreak modeling threads from last year. Tagged the v1.0-rc1 release today; the full draft, code, calibrated parameter vectors, validation framework, and an interactive Carbon Atlas are now public at:
 
-**https://github.com/holoros/landis2HPC** (PERSEUS framework lives in `perseus/`)
+**https://github.com/holoros/landis2HPC/releases/tag/v1.0-rc1** (PERSEUS framework lives in `perseus/`)
 
-**Manuscript (start here):** [`docs/methods_paper_FINAL_ASSEMBLY.md`](https://github.com/holoros/landis2HPC/blob/main/docs/methods_paper_FINAL_ASSEMBLY.md)
+**Quick navigation:**
+- Manuscript (start here): [`docs/methods_paper_FINAL_ASSEMBLY.md`](https://github.com/holoros/landis2HPC/blob/main/docs/methods_paper_FINAL_ASSEMBLY.md)
+- One-page summary of what's final vs rc1: [`docs/v1.0-rc1_summary.md`](https://github.com/holoros/landis2HPC/blob/main/docs/v1.0-rc1_summary.md)
+- 3-panel Tier 2 species heatmap: [`perseus/figures/t2_species_heatmap_3state_2026-05-17.png`](https://github.com/holoros/landis2HPC/raw/main/perseus/figures/t2_species_heatmap_3state_2026-05-17.png)
+- CMA-ES convergence snapshot: [`perseus/figures/t2_cma_convergence_2026-05-17.png`](https://github.com/holoros/landis2HPC/raw/main/perseus/figures/t2_cma_convergence_2026-05-17.png)
 
 The headline finding is that literature LANDIS-II Biomass Succession parameters are systematically biased in direction-specific ways across our three states — Maine slight under-prediction, Georgia strong over-prediction, Washington moderate over-prediction. A four-tier calibration ladder against the FIA multi-cycle hindcast closes the gap with state-specific optima. The biggest single number is that calibration changes the 100-year per-cell biomass asymptote by 7% in Maine, 35% in Georgia, and 67% in Washington — large enough to matter for any state-scale carbon analysis that uses LANDIS-II projections.
 
@@ -28,7 +32,7 @@ The headline finding is that literature LANDIS-II Biomass Succession parameters 
 
 3. **The Tier 2 per-species multipliers for Maine** (Figure 6, [`perseus/figures/me_tier2_species_heatmap.png`](https://github.com/holoros/landis2HPC/raw/main/perseus/figures/me_tier2_species_heatmap.png)). Balsam fir at ANPP×2.26 with BMAX×0.54 is the strongest signal — fast growth with a lowered ceiling, consistent with budworm-driven stagnation. Does this match the field intuition you'd expect?
 
-**Status of WA + GA Tier 2:** CMA-ES is currently converging on Cardinal (iter 2 of 8 as of last check). Early iter1 result was extremely promising (negLL=50 over ~280 cells, implying Tier 2 will substantially beat Tier 1 for WA too). I expect the converged Tier 2 numbers to land in the next ~24 hours and I'll refresh Section 3.3 once they're in. The paper structure and headline argument are stable regardless — only specific numbers in 3.3 are pending.
+**Status of WA + GA Tier 2 (RC1 snapshots in this release):** Both CMA-ES chains are still running on Cardinal as of email send. GA T2 has converged at negLL=−15.75 (LL=+15.75) across iterations 0, 5, and 6 — the rc1 snapshot is the converged solution. WA T2 v2 (resumed with a patched driver that flags degenerate empty-aggregator candidates) holds iter1 best at negLL=50.01 (LL=−50) while exploring with the new constraint. Both will land in the next 12–24 hours. v1.0 final swap is only the two Tier 2 theta vectors + figure refresh. The paper structure, headline argument, and the directional asymmetry finding are stable in v1.0-rc1.
 
 **What I'd love to know from each of you:**
 
