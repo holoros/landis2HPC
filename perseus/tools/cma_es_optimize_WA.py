@@ -93,6 +93,20 @@ def evaluate(theta_log, tag, bay_dir, tools_dir):
             f.write(f"n_active={n_active}\nn_total={n_total}\nfrac={frac:.4f}\n")
     except: pass
 
+    # Empty-aggregator check: LL=0 commonly arises when per_plot.csv is empty
+    # (aggregator failed to produce any paired predicted/observed rows). Treat
+    # as a failed candidate so CMA-ES does not drift toward it.
+    per_plot_csv = tag_dir / "per_plot.csv"
+    if per_plot_csv.exists():
+        try:
+            with open(per_plot_csv) as fp:
+                n_rows = sum(1 for _ in fp) - 1  # subtract header
+        except Exception:
+            n_rows = -1
+        if n_rows <= 0:
+            sys.stderr.write(f"DEGEN {tag}: per_plot.csv empty (rows={n_rows}, LL={ll}); penalized\n")
+            return DEGENERACY_PENALTY
+
     if ll == 0.0 and frac < MIN_ACTIVE_GROWTH_FRAC:
         # LL=0 with low active-growth → degenerate (predicted ≈ obs because both near IC)
         sys.stderr.write(f"DEGEN {tag}: LL=0 with active_growth_frac={frac:.2f} < {MIN_ACTIVE_GROWTH_FRAC}; penalized\n")

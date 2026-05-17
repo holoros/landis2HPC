@@ -80,6 +80,19 @@ def evaluate(theta_log, tag, bay, tools):
             f.write(f"n_active={n_active}\nn_total={n_total}\nfrac={frac:.4f}\n")
     except: pass
 
+    # Empty-aggregator check: catches failed-aggregator candidates where
+    # per_plot.csv has no rows so LL defaults to 0.
+    per_plot_csv = tag_dir / "per_plot.csv"
+    if per_plot_csv.exists():
+        try:
+            with open(per_plot_csv) as fp:
+                n_rows = sum(1 for _ in fp) - 1
+        except Exception:
+            n_rows = -1
+        if n_rows <= 0:
+            sys.stderr.write(f"DEGEN {tag}: per_plot.csv empty (rows={n_rows}, LL={ll}); penalized\n")
+            return DEGENERACY_PENALTY
+
     if ll == 0.0 and frac < MIN_ACTIVE_GROWTH_FRAC:
         sys.stderr.write(f"DEGEN {tag}: LL=0 with active_growth_frac={frac:.2f} < {MIN_ACTIVE_GROWTH_FRAC}; penalized\n")
         return DEGENERACY_PENALTY
