@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PERSEUS Carbon Atlas — v0 prototype</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         margin: 0; padding: 0; background: #f5f5f5; color: #222; }
+  header { background: white; padding: 16px 24px; border-bottom: 1px solid #ddd;
+           display: flex; justify-content: space-between; align-items: center; }
+  h1 { margin: 0; font-size: 22px; }
+  .badge { display: inline-block; padding: 2px 8px; font-size: 11px; border-radius: 3px;
+           background: #E3F2FD; color: #1565C0; font-weight: 600; margin-left: 8px;
+           vertical-align: middle; }
+  .layout { display: grid; grid-template-columns: 320px 1fr; min-height: calc(100vh - 56px); }
+  .sidebar { background: white; padding: 20px; border-right: 1px solid #ddd; overflow-y: auto; }
+  .main { display: flex; flex-direction: column; }
+  #map { flex: 1; min-height: 400px; }
+  .charts { background: white; padding: 16px 24px; border-top: 1px solid #ddd;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  h2 { font-size: 16px; margin: 16px 0 8px 0; color: #555; }
+  h3 { font-size: 13px; margin: 8px 0 4px 0; color: #777; text-transform: uppercase;
+       letter-spacing: 0.5px; }
+  .control { margin-bottom: 16px; }
+  label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
+  select, input { width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid #ddd;
+                  border-radius: 4px; box-sizing: border-box; }
+  .metric { padding: 12px; background: #f9f9f9; border-left: 3px solid #1565C0;
+            border-radius: 4px; margin-bottom: 8px; }
+  .metric-label { font-size: 11px; color: #777; text-transform: uppercase; }
+  .metric-value { font-size: 18px; font-weight: 600; }
+  .info-panel { background: #fffbf0; border: 1px solid #ffd54f;
+                padding: 12px 16px; border-radius: 4px; font-size: 13px; margin-top: 12px; }
+  .plot-marker { width: 8px; height: 8px; border-radius: 50%; border: 1px solid white; }
+  .legend { background: white; padding: 10px; border-radius: 4px;
+            font-size: 12px; line-height: 1.6; box-shadow: 0 0 6px rgba(0,0,0,0.15); }
+  .legend .swatch { display: inline-block; width: 12px; height: 12px; margin-right: 6px;
+                    vertical-align: middle; border: 1px solid #888; }
+</style>
+</head>
+<body>
+<header>
+  <h1>PERSEUS Carbon Atlas <span class="badge">v0 prototype</span></h1>
+  <span style="font-size:12px; color:#888;">Calibrated LANDIS-II forest biomass projections for Maine, Georgia, Washington</span>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="control">
+      <label for="state">State</label>
+      <select id="state" onchange="redraw()">
+        <option value="WA">Washington</option>
+        <option value="GA">Georgia</option>
+        <option value="ME">Maine</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="layer">Map layer</label>
+      <select id="layer" onchange="redraw()">
+        <option value="biomass_yr0">Year 0 biomass (FIA Round 1)</option>
+        <option value="biomass_yr50">Year 50 calibrated projection</option>
+        <option value="biomass_yr100">Year 100 calibrated projection</option>
+        <option value="tier0_vs_tier1">Calibration delta (T0 − T1 at year 100)</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="climate">Climate scenario</label>
+      <select id="climate" onchange="redraw()">
+        <option value="baseline">Baseline (historical)</option>
+        <option value="ssp245" disabled>SSP245 (pending factorial)</option>
+        <option value="ssp585" disabled>SSP585 (pending factorial)</option>
+      </select>
+    </div>
+
+    <h2>State summary</h2>
+    <div id="summary">
+      <div class="metric">
+        <div class="metric-label">Best calibration</div>
+        <div class="metric-value" id="best-calib">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Mean log-residual</div>
+        <div class="metric-value" id="mean-resid">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Year-100 biomass change vs literature</div>
+        <div class="metric-value" id="asymptote-delta">—</div>
+      </div>
+    </div>
+
+    <div class="info-panel">
+      <strong>Prototype data:</strong> This v0 demonstrates the Option B map view
+      and trajectory comparison. SSP245 / SSP585 climate scenarios will populate
+      when the factorial sweep completes.
+    </div>
+  </aside>
+
+  <div class="main">
+    <div id="map"></div>
+    <div class="charts">
+      <div>
+        <h2>State-aggregate biomass trajectory</h2>
+        <canvas id="trajectoryChart" height="100"></canvas>
+      </div>
+      <div>
+        <h2>Selected plot history (click a plot)</h2>
+        <canvas id="plotChart" height="100"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// State configurations
+const STATES = {
+  WA: { center: [47.4, -120.7], zoom: 7, color: "#1565C0",
+        bbox: [[45.5, -125.0], [49.1, -116.9]],
+        bestCalib: "Tier 1 θ=0.30 (active-growth)",
+        meanResid: "+0.011",
+        asymptoteDelta: "−67%" },
+  GA: { center: [32.5, -83.0], zoom: 7, color: "#C62828",
+        bbox: [[30.4, -85.7], [35.0, -80.8]],
+        bestCalib: "Tier 1 θ=0.30",
+        meanResid: "+0.150",
+        asymptoteDelta: "−35%" },
+  ME: { center: [45.2, -69.0], zoom: 7, color: "#2E7D32",
+        bbox: [[43.0, -71.2], [47.5, -66.9]],
+        bestCalib: "Tier 2 per-species",
+        meanResid: "−0.043",
+        asymptoteDelta: "−7.5%" }
+};
+
+// Sample plot data — would come from PostgreSQL in production
+// For prototype, we synthesize representative WA plots
+function generateSamplePlots(state) {
+  const cfg = STATES[state];
+  const [[lat0, lon0], [lat1, lon1]] = cfg.bbox;
+  const N = 200;
+  const plots = [];
+  for (let i = 0; i < N; i++) {
+    plots.push({
+      id: i + 1,
+      lat: lat0 + Math.random() * (lat1 - lat0),
+      lon: lon0 + Math.random() * (lon1 - lon0),
+      biomass_yr0: 50 + Math.random() * 300,
+      biomass_yr100_t1: 100 + Math.random() * 400,
+      biomass_yr100_t0: 300 + Math.random() * 600
+    });
+  }
+  return plots;
+}
+
+function biomassColor(v, layer) {
+  // Color ramp
+  if (layer === "tier0_vs_tier1") {
+    // Diverging: red for over-pred, blue for under-pred
+    const t = Math.min(Math.max(v / 500, -1), 1);
+    if (t > 0) return `rgb(${Math.round(220 - 80*t)}, ${Math.round(60 - 60*t)}, ${Math.round(60 - 60*t)})`;
+    return `rgb(${Math.round(60 + 200*t)}, ${Math.round(60 + 100*t)}, ${Math.round(220 + 35*t)})`;
+  }
+  // Sequential green-to-dark-green for biomass
+  const t = Math.min(v / 600, 1);
+  return `rgb(${Math.round(220 - 180*t)}, ${Math.round(245 - 120*t)}, ${Math.round(220 - 180*t)})`;
+}
+
+// Initialize Leaflet map
+let map = L.map('map').setView(STATES.WA.center, STATES.WA.zoom);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap',
+  maxZoom: 12
+}).addTo(map);
+
+let plotLayer = null;
+let plots = generateSamplePlots('WA');
+let trajectoryChart = null;
+let plotChart = null;
+
+// Legend
+const legend = L.control({position: 'bottomright'});
+legend.onAdd = function() {
+  const div = L.DomUtil.create('div', 'legend');
+  div.innerHTML = '<strong>Biomass (Mg/ha)</strong><br>' +
+    '<span class="swatch" style="background:#E0F5E0"></span> < 100<br>' +
+    '<span class="swatch" style="background:#A0DDA0"></span> 100–300<br>' +
+    '<span class="swatch" style="background:#40A040"></span> 300–500<br>' +
+    '<span class="swatch" style="background:#206020"></span> > 500';
+  return div;
+};
+legend.addTo(map);
+
+function redraw() {
+  const state = document.getElementById('state').value;
+  const layer = document.getElementById('layer').value;
+  const cfg = STATES[state];
+
+  // Update sidebar metrics
+  document.getElementById('best-calib').textContent = cfg.bestCalib;
+  document.getElementById('mean-resid').textContent = cfg.meanResid;
+  document.getElementById('asymptote-delta').textContent = cfg.asymptoteDelta;
+
+  // Re-fly map
+  map.flyTo(cfg.center, cfg.zoom);
+
+  // Regenerate sample plots for state
+  plots = generateSamplePlots(state);
+
+  // Update plot layer
+  if (plotLayer) plotLayer.clearLayers();
+  plotLayer = L.layerGroup();
+  plots.forEach(p => {
+    let v;
+    if (layer === "biomass_yr0") v = p.biomass_yr0;
+    else if (layer === "biomass_yr50") v = (p.biomass_yr0 + p.biomass_yr100_t1) / 2;
+    else if (layer === "biomass_yr100") v = p.biomass_yr100_t1;
+    else if (layer === "tier0_vs_tier1") v = p.biomass_yr100_t0 - p.biomass_yr100_t1;
+    const marker = L.circleMarker([p.lat, p.lon], {
+      radius: 4,
+      color: 'white',
+      weight: 1,
+      fillColor: biomassColor(v, layer),
+      fillOpacity: 0.85
+    });
+    marker.bindTooltip(`Plot ${p.id}: ${v.toFixed(0)} Mg/ha`);
+    marker.on('click', () => updatePlotChart(p));
+    plotLayer.addLayer(marker);
+  });
+  plotLayer.addTo(map);
+
+  // Update trajectory chart
+  drawTrajectoryChart(state);
+}
+
+function drawTrajectoryChart(state) {
+  const ctx = document.getElementById('trajectoryChart').getContext('2d');
+  const cfg = STATES[state];
+
+  // Sample trajectory data — would come from API in production
+  const years = Array.from({length: 21}, (_, i) => i * 5);
+  let t0_traj, t1_traj;
+  if (state === 'WA') {
+    t0_traj = years.map(y => 138 + (562 - 138) * (y/100) * (1 - Math.exp(-y/30)));
+    t1_traj = years.map(y => 138 + (185 - 138) * (y/100) * (1 - Math.exp(-y/30)));
+  } else if (state === 'ME') {
+    t0_traj = years.map(y => 75 + (290 - 75) * (1 - Math.exp(-y/40)));
+    t1_traj = years.map(y => 75 + (268 - 75) * (1 - Math.exp(-y/40)));
+  } else {
+    t0_traj = years.map(y => 95 + (220 - 95) * (1 - Math.exp(-y/25)));
+    t1_traj = years.map(y => 95 + (143 - 95) * (1 - Math.exp(-y/25)));
+  }
+
+  if (trajectoryChart) trajectoryChart.destroy();
+  trajectoryChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      datasets: [
+        { label: 'Tier 0 (literature)',
+          data: years.map((y, i) => ({x: y, y: t0_traj[i]})),
+          borderColor: '#999', backgroundColor: '#99999920',
+          borderWidth: 2, borderDash: [4, 4] },
+        { label: 'Calibrated',
+          data: years.map((y, i) => ({x: y, y: t1_traj[i]})),
+          borderColor: cfg.color, backgroundColor: cfg.color + '20',
+          borderWidth: 2.5 }
+      ]
+    },
+    options: {
+      scales: {
+        x: { type: 'linear', title: { display: true, text: 'Year' } },
+        y: { title: { display: true, text: 'State median biomass (Mg/ha)' } }
+      }
+    }
+  });
+}
+
+function updatePlotChart(p) {
+  const ctx = document.getElementById('plotChart').getContext('2d');
+  const years = Array.from({length: 21}, (_, i) => i * 5);
+  // Sample trajectory for this plot
+  const t1_traj = years.map(y => p.biomass_yr0 + (p.biomass_yr100_t1 - p.biomass_yr0) *
+                                                  (1 - Math.exp(-y/30)));
+  const t0_traj = years.map(y => p.biomass_yr0 + (p.biomass_yr100_t0 - p.biomass_yr0) *
+                                                  (1 - Math.exp(-y/30)));
+  if (plotChart) plotChart.destroy();
+  plotChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      datasets: [
+        { label: `Plot ${p.id} — Tier 0`,
+          data: years.map((y, i) => ({x: y, y: t0_traj[i]})),
+          borderColor: '#999', borderDash: [4, 4] },
+        { label: `Plot ${p.id} — Calibrated`,
+          data: years.map((y, i) => ({x: y, y: t1_traj[i]})),
+          borderColor: '#1565C0', borderWidth: 2.5 }
+      ]
+    },
+    options: {
+      scales: {
+        x: { type: 'linear', title: { display: true, text: 'Year' } },
+        y: { title: { display: true, text: 'Plot biomass (Mg/ha)' } }
+      }
+    }
+  });
+}
+
+redraw();
+</script>
+</body>
+</html>

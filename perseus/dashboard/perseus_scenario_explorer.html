@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PERSEUS Scenario Explorer — prototype</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         margin: 0; padding: 20px; background: #f5f5f5; color: #222; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  header { background: white; padding: 20px 30px; border-radius: 8px;
+           box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 20px; }
+  h1 { margin: 0 0 8px 0; font-size: 24px; color: #1a1a1a; }
+  h2 { font-size: 18px; color: #444; margin: 0 0 12px 0; }
+  .subtitle { color: #666; font-size: 14px; margin: 0; }
+  .controls { display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0; padding: 20px;
+              background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .control { display: flex; flex-direction: column; gap: 4px; }
+  label { font-size: 13px; color: #555; font-weight: 500; }
+  select, input { padding: 8px 12px; font-size: 14px; border: 1px solid #ddd;
+                  border-radius: 4px; background: white; }
+  .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .panel { background: white; padding: 24px; border-radius: 8px;
+           box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .panel.wide { grid-column: span 2; }
+  .metric-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+  .metric { flex: 1; min-width: 140px; padding: 12px 16px; background: #f9f9f9;
+            border-left: 3px solid #1565C0; border-radius: 4px; }
+  .metric-label { font-size: 11px; color: #777; text-transform: uppercase;
+                  letter-spacing: 0.5px; margin-bottom: 4px; }
+  .metric-value { font-size: 18px; font-weight: 600; color: #222; }
+  .badge { display: inline-block; padding: 2px 8px; font-size: 11px; border-radius: 3px;
+           background: #E3F2FD; color: #1565C0; font-weight: 600; }
+  .badge.maine { background: #E8F5E9; color: #2E7D32; }
+  .badge.georgia { background: #FFEBEE; color: #C62828; }
+  .badge.washington { background: #E3F2FD; color: #1565C0; }
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 13px; }
+  th { font-weight: 600; color: #555; background: #f9f9f9; }
+  tr:hover { background: #fafafa; }
+  .footer { text-align: center; padding: 20px; color: #888; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>PERSEUS Scenario Explorer <span class="badge">prototype</span></h1>
+    <p class="subtitle">Multi-state LANDIS-II calibrated forest biomass projections —
+      Maine, Georgia, Washington — Weiskittel et al. (in prep)</p>
+  </header>
+
+  <div class="controls">
+    <div class="control">
+      <label for="state">State</label>
+      <select id="state" onchange="redraw()">
+        <option value="WA">Washington</option>
+        <option value="GA">Georgia</option>
+        <option value="ME">Maine</option>
+      </select>
+    </div>
+    <div class="control">
+      <label for="tier">Calibration tier</label>
+      <select id="tier" onchange="redraw()">
+        <option value="tier1_best">Tier 1 best (recommended)</option>
+        <option value="tier0">Tier 0 literature</option>
+        <option value="all">All tiers (compare)</option>
+      </select>
+    </div>
+    <div class="control">
+      <label for="metric">Metric</label>
+      <select id="metric" onchange="redraw()">
+        <option value="biomass">Per-cell biomass trajectory</option>
+        <option value="ll">Log-likelihood by θ</option>
+        <option value="residuals">Mean log-residual</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="panels">
+    <div class="panel">
+      <h2>Calibration summary</h2>
+      <div id="calib-meta"></div>
+      <div class="metric-row" id="metrics"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Cross-state comparison</h2>
+      <table>
+        <thead>
+          <tr><th>State</th><th>Best</th><th>LL/cell</th><th>Mean resid</th><th>Direction</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="badge maine">Maine</span></td><td>Tier 2 per-species</td>
+              <td>+0.18</td><td>−0.04</td><td>slight boost</td></tr>
+          <tr><td><span class="badge georgia">Georgia</span></td><td>Tier 1 θ=0.30</td>
+              <td>−8.81</td><td>+0.15</td><td>strong downscale</td></tr>
+          <tr><td><span class="badge washington">Washington</span></td><td>Tier 1 θ=0.30</td>
+              <td>−0.54</td><td>+0.01</td><td>active-growth optimum</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel wide">
+      <h2>Selected trajectory or curve</h2>
+      <canvas id="mainChart" height="100"></canvas>
+    </div>
+
+    <div class="panel wide">
+      <h2>WA Tier 1 ladder — all 12 θ values</h2>
+      <canvas id="ladderChart" height="80"></canvas>
+    </div>
+  </div>
+
+  <div class="footer">
+    PERSEUS — Center for Research on Sustainable Forests, University of Maine.
+    Calibrated against FIA multi-cycle hindcast. v1 prototype, 2026-05-16.
+  </div>
+</div>
+
+<script>
+// Embedded calibration result data
+const WA_LADDER = [
+  {theta: 1.00, ll: -7868.63, llcell: -0.851, mean: 0.256, sd: 0.555},
+  {theta: 0.85, ll: -7327.16, llcell: -0.792, mean: null, sd: null},
+  {theta: 0.75, ll: -6925.88, llcell: -0.749, mean: null, sd: null},
+  {theta: 0.65, ll: -6495.84, llcell: -0.703, mean: null, sd: null},
+  {theta: 0.50, ll: -5820.80, llcell: -0.630, mean: 0.182, sd: 0.512},
+  {theta: 0.45, ll: -5596.64, llcell: -0.605, mean: null, sd: null},
+  {theta: 0.40, ll: -5381.27, llcell: -0.582, mean: 0.053, sd: 0.433},
+  {theta: 0.30, ll: -5032.28, llcell: -0.544, mean: 0.011, sd: 0.417},
+  {theta: 0.25, ll: -4925.23, llcell: -0.533, mean: null, sd: null},
+  {theta: 0.20, ll: -4897.34, llcell: -0.530, mean: null, sd: null}, // LL min, partial degeneracy
+  {theta: 0.15, ll: -4987.73, llcell: -0.539, mean: -0.054, sd: 0.415},
+  {theta: 0.10, ll: -5263.73, llcell: -0.569, mean: -0.076, sd: 0.428},
+];
+
+const GA_LADDER = [
+  {theta: 1.00, ll: -170019.47, llcell: -14.07, mean: 0.65, sd: 0.70},
+  {theta: 0.90, ll: -158378.17, llcell: -13.10, mean: null, sd: null},
+  {theta: 0.70, ll: -135820.71, llcell: -11.24, mean: null, sd: null},
+  {theta: 0.50, ll: -116259.48, llcell: -9.62, mean: null, sd: null},
+  {theta: 0.30, ll: -106465.14, llcell: -8.81, mean: 0.15, sd: 0.65},
+];
+
+// WA biomass trajectory data (year, per-cell median Mg/ha) for selected θ
+const WA_TRAJ = {
+  // Tier 0 (θ=1.00)
+  "tier0": [
+    [0, 138.4], [5, 162], [10, 187], [15, 211], [20, 236], [25, 261], [30, 285],
+    [35, 309], [40, 331], [45, 353], [50, 376], [55, 397], [60, 417], [65, 437],
+    [70, 456], [75, 474], [80, 491], [85, 508], [90, 525], [95, 541], [100, 562]
+  ],
+  // Tier 1 θ=0.30 (recommended)
+  "tier1_best": [
+    [0, 138.2], [5, 142.9], [10, 147.5], [15, 152.1], [20, 156.5], [25, 160.6],
+    [30, 164.4], [35, 167.8], [40, 170.9], [45, 173.6], [50, 175.9], [55, 177.8],
+    [60, 179.4], [65, 180.7], [70, 181.8], [75, 182.7], [80, 183.4], [85, 183.9],
+    [90, 184.4], [95, 184.8], [100, 185.1]
+  ]
+};
+
+let mainChart, ladderChart;
+
+function makeChartCfg(label, data, color, ylabel) {
+  return {
+    type: 'line',
+    data: {
+      datasets: [{
+        label: label,
+        data: data.map(d => ({x: d[0], y: d[1]})),
+        borderColor: color,
+        backgroundColor: color + '20',
+        borderWidth: 2.5,
+        pointRadius: 4,
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: { type: 'linear', title: { display: true, text: 'LANDIS year' } },
+        y: { title: { display: true, text: ylabel } }
+      }
+    }
+  };
+}
+
+function redraw() {
+  const state = document.getElementById('state').value;
+  const tier = document.getElementById('tier').value;
+  const metric = document.getElementById('metric').value;
+  const stateName = {WA: 'Washington', GA: 'Georgia', ME: 'Maine'}[state];
+  const color = {WA: '#1565C0', GA: '#C62828', ME: '#2E7D32'}[state];
+
+  // Update metadata panel
+  const meta = document.getElementById('calib-meta');
+  const metricsDiv = document.getElementById('metrics');
+  if (state === 'WA' && tier === 'tier1_best') {
+    meta.innerHTML = `
+      <span class="badge ${stateName.toLowerCase()}">${stateName}</span>
+      <strong> Tier 1 θ=0.30 (recommended, active-growth optimum)</strong>
+      <p style="margin: 8px 0; color: #555; font-size: 14px;">
+        Validated against 9,246 paired (LANDIS year, FIA observed) cells across 4,461 plots.
+      </p>`;
+    metricsDiv.innerHTML = `
+      <div class="metric"><div class="metric-label">LL / cell</div>
+        <div class="metric-value">−0.544</div></div>
+      <div class="metric"><div class="metric-label">Mean log-resid</div>
+        <div class="metric-value">+0.011</div></div>
+      <div class="metric"><div class="metric-label">SD log-resid</div>
+        <div class="metric-value">0.417</div></div>
+      <div class="metric"><div class="metric-label">Year-100 biomass</div>
+        <div class="metric-value">185 Mg/ha</div></div>
+    `;
+  } else if (state === 'WA' && tier === 'tier0') {
+    meta.innerHTML = `
+      <span class="badge washington">Washington</span>
+      <strong> Tier 0 literature parameters (uncalibrated baseline)</strong>
+      <p style="margin: 8px 0; color: #555; font-size: 14px;">
+        Systematic over-prediction: +25.6% mean log-residual.
+      </p>`;
+    metricsDiv.innerHTML = `
+      <div class="metric"><div class="metric-label">LL / cell</div>
+        <div class="metric-value">−0.851</div></div>
+      <div class="metric"><div class="metric-label">Mean log-resid</div>
+        <div class="metric-value">+0.256</div></div>
+      <div class="metric"><div class="metric-label">SD log-resid</div>
+        <div class="metric-value">0.555</div></div>
+      <div class="metric"><div class="metric-label">Year-100 biomass</div>
+        <div class="metric-value">562 Mg/ha</div></div>
+    `;
+  } else {
+    meta.innerHTML = `<p style="color: #888;">Select state, tier, and metric above.</p>`;
+    metricsDiv.innerHTML = '';
+  }
+
+  // Main chart
+  if (mainChart) mainChart.destroy();
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  if (state === 'WA' && metric === 'biomass') {
+    const data = WA_TRAJ[tier === 'tier0' ? 'tier0' : 'tier1_best'];
+    mainChart = new Chart(ctx,
+      makeChartCfg(`${stateName} ${tier === 'tier0' ? 'Tier 0' : 'Tier 1 best'} per-cell median biomass`,
+                   data, color, 'Biomass (Mg/ha)'));
+  } else if (state === 'WA' && tier === 'all') {
+    mainChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: [
+          { label: 'Tier 0', data: WA_TRAJ.tier0.map(d => ({x:d[0],y:d[1]})),
+            borderColor: '#999', backgroundColor: '#99999920', borderWidth: 2 },
+          { label: 'Tier 1 best (θ=0.30)', data: WA_TRAJ.tier1_best.map(d => ({x:d[0],y:d[1]})),
+            borderColor: '#1565C0', backgroundColor: '#1565C020', borderWidth: 2.5 }
+        ]
+      },
+      options: { responsive: true,
+        scales: { x: {type:'linear', title:{display:true, text:'LANDIS year'}},
+                  y: {title:{display:true, text:'Biomass (Mg/ha)'}}} }
+    });
+  }
+
+  // Ladder chart (always show)
+  if (ladderChart) ladderChart.destroy();
+  const ctxL = document.getElementById('ladderChart').getContext('2d');
+  ladderChart = new Chart(ctxL, {
+    type: 'line',
+    data: {
+      datasets: [
+        {
+          label: 'Washington (n=9,246 cells)',
+          data: WA_LADDER.map(d => ({x: d.theta, y: d.llcell})),
+          borderColor: '#1565C0',
+          backgroundColor: '#1565C020',
+          borderWidth: 2.5, pointRadius: 5
+        },
+        {
+          label: 'Georgia (n=12,087 cells, scaled ×0.1)',
+          data: GA_LADDER.map(d => ({x: d.theta, y: d.llcell * 0.1})),
+          borderColor: '#C62828',
+          backgroundColor: '#C6282820',
+          borderWidth: 2.5, pointRadius: 5
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: { type: 'linear', title: { display: true, text: 'θ (uniform productivity multiplier)' } },
+        y: { title: { display: true, text: 'LL per cell' } }
+      },
+      plugins: { tooltip: { callbacks: { label: ctx =>
+        `θ=${ctx.parsed.x.toFixed(2)}: LL/cell = ${ctx.parsed.y.toFixed(3)}` } } }
+    }
+  });
+}
+
+redraw();
+</script>
+</body>
+</html>

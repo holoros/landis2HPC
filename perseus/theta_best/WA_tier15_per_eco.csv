@@ -1,0 +1,10 @@
+ecoregion,name,best_theta,LL_per_cell,notes
+1,Coast Range,0.40,-0.203,Wet-side; least aggressive downscale
+2,Puget Lowland,0.30,-0.522,Wet-side moderate
+3,Willamette Valley,0.25,-1.256,Low power (n=15)
+4,Cascades,0.40,-0.092,Wet-side; cleanest fit
+9,Eastern Cascades,0.15,-0.317,Dry-side
+10,Columbia Plateau,0.10,-0.988,Driest; heavy downscale
+11,Blue Mountains,0.20,-0.974,Dry-side strong
+15,Northern Rockies,0.15,-0.307,Dry-side
+77,North Cascades,0.15,-0.712,Largest WA ecoregion (3036 cells)

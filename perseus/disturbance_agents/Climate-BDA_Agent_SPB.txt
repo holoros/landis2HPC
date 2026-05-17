@@ -1,0 +1,101 @@
+LandisData "BDA Agent"
+
+BDAAgentName		spb
+BDPCalibrator		1
+SRDMode			mean
+StartYear		5
+EndYear			100
+
+>>----------------------------------
+>> BDA DISTURBANCE REGIME PARAMETERS
+>> Southern pine beetle (Dendroctonus frontalis) - Georgia / Southeast
+>> Outbreak cycle: 6-12 yr (much shorter than SBW); peak 1999-2002, 2014-2018
+>> Sources: Pye et al 2011 (SE-USA SPB risk model), Asaro et al 2017 GA
+>> response after burn / thinning treatment; Coulson & Klepzig 2011
+>>----------------------------------
+
+>>-------- Regional Outbreak Inputs -------------
+OutbreakPattern		CyclicNormal
+Mean			9.0			<<years between peaks (8-12 yr historical)
+StDev			3.0			<<modest variability
+TimeSinceLastEpidemic	5			<<assume 5 years since last peak
+TemporalType 		variablepulse
+MinROS			0
+MaxROS			3
+
+>>-------- Dispersal Inputs ----------------------
+>> SPB has aggressive short-range dispersal via aggregation pheromones
+Dispersal		yes
+DispersalRate		2000		<<meters/year (frontalin-mediated spot expansion)
+EpidemicThresh		0.4		<<lower threshold than SBW — outbreaks initiate faster
+InitialEpicenterNum	0
+OutbreakEpicenterCoeff	0.02
+OutbreakEpicenterThresh 0.0
+SeedEpicenter		yes
+SeedEpicenterMax	40
+SeedEpicenterCoeff	0.5
+DispersalTemplate	MaxRadius
+
+>>-------- Neighborhood Resource Inputs -----------
+>> SPB classic "spot" infestations: tight 50-100 m clusters that expand
+NeighborFlag	yes
+NeighborSpeedUp	2x			<<spot growth is fast
+NeighborRadius	100
+NeighborShape	uniform
+NeighborWeight	100
+
+>>-- Intensity Class Thresholds --
+IntensityClass2_BDP 	0.30
+IntensityClass3_BDP 	0.55
+
+DisturbanceModifiers
+>> Recent fire reduces susceptibility (low surface fuels + healthy residual trees)
+>> Recent harvest/thinning also reduces susceptibility
+   -0.30	 10		Fire
+   -0.20	 10		MaxAgeClearcut
+
+>>-------------------------
+>> BDA SEVERITY PARAMETERS
+>> Host hierarchy (most → least preferred):
+>>   LL (loblolly pine) - major host
+>>   SP (shortleaf pine) - major host
+>>   TT (longleaf pine) - secondary (more fire-tolerant, often spared)
+>>   VP (virginia pine) - secondary
+>>   PO (pond pine) - minor
+>> SPB preferentially attacks mid-aged dense stands; older trees less vulnerable to mass attack
+>>--------------------------
+
+BDASpeciesParameters
+>>         -------------Host Value--------------  -------------Susceptibility-------------
+>>Species  MinorHost    2ndHost      MajorHost    Class3        Class2        Class1       CFS
+>>Name     Age SRDProb  Age SRDProb  Age SRDProb  Age VulnProb  Age VulnProb  Age VulnProb Conifer?
+>> ---------------------------------------------------------------------------------------------
+LL        0   0.30     15  0.75     30  1.0       15  0.4       30  1.0       60  0.8      yes
+SP        0   0.30     15  0.70     30  0.95      15  0.4       30  0.95      60  0.7      yes
+TT        0   0.10     20  0.30     40  0.50      20  0.2       40  0.5       80  0.4      yes
+VP        0   0.20     15  0.50     30  0.75      15  0.3       30  0.7       60  0.5      yes
+PO        0   0.10     15  0.30     30  0.50      15  0.2       30  0.4       60  0.3      yes
+
+IgnoredSpecies
+AE
+BC
+BE
+BG
+BO
+BSW
+CO
+EH
+ERC
+HK
+LO
+MG
+RM
+RO
+SL
+SM
+SO
+SY
+WAO
+WAS
+WO
+YB

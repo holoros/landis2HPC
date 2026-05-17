@@ -1,0 +1,97 @@
+LandisData  "Hurricane"
+
+Timestep  1
+InputUnitsEnglish N
+HurricaneRandomNumberSeed 1974
+
+>>------------------------------------
+>> ATLANTIC HURRICANE CLIMATOLOGY - GA
+>> Source: NOAA Atlantic Hurricane Database (HURDAT2) 1851-2020;
+>>   National Hurricane Center storm-track climatology for the
+>>   Atlantic + Gulf coast region affecting Georgia.
+>>------------------------------------
+
+>> Per-year storm-count probability for GA (state-wide ground-impact storms)
+StormOccurrenceProbabilities
+>> Storms/yr   Probability   << Sum must = 1.0
+0	0.25
+1	0.35
+2	0.22
+3	0.12
+4	0.04
+5	0.02
+
+>> Max wind speed at GA landfall - log-normal distribution
+>> Calibrated to HURDAT2 record of named storms reaching GA mainland
+LowBoundLandfallWindSpeed	60	<< kmh (TS threshold)
+ModeLandfallWindSpeed		95	<< kmh (Cat-1 typical)
+HighBoundLandfallWindSpeed	220	<< kmh (Cat-4 truncation)
+
+CoastalSlope -1.0			<< storms attenuate moving inland from GA coast
+
+>> GA landfall geography: mean intersection along the GA coastline
+>> centered near St. Simons Island ~31.13N -81.40W in projected coords
+MeanStormIntersectionX 1100.0
+MeanStormIntersectionY 0.0
+
+LandfallSigma 50			<< landfall location variance (km)
+
+>> Storm direction climatology - most Atlantic storms enter GA from SE
+StormDirectionMu 315.0			<< degrees (NW heading)
+StormDirectionSigma 35.0		<< degrees
+
+MinimumWindSpeedforDamage 80		<< kmh
+
+>> Wind exposure maps by storm direction
+>> For single-cell scenarios, all maps reduce to same exposure;
+>> for multi-cell GA scale-up, these direction-specific rasters
+>> capture topographic + fetch effects
+ExposureMaps
+135	./Hurricane_exposure_135_GA.tif
+180	./Hurricane_exposure_180_GA.tif
+225	./Hurricane_exposure_225_GA.tif
+
+>> Per-species hurricane vulnerability table
+>> Calibrated from SAMMS hurricane impact studies (Stanturf et al 2007),
+>> Foster + Boose (1992) hurricane disturbance scaling, and GFC-FIA
+>> post-Hurricane Michael (2018) GA panhandle damage assessment.
+>> Values: <wind speed kmh>:<mortality prob>
+WindSpeedVulnerabilities
+>> Species   MaxAge       Vulnerabilities (wind speed : mortality)
+LL          150          80:0.05    120:0.30   160:0.65   200:0.95
+SP          200          80:0.05    120:0.30   160:0.65   200:0.95
+TT          400          80:0.03    120:0.15   160:0.40   200:0.80
+VP          150          80:0.05    120:0.35   160:0.70   200:0.95
+PO          200          80:0.05    120:0.30   160:0.65   200:0.90
+
+WO          300          80:0.02    120:0.10   160:0.30   200:0.65
+RO          250          80:0.02    120:0.12   160:0.35   200:0.70
+SO          200          80:0.03    120:0.15   160:0.40   200:0.75
+LO          300          80:0.02    120:0.10   160:0.32   200:0.65
+BO          250          80:0.02    120:0.12   160:0.35   200:0.70
+WAO         300          80:0.02    120:0.10   160:0.30   200:0.65
+CO          200          80:0.03    120:0.18   160:0.42   200:0.75
+PO          200          80:0.05    120:0.30   160:0.65   200:0.90
+
+YB          200          80:0.04    120:0.20   160:0.50   200:0.85
+SM          300          80:0.03    120:0.15   160:0.45   200:0.80
+RM          150          80:0.04    120:0.22   160:0.55   200:0.85
+BE          200          80:0.04    120:0.20   160:0.50   200:0.82
+MG          200          80:0.05    120:0.25   160:0.55   200:0.85
+SY          150          80:0.05    120:0.28   160:0.60   200:0.88
+TT          400          80:0.03    120:0.15   160:0.40   200:0.80
+HK          200          80:0.04    120:0.20   160:0.48   200:0.80
+BC          150          80:0.06    120:0.32   160:0.65   200:0.92
+SL          150          80:0.06    120:0.32   160:0.65   200:0.92
+BG          250          80:0.04    120:0.22   160:0.52   200:0.85
+BSW         250          80:0.03    120:0.18   160:0.45   200:0.80
+ERC         300          80:0.02    120:0.10   160:0.32   200:0.65
+EH          400          80:0.02    120:0.12   160:0.35   200:0.70
+AE          250          80:0.04    120:0.22   160:0.55   200:0.85
+WAS         200          80:0.05    120:0.30   160:0.65   200:0.92
+
+MapNames    output/hurricane/max-windspeed-{timestep}-{stormNumber}.tif
+LogFile     output/hurricane/hurricane-log.csv
+
+>> Wind reduction by canopy evenness (closed-canopy stands break wind more)
+WindReductionTableCSV	./EvennessWindReductions_GA.csv

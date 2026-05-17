@@ -1,0 +1,38 @@
+{
+  "title": "PERSEUS Multi-state LANDIS-II Calibration",
+  "generated_at": "2026-05-17",
+  "states": {
+    "ME": {
+      "name": "Maine",
+      "n_plots": 3632,
+      "best_tier": "Tier 2 per-species",
+      "ll_gain": 0.59,
+      "color": "#2E7D32"
+    },
+    "GA": {
+      "name": "Georgia",
+      "n_plots": 5216,
+      "best_tier": "Tier 1 \u03b8=0.30",
+      "ll_gain": 5.26,
+      "color": "#C62828"
+    },
+    "WA": {
+      "name": "Washington",
+      "n_plots": 4471,
+      "best_tier": "Tier 1 \u03b8=0.30 (active-growth)",
+      "ll_gain": 0.31,
+      "color": "#1565C0"
+    }
+  },
+  "methodology": {
+    "framework": "Multi-cycle FIA hindcast",
+    "validation_tests_passed": [
+      "k-fold CV",
+      "time-out-of-sample",
+      "leave-one-ecoregion-out",
+      "cross-state",
+      "bootstrap CI"
+    ],
+    "novel_finding": "Calibration degeneracy at very low \u03b8 \u2014 active-growth diagnostic"
+  }
+}

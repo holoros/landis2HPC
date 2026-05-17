@@ -1,10 +1,22 @@
-# LANDIS-II Console plug-in loader patch + Cardinal factorial pipeline
+# LANDIS-II HPC + PERSEUS Multi-State Calibration
 
-A drop-in fix for the harvest + wind plug-in loading failure in the official LANDIS-II Foundation v1.1 Apptainer image (`landis-ii_v8_allext_v1.0.sif`, md5 `7c255eedb76f248e4386f184e2d70dbe`), plus the SLURM factorial pipeline that uses it on the OSC Cardinal HPC cluster.
+This repository provides two layers of LANDIS-II infrastructure for OSC Cardinal
+and similar HPC environments:
 
-## What problem does this solve
+| Layer | Directory | Purpose |
+|---|---|---|
+| **1. Console patch** (foundation) | `console-patch/` | .NET 8 fixes that enable LANDIS extension loading |
+| **2. PERSEUS framework** (calibration + projections) | `perseus/` | Multi-state inverse parameterization against FIA observations |
+| **3. Original ME pipeline** (legacy) | `pipeline/` | Initial Maine-only factorial scaffolding (pre-PERSEUS) |
 
-In the Foundation v1.1 image the LANDIS Console fails to load `Biomass Harvest` and `Original Wind` extensions, throwing
+---
+
+## Layer 1: LANDIS-II Console patch
+
+### What problem does this solve
+
+In the Foundation v1.1 Apptainer image the LANDIS Console fails to load `Biomass Harvest` and
+`Original Wind` extensions, throwing
 
 ```
 Error while loading the plug-in: <Name>
@@ -13,104 +25,119 @@ Error while loading the plug-in: <Name>
     Error:      No data type with that name is installed.
 ```
 
-Root cause is a combination of two .NET 8 changes:
+Root cause is two .NET 8 changes:
 
-1. .NET 8 ignores the `<probing privatePath="8.0;extensions"/>` entry in `Landis.Console.dll.config`, so extension assemblies are never on the runtime probe path.
-2. `System.Type.GetType(qualifiedName)` does not see types in assemblies loaded by custom AssemblyLoadContexts (dotnet/runtime issue [#103222](https://github.com/dotnet/runtime/issues/103222)).
+1. .NET 8 ignores `<probing privatePath="8.0;extensions"/>` in `Landis.Console.dll.config`,
+   so extension assemblies are never on the runtime probe path.
+2. `System.Type.GetType(qualifiedName)` does not see types in assemblies loaded by custom
+   `AssemblyLoadContext` (dotnet/runtime [#103222](https://github.com/dotnet/runtime/issues/103222)).
 
-The patch replaces `Type.GetType(qualifiedName)` with explicit assembly resolution. Two complementary fixes ship together:
+The patch replaces `Type.GetType(qualifiedName)` with explicit assembly resolution.
+Two complementary fixes ship together; either alone resolves the bug, both ship for
+defence in depth.
 
 | File | What it does |
 |---|---|
-| `console-patch/src/Tool-Console/App.cs` | Installs an `AssemblyLoadContext.Default.Resolving` handler that probes `./extensions`, `../extensions`, `./8.0`, `../8.0` for missing assemblies and calls `LoadFromAssemblyPath`. |
-| `console-patch/src/Library-Utilities/Loader.cs` | `Loader.Load<T>(IInfo info)` walks `AppDomain.CurrentDomain.GetAssemblies()`, then `Assembly.Load(AssemblyName)`, then probes the same directories with `Assembly.LoadFrom`, and finally calls `assembly.GetType(typeName)` on the resolved Assembly instance. |
+| `console-patch/src/Tool-Console/App.cs` | Installs `AssemblyLoadContext.Default.Resolving` handler probing `./extensions`, `../extensions`, `./8.0`, `../8.0` |
+| `console-patch/src/Library-Utilities/Loader.cs` | `Loader.Load<T>(IInfo info)` walks loaded assemblies, then probes directories with `Assembly.LoadFrom` |
 
-Either fix alone resolves the bug; both ship for defence in depth. Built against dotnet SDK 8.0.420.
+Built against dotnet SDK 8.0.420.
+
+### Console patch layout
+
+```
+console-patch/
+  dist/                    Pre-built DLLs with SHA256 + MD5 checksums
+  patches/                 Unified diffs against upstream Foundation source
+  src/                     Patched source files (Tool-Console/App.cs, Library-Utilities/Loader.cs)
+```
+
+---
+
+## Layer 2: PERSEUS Multi-state calibration framework
+
+Multi-state inverse parameterization of LANDIS-II Biomass Succession against the
+USDA Forest Inventory and Analysis (FIA) multi-cycle hindcast. Calibrated parameter
+sets for Maine, Georgia, and Washington with full validation framework.
+
+### Headline findings
+
+- **Literature parameters systematically biased** (over-prediction in GA + WA, slight
+  under-prediction in ME)
+- **Four-tier calibration ladder** closes the gap with state-specific optima
+- **Calibration changes 100-year biomass asymptotes by 7–67%** — directly relevant
+  to state-scale forest carbon accounting
+- **Calibration degeneracy diagnostic** — novel methodological contribution; the
+  active-growth fraction is the recommended diagnostic for production calibration
+
+### Quick start
+
+```bash
+# Browse the integrated methods paper
+less docs/methods_paper_FINAL_ASSEMBLY.md
+
+# Open the interactive PERSEUS Carbon Atlas
+xdg-open perseus/dashboard/atlas/index.html
+
+# Inspect calibrated parameter vectors
+cat perseus/theta_best/ME_tier2_theta_best.csv
+```
+
+See [`perseus/README.md`](perseus/README.md) for full PERSEUS layer documentation.
+
+### Companion paper
+
+Weiskittel, A.R., Lucash, M.S., Scheller, R.M., et al. (2026). Multi-state inverse
+parameterization of LANDIS-II Biomass Succession against the FIA inventory cycle:
+a calibration ladder for Maine, Georgia, and Washington forests.
+*Environmental Modelling & Software*, submitted.
+
+---
 
 ## Repo layout
 
 ```
-console-patch/
-  dist/                Pre-built DLLs with SHA256 + MD5 checksums
-  patches/             Unified diffs against upstream Foundation source
-  src/                 Patched source files (Tool-Console/App.cs, Library-Utilities/Loader.cs)
-pipeline/
-  scenario_factorial_subtile.sh   Tile based factorial submitter for OSC Cardinal
-  aggregate_subtile_factorial.R   Year-50 biomass aggregator and heatmap generator
-docs/
-  email_landis_foundation.md      Diagnostic write-up sent to the LANDIS-II Foundation
-build.sh                          One-shot reproducer (clones upstream, applies patches, builds, verifies md5)
+landis2HPC/
+├── README.md                            # this file
+├── LICENSE                              # MIT
+├── CHANGELOG.md                         # version history
+├── build.sh                             # console patch build helper
+├── .gitignore
+│
+├── console-patch/                       # Layer 1: .NET 8 DLL fixes
+│   ├── dist/                            # Pre-built patched DLLs
+│   ├── patches/                         # Unified diffs vs upstream Foundation
+│   └── src/                             # Patched source files
+│
+├── pipeline/                            # Legacy ME-only factorial scaffolding
+│   ├── scenario_factorial_subtile.sh
+│   └── aggregate_subtile_factorial.R
+│
+├── perseus/                             # Layer 2: PERSEUS framework
+│   ├── README.md                        # PERSEUS layer details
+│   ├── tools/                           # 22 calibration scripts
+│   ├── disturbance_agents/              # 6 validated agent files
+│   ├── theta_best/                      # Per-state best calibrations
+│   ├── figures/                         # 16 publication-quality PNGs
+│   ├── data/                            # FIA plot lists + ecoregion lookups
+│   ├── dashboard/                       # PERSEUS Carbon Atlas v1 (static HTML)
+│   └── tests/                           # Reproducibility scripts
+│
+└── docs/                                # All documentation
+    ├── email_landis_foundation.md       # Original .NET 8 patch context (Layer 1)
+    ├── methods_paper_FINAL_ASSEMBLY.md  # Integrated methods paper
+    ├── methods_paper_section_*.md       # Individual section drafts
+    ├── scenario_paper_*.md              # Companion paper (3 sections)
+    ├── calibration_degeneracy_finding.md  # Novel methodological contribution
+    ├── stress_validation_framework.md   # 6-test framework design
+    ├── stress_validation_results.md     # Executed results (5 of 6 passing)
+    ├── T2_pairing_fix_resolution.md     # T2 CMA-ES debug audit
+    ├── disturbance_extensions.md        # v8 Apptainer extension validation
+    ├── GUI_scope_memo.md                # Next-step product decisions
+    ├── deposit_plan.md                  # GitHub + Zenodo strategy
+    └── references.bib                   # 40-entry bibliography
 ```
 
-## Quick start: bind-mount the patched DLLs
+## License
 
-The pre-built DLLs in `console-patch/dist/` are ready to go. Drop them somewhere on shared storage, then bind-mount over the originals at run time. No rebuild of the Apptainer image needed.
-
-```bash
-SIF=/path/to/landis-ii_v8_allext_v1.0.sif
-PATCH=/path/to/console-patch/dist
-SCENARIO=/path/to/your/scenario_directory
-
-apptainer exec \
-  --bind $PATCH/Landis.Console.dll:/bin/LANDIS_Linux/build/Release/Landis.Console.dll \
-  --bind $PATCH/Landis.Utilities.dll:/bin/LANDIS_Linux/build/Release/Landis.Utilities.dll \
-  --bind $SCENARIO:/work --pwd /work \
-  $SIF dotnet /bin/LANDIS_Linux/build/Release/Landis.Console.dll scenario.txt
-```
-
-Verified end-to-end on Cardinal 2026-05-05: `Biomass Harvest` and `Original Wind` both load and run, harvest event logs and severity rasters land alongside per-species biomass output.
-
-## Verifying the binaries
-
-Checksums of the shipped DLLs:
-
-```
-a42d209f4faf2f2562cd5f63e32b8f8a  Landis.Console.dll      (10752 bytes)
-c0be4b9f064b817b6352c61feb42be24  Landis.Utilities.dll    (46592 bytes)
-```
-
-See `console-patch/dist/SHA256SUMS` for the SHA-256 versions.
-
-## Building from source
-
-```bash
-./build.sh
-```
-
-The script clones `LANDIS-II-Foundation/Core-Model-v8-LINUX` (Tool-Console) and `LANDIS-II-Foundation/Library-Utilities`, applies the patches, builds against dotnet SDK 8.0, and validates the resulting DLLs against the shipped checksums. Requires git, dotnet 8.0+, curl.
-
-## Cardinal factorial pipeline
-
-`pipeline/scenario_factorial_subtile.sh` runs a per-tile factorial of (state × tile × owner × climate × harvest) on OSC Cardinal. Defaults assume the LANDIS-II workspace at `/fs/scratch/PUOM0008/crsfaaron/landis2/`. Notable flags:
-
-| Flag | Default | Meaning |
-|---|---|---|
-| `--tiles N` | 0 (all) | Limit to first N tiles for smoke tests |
-| `--owners ind,nipf,public` | all 3 | Subset of management area rasters |
-| `--climate baseline,ssp245,ssp585` | all 3 | Climate scenarios |
-| `--harvest none,baseline,increased,perseus` | all 4 | Harvest prescriptions |
-| `--duration 50` | 50 | Simulation length in years |
-| `--use-patch yes\|no` | yes | Bind-mount the patched DLLs into the apptainer call |
-| `--patch-dir <path>` | `$SCRATCH/landis2/patches` | Where the patched DLLs live |
-| `--wind yes\|no` | yes | Include Original Wind in scenario.txt |
-| `--skip-existing yes\|no` | no | Skip a scenario when its year-DURATION biomass tif is already present |
-| `--queue-limit N` | 900 | Sleep when squeue size reaches this many jobs |
-| `--rebuild-cache yes\|no` | no | Force rebuild of the per-tile MA + stands rasters |
-
-The script auto-handles the LANDIS-II v8 file format quirks documented in `docs/landis_v8_format_notes.md` (or in the project workspace `landis2/docs/`).
-
-## Status: 2026-05-05
-
-End to end validated on OSC Cardinal. 5-tile sweep PASSED 20 of 20 with year-50 biomass + harvest output. Full 9540-scenario factorial submission in flight at the time of this commit.
-
-## Licence
-
-Apache 2.0, matching upstream `LANDIS-II-Foundation/Core-Model-v8-LINUX` and `LANDIS-II-Foundation/Library-Utilities`. See `LICENSE`.
-
-## Upstreaming
-
-The patch is intended to be sent upstream. The diagnostic write-up in `docs/email_landis_foundation.md` is the parallel email to Robert Scheller at NCSU describing the bug and fix. Issue / PR pointers will be added here once filed.
-
-## Acknowledgements
-
-LANDIS-II Foundation for the v8 platform and source. Center for Research on Sustainable Forests at the University of Maine for the multi-state framework this work was developed in.
+MIT. See [LICENSE](LICENSE).

@@ -1,0 +1,100 @@
+LandisData "BDA Agent"
+
+BDAAgentName		mpb
+BDPCalibrator		1
+SRDMode			mean
+StartYear		5
+EndYear			100
+
+>>----------------------------------
+>> BDA DISTURBANCE REGIME PARAMETERS
+>> Mountain pine beetle (Dendroctonus ponderosae) - Pacific Northwest
+>> Recent outbreak: 2000-2015 unprecedented across BC, MT, ID, WA
+>> Outbreak cycle: 20-40 yr historical; recent warming shortened to 10-15 yr
+>> Climate driver: winter min temp >-40C, drought stress on hosts
+>> Sources: Carroll et al 2003; Bentz et al 2010 (BioScience); Raffa et al 2008
+>>----------------------------------
+
+>>-------- Regional Outbreak Inputs -------------
+OutbreakPattern		CyclicNormal
+Mean			20.0			<<years; shorter under climate-amplified scenario
+StDev			8.0			<<high variability under climate non-stationarity
+TimeSinceLastEpidemic	10
+TemporalType 		variablepulse
+MinROS			0
+MaxROS			3
+
+>>-------- Dispersal Inputs ----------------------
+>> MPB has long-range dispersal in mass-attack years (km-scale)
+Dispersal		yes
+DispersalRate		8000		<<meters/year (km-scale dispersal in mass flight years)
+EpidemicThresh		0.45
+InitialEpicenterNum	0
+OutbreakEpicenterCoeff	0.015
+OutbreakEpicenterThresh 0.0
+SeedEpicenter		yes
+SeedEpicenterMax	30
+SeedEpicenterCoeff	0.4
+DispersalTemplate	MaxRadius
+
+>>-------- Neighborhood Resource Inputs -----------
+NeighborFlag	yes
+NeighborSpeedUp	2x
+NeighborRadius	200
+NeighborShape	gaussian
+NeighborWeight	100
+
+>>-- Intensity Class Thresholds --
+IntensityClass2_BDP 	0.25
+IntensityClass3_BDP 	0.50
+
+DisturbanceModifiers
+>> Fire opens canopy and reduces immediate susceptibility
+>> Recent harvest also reduces (younger residual stands less vulnerable)
+   -0.30	 15		Fire
+   -0.20	 15		MaxAgeClearcut
+
+>>-------------------------
+>> BDA SEVERITY PARAMETERS
+>> Host hierarchy:
+>>   LP (lodgepole pine) - PRIMARY host; even-aged dense LP stands devastated
+>>   PP (ponderosa pine) - major host, especially dry-site mature trees
+>>   WBP (whitebark pine) - secondary but high-conservation impact (T&E spp.)
+>>   WP (western white pine) - tertiary host
+>>   DF (Douglas-fir) - generally NOT an MPB host (different beetle: DFB)
+>>   Other firs / hemlocks / cedars - not hosts
+>> MPB targets mature trees (>30 yr) of larger diameter
+>>--------------------------
+
+BDASpeciesParameters
+>>         -------------Host Value--------------  -------------Susceptibility-------------
+>>Species  MinorHost    2ndHost      MajorHost    Class3        Class2        Class1       CFS
+>>Name     Age SRDProb  Age SRDProb  Age SRDProb  Age VulnProb  Age VulnProb  Age VulnProb Conifer?
+>> ---------------------------------------------------------------------------------------------
+LP        0   0.20     20  0.6      40  1.0       20  0.4       40  1.0       80  0.95     yes
+PP        0   0.15     30  0.5      60  0.95      30  0.3       60  0.85     120  0.85     yes
+WBP       0   0.10     30  0.4      60  0.80      30  0.25      60  0.65     150  0.7      yes
+WP        0   0.10     20  0.30     40  0.55      20  0.2       40  0.55      80  0.5      yes
+
+IgnoredSpecies
+DF
+WH
+WC
+PSF
+GF
+NF
+SS
+ES
+AF
+WF
+MH
+WL
+IC
+PY
+BM
+RA
+PM
+PB
+QA
+BCW
+GO

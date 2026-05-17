@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PERSEUS Carbon Atlas v1</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         margin: 0; padding: 0; background: #f5f5f5; color: #222; }
+  header { background: white; padding: 14px 24px; border-bottom: 1px solid #ddd;
+           display: flex; justify-content: space-between; align-items: center; }
+  h1 { margin: 0; font-size: 20px; }
+  .badge { display: inline-block; padding: 2px 8px; font-size: 11px; border-radius: 3px;
+           background: #E3F2FD; color: #1565C0; font-weight: 600; margin-left: 8px;
+           vertical-align: middle; }
+  .layout { display: grid; grid-template-columns: 340px 1fr; min-height: calc(100vh - 52px); }
+  .sidebar { background: white; padding: 18px; border-right: 1px solid #ddd; overflow-y: auto; }
+  .main { display: flex; flex-direction: column; }
+  #map { flex: 1; min-height: 350px; }
+  .charts { background: white; padding: 12px 20px; border-top: 1px solid #ddd;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 14px; height: 280px; }
+  h2 { font-size: 14px; margin: 12px 0 8px 0; color: #555; text-transform: uppercase;
+       letter-spacing: 0.4px; }
+  h3 { font-size: 12px; margin: 4px 0; color: #777; }
+  .control { margin-bottom: 14px; }
+  label { display: block; font-size: 12px; color: #555; margin-bottom: 4px; font-weight: 500; }
+  select, input { width: 100%; padding: 7px 10px; font-size: 13px; border: 1px solid #ccc;
+                  border-radius: 4px; box-sizing: border-box; background: white; }
+  .metric { padding: 10px 12px; background: #f9f9f9; border-left: 3px solid #1565C0;
+            border-radius: 3px; margin-bottom: 6px; }
+  .metric-label { font-size: 10px; color: #777; text-transform: uppercase;
+                  letter-spacing: 0.4px; }
+  .metric-value { font-size: 17px; font-weight: 600; margin-top: 1px; }
+  .info-panel { background: #fffbf0; border: 1px solid #ffd54f;
+                padding: 10px 12px; border-radius: 4px; font-size: 12px; margin-top: 8px;
+                line-height: 1.4; }
+  .info-panel strong { color: #d68d00; }
+  .legend { background: white; padding: 8px 10px; border-radius: 4px;
+            font-size: 11px; line-height: 1.5; box-shadow: 0 0 6px rgba(0,0,0,0.15); }
+  .legend .swatch { display: inline-block; width: 12px; height: 12px; margin-right: 6px;
+                    vertical-align: middle; border: 1px solid #888; }
+  .download { padding: 8px 12px; background: #1565C0; color: white; border: none;
+              border-radius: 4px; font-size: 13px; cursor: pointer; width: 100%; margin-top: 8px; }
+  .download:hover { background: #0d4a8a; }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .footer-stats { padding: 6px 16px; background: #fafafa; font-size: 11px; color: #666;
+                  border-top: 1px solid #eee; display: flex; gap: 20px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>PERSEUS Carbon Atlas <span class="badge">v1 — real data</span></h1>
+  <span style="font-size:11px; color:#888;">
+    Calibrated LANDIS-II forest biomass projections | Weiskittel et al. (in prep)
+  </span>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="control">
+      <label for="state">State</label>
+      <select id="state" onchange="loadState()">
+        <option value="WA">Washington (4,471 plots)</option>
+        <option value="GA">Georgia (5,216 plots)</option>
+        <option value="ME">Maine (3,632 plots)</option>
+      </select>
+    </div>
+
+    <div class="control">
+      <label for="layer">Map color layer</label>
+      <select id="layer" onchange="redrawMap()">
+        <option value="obs_yr0">Observed biomass (FIA Round 1)</option>
+        <option value="t0_yr100">Tier 0 year-100 projection (literature)</option>
+        <option value="t1_yr100">Tier 1 year-100 projection (calibrated)</option>
+        <option value="delta">Tier 0 − Tier 1 (literature over-estimate)</option>
+      </select>
+    </div>
+
+    <h2>Calibration summary</h2>
+    <div id="summary"></div>
+
+    <h2>Cross-state comparison</h2>
+    <div id="cross-state" style="font-size: 12px;"></div>
+
+    <div class="info-panel" id="degeneracy-note" style="display:none;">
+      <strong>Calibration degeneracy diagnostic:</strong> WA Tier 1 LL minimum
+      occurs at θ=0.20 but with only 37% of plots showing active growth.
+      Recommended optimum is <strong>θ=0.30</strong> (54% active growth), the
+      "active-growth optimum" — where the model still simulates real succession.
+    </div>
+
+    <button class="download" onclick="downloadCSV()">Download per-plot CSV</button>
+  </aside>
+
+  <div class="main">
+    <div id="map"></div>
+    <div class="charts">
+      <div>
+        <h2>State-aggregate trajectory</h2>
+        <canvas id="trajectoryChart" height="120"></canvas>
+      </div>
+      <div>
+        <h2>Selected plot (click marker)</h2>
+        <canvas id="plotChart" height="120"></canvas>
+      </div>
+    </div>
+    <div class="footer-stats" id="footer-stats">Loading...</div>
+  </div>
+</div>
+
+<script>
+const STATES = {
+  WA: { center: [47.4, -120.7], zoom: 7, color: "#1565C0", file: "WA.json" },
+  GA: { center: [32.5, -83.0], zoom: 7, color: "#C62828", file: "GA.json" },
+  ME: { center: [45.2, -69.0], zoom: 7, color: "#2E7D32", file: "ME.json" }
+};
+
+let map = L.map('map').setView(STATES.WA.center, STATES.WA.zoom);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap', maxZoom: 12 }).addTo(map);
+
+let plotLayer = null;
+let currentBundle = null;
+let trajectoryChart = null;
+let plotChart = null;
+
+const legend = L.control({position: 'bottomright'});
+legend.onAdd = function() {
+  const div = L.DomUtil.create('div', 'legend');
+  div.id = 'map-legend';
+  return div;
+};
+legend.addTo(map);
+
+function biomassColor(v, layer, max) {
+  if (v == null) return '#999';
+  if (layer === 'delta') {
+    const t = Math.min(Math.max(v / max, -1), 1);
+    if (t > 0) return `rgb(${Math.round(220-100*t)},${Math.round(60)},${Math.round(60)})`;
+    return `rgb(${Math.round(60)},${Math.round(60)},${Math.round(220+35*t)})`;
+  }
+  const t = Math.min(v / max, 1);
+  return `rgb(${Math.round(230 - 200*t)}, ${Math.round(240 - 100*t)}, ${Math.round(230 - 200*t)})`;
+}
+
+function updateLegend(layer, maxVal) {
+  const el = document.getElementById('map-legend');
+  if (!el) return;
+  if (layer === 'delta') {
+    el.innerHTML = `<strong>Tier 0 − Tier 1 (Mg/ha)</strong><br>
+      <span class="swatch" style="background:#3c3cdc"></span>negative<br>
+      <span class="swatch" style="background:#dc6060"></span>positive (lit over-est)`;
+  } else {
+    el.innerHTML = `<strong>Biomass (Mg/ha)</strong><br>
+      <span class="swatch" style="background:#E0F5E0"></span>< ${(maxVal*0.2).toFixed(0)}<br>
+      <span class="swatch" style="background:#A0DDA0"></span>${(maxVal*0.2).toFixed(0)}-${(maxVal*0.5).toFixed(0)}<br>
+      <span class="swatch" style="background:#40A040"></span>${(maxVal*0.5).toFixed(0)}-${(maxVal*0.8).toFixed(0)}<br>
+      <span class="swatch" style="background:#206020"></span>> ${(maxVal*0.8).toFixed(0)}`;
+  }
+}
+
+async function loadState() {
+  const state = document.getElementById('state').value;
+  const cfg = STATES[state];
+  const r = await fetch(cfg.file);
+  currentBundle = await r.json();
+  map.flyTo(cfg.center, cfg.zoom);
+  updateSidebar(currentBundle);
+  drawTrajectory(currentBundle);
+  redrawMap();
+  updateFooter(currentBundle);
+}
+
+function updateSidebar(bundle) {
+  const cal = bundle.calibration;
+  document.getElementById('summary').innerHTML = `
+    <div class="metric"><div class="metric-label">Best calibration</div>
+      <div class="metric-value">${cal.best_tier}</div></div>
+    <div class="metric"><div class="metric-label">LL/cell improvement</div>
+      <div class="metric-value">${(cal.ll_per_cell_t1 || cal.ll_per_cell_t2 || 0).toFixed(2)}
+        <span style="font-size:11px;color:#777;">(from ${cal.ll_per_cell_t0.toFixed(2)})</span></div></div>
+    <div class="metric"><div class="metric-label">Mean log-residual</div>
+      <div class="metric-value">${(cal.mean_resid_t1 || cal.mean_resid_t2 || 0).toFixed(3)}
+        <span style="font-size:11px;color:#777;">(from ${cal.mean_resid_t0.toFixed(2)})</span></div></div>
+    <div class="metric"><div class="metric-label">Year-100 vs literature</div>
+      <div class="metric-value">−${cal.reduction_pct}%</div></div>
+  `;
+  // Cross-state
+  document.getElementById('cross-state').innerHTML = `
+    <table style="width:100%; font-size:11px;">
+      <tr><th></th><th>Best</th><th>ΔLL/cell</th></tr>
+      <tr><td>Maine</td><td>T2 per-species</td><td>+0.59</td></tr>
+      <tr><td>Georgia</td><td>T1 θ=0.30</td><td>+5.26</td></tr>
+      <tr><td>Washington</td><td>T1 θ=0.30 active</td><td>+0.31</td></tr>
+    </table>
+  `;
+  // Show degeneracy note only for WA
+  document.getElementById('degeneracy-note').style.display =
+    (bundle.state_code === 'WA') ? 'block' : 'none';
+}
+
+function redrawMap() {
+  const layer = document.getElementById('layer').value;
+  if (!currentBundle) return;
+  if (plotLayer) plotLayer.clearLayers();
+  plotLayer = L.layerGroup();
+  // Determine max for colormap
+  let vals = [];
+  const plotsToShow = currentBundle.plots.slice(0, 2500); // perf cap
+  plotsToShow.forEach(p => {
+    let v = null;
+    if (layer === 'obs_yr0') v = p.obs_yr0;
+    else if (layer === 't0_yr100') v = (p.t0 && p.t0['100']) ? p.t0['100'] * 0.01 : null;
+    else if (layer === 't1_yr100') v = (p.t1 && p.t1['100']) ? p.t1['100'] * 0.01 : null;
+    else if (layer === 'delta') {
+      const t0 = (p.t0 && p.t0['100']) ? p.t0['100'] * 0.01 : 0;
+      const t1 = (p.t1 && p.t1['100']) ? p.t1['100'] * 0.01 : 0;
+      v = t0 - t1;
+    }
+    if (v != null) vals.push(Math.abs(v));
+  });
+  vals.sort((a,b) => b-a);
+  const max = vals[Math.floor(vals.length * 0.05)] || 600;
+  updateLegend(layer, max);
+
+  plotsToShow.forEach(p => {
+    let v = null;
+    if (layer === 'obs_yr0') v = p.obs_yr0;
+    else if (layer === 't0_yr100') v = (p.t0 && p.t0['100']) ? p.t0['100'] * 0.01 : null;
+    else if (layer === 't1_yr100') v = (p.t1 && p.t1['100']) ? p.t1['100'] * 0.01 : null;
+    else if (layer === 'delta') {
+      const t0 = (p.t0 && p.t0['100']) ? p.t0['100'] * 0.01 : 0;
+      const t1 = (p.t1 && p.t1['100']) ? p.t1['100'] * 0.01 : 0;
+      v = t0 - t1;
+    }
+    if (v == null && layer !== 'obs_yr0') return;
+    const marker = L.circleMarker([p.lat, p.lon], {
+      radius: 3.5, color: 'white', weight: 0.8,
+      fillColor: biomassColor(v, layer, max), fillOpacity: 0.75
+    });
+    marker.bindTooltip(`Plot ${p.fia_plot || p.plot_id}: ${v != null ? v.toFixed(0) : '—'} Mg/ha`);
+    marker.on('click', () => drawPlotChart(p));
+    plotLayer.addLayer(marker);
+  });
+  plotLayer.addTo(map);
+}
+
+function drawTrajectory(bundle) {
+  const ctx = document.getElementById('trajectoryChart').getContext('2d');
+  const cfg = STATES[bundle.state_code];
+  // Aggregate trajectories from per-plot data
+  const years = [0, 25, 50, 75, 100];
+  const t0_med = [], t1_med = [];
+  for (const y of years) {
+    const t0_vals = bundle.plots.map(p => p.t0 && p.t0[y]).filter(v => v && v > 0);
+    const t1_vals = bundle.plots.map(p => p.t1 && p.t1[y]).filter(v => v && v > 0);
+    if (t0_vals.length > 0) {
+      t0_vals.sort((a,b) => a-b);
+      t0_med.push(t0_vals[Math.floor(t0_vals.length/2)] * 0.01);
+    } else t0_med.push(null);
+    if (t1_vals.length > 0) {
+      t1_vals.sort((a,b) => a-b);
+      t1_med.push(t1_vals[Math.floor(t1_vals.length/2)] * 0.01);
+    } else t1_med.push(null);
+  }
+  if (trajectoryChart) trajectoryChart.destroy();
+  trajectoryChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      datasets: [
+        { label: 'Tier 0 (literature)',
+          data: years.map((y,i) => ({x:y, y:t0_med[i]})),
+          borderColor: '#999', backgroundColor: '#99999920',
+          borderWidth: 2, borderDash: [4,4] },
+        { label: 'Calibrated (Tier 1 best)',
+          data: years.map((y,i) => ({x:y, y:t1_med[i]})),
+          borderColor: cfg.color, backgroundColor: cfg.color + '20',
+          borderWidth: 2.5 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      scales: { x: {type:'linear', title:{display:true,text:'Year'}},
+                y: {title:{display:true,text:'Per-plot median biomass (Mg/ha)'}}}
+    }
+  });
+}
+
+function drawPlotChart(p) {
+  const ctx = document.getElementById('plotChart').getContext('2d');
+  const years = [0, 25, 50, 75, 100];
+  const t0_vals = years.map(y => p.t0 && p.t0[y] ? p.t0[y] * 0.01 : null);
+  const t1_vals = years.map(y => p.t1 && p.t1[y] ? p.t1[y] * 0.01 : null);
+  if (plotChart) plotChart.destroy();
+  plotChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      datasets: [
+        { label: `Plot ${p.fia_plot || p.plot_id} — Tier 0`,
+          data: years.map((y,i) => ({x:y, y:t0_vals[i]})),
+          borderColor: '#999', borderDash: [4,4] },
+        { label: `Plot ${p.fia_plot || p.plot_id} — Calibrated`,
+          data: years.map((y,i) => ({x:y, y:t1_vals[i]})),
+          borderColor: '#1565C0', borderWidth: 2.5 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      scales: { x: {type:'linear', title:{display:true,text:'Year'}},
+                y: {title:{display:true,text:'Plot biomass (Mg/ha)'}}}
+    }
+  });
+}
+
+function updateFooter(bundle) {
+  const fs = document.getElementById('footer-stats');
+  fs.innerHTML = `<strong>${bundle.state}</strong> · ${bundle.n_plots.toLocaleString()} untreated FIA plots
+    · Tier ${bundle.calibration.best_tier} · LL/cell improvement ${(bundle.calibration.ll_per_cell_t1 || bundle.calibration.ll_per_cell_t2).toFixed(2)}
+    · 100-yr asymptote −${bundle.calibration.reduction_pct}% vs literature`;
+}
+
+function downloadCSV() {
+  if (!currentBundle) return;
+  const rows = [['plot_id', 'fia_plot', 'lat', 'lon', 'invyr', 'obs_yr0',
+    't0_yr0', 't0_yr50', 't0_yr100', 't1_yr0', 't1_yr50', 't1_yr100']];
+  currentBundle.plots.forEach(p => {
+    rows.push([
+      p.plot_id || '', p.fia_plot || '', p.lat, p.lon, p.invyr, p.obs_yr0 || '',
+      p.t0?.[0] ?? '', p.t0?.[50] ?? '', p.t0?.[100] ?? '',
+      p.t1?.[0] ?? '', p.t1?.[50] ?? '', p.t1?.[100] ?? ''
+    ]);
+  });
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `PERSEUS_${currentBundle.state_code}_plots.csv`;
+  a.click();
+}
+
+loadState();
+</script>
+</body>
+</html>

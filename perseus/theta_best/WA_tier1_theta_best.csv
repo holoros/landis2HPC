@@ -1,0 +1,2 @@
+state,tier,best_theta,LL,LL_per_cell,mean_log_resid,sd_log_resid,n_cells,notes
+WA,Tier 1 (uniform; active-growth optimum),0.30,-5032.28,-0.544,0.011,0.417,9246,"Recommended production calibration. Raw LL minimum at theta=0.20 (LL/cell=-0.530) is degenerate (37% of plots zero-growth). Active-growth optimum theta=0.30 (53.5% active) preserves succession dynamics."
