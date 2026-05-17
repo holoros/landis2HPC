@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PERSEUS Carbon Atlas — Scenario Comparison</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         margin: 0; padding: 0; background: #f5f5f5; color: #222; }
+  header { background: white; padding: 14px 24px; border-bottom: 1px solid #ddd;
+           display: flex; justify-content: space-between; align-items: center; }
+  nav a { color: #1565C0; text-decoration: none; margin-left: 16px; font-size: 13px; }
+  nav a:hover { text-decoration: underline; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+  h1 { margin: 0; font-size: 20px; }
+  h2 { font-size: 15px; margin: 14px 0 8px 0; color: #555; text-transform: uppercase;
+       letter-spacing: 0.4px; }
+  .badge { display: inline-block; padding: 2px 8px; font-size: 11px; border-radius: 3px;
+           background: #E3F2FD; color: #1565C0; font-weight: 600; margin-left: 8px;
+           vertical-align: middle; }
+
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px; }
+  .compare-panel { background: white; padding: 18px; border-radius: 8px;
+                   box-shadow: 0 1px 3px rgba(0,0,0,0.06); border-top: 4px solid #1565C0; }
+  .compare-panel.right { border-top-color: #C62828; }
+  .compare-panel h3 { margin: 0; font-size: 14px; color: #888; text-transform: uppercase;
+                      letter-spacing: 0.5px; }
+  .compare-panel .title { margin-top: 4px; font-size: 18px; font-weight: 600; }
+
+  .controls { display: flex; gap: 12px; margin-top: 10px; }
+  select { padding: 6px 10px; font-size: 13px; border: 1px solid #ccc; border-radius: 4px;
+           background: white; flex: 1; }
+
+  .metric-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+  .metric { padding: 10px 12px; background: #f8f8f8; border-radius: 4px;
+            border-left: 3px solid #1565C0; }
+  .metric-label { font-size: 10px; color: #777; text-transform: uppercase;
+                  letter-spacing: 0.4px; }
+  .metric-value { font-size: 17px; font-weight: 600; }
+
+  .delta-panel { background: white; padding: 18px; border-radius: 8px;
+                 box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-top: 20px; }
+  .delta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+                margin-top: 12px; }
+  .delta { padding: 12px 14px; border-radius: 4px;
+           background: linear-gradient(135deg, #f4faff 0%, #e0eef9 100%); }
+  .delta-positive { background: linear-gradient(135deg, #e6f4ea 0%, #c8e6c9 100%); }
+  .delta-negative { background: linear-gradient(135deg, #fff0f0 0%, #ffd0d0 100%); }
+  .delta-label { font-size: 11px; color: #555; }
+  .delta-value { font-size: 22px; font-weight: 700; margin-top: 2px; }
+
+  .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+  .chart-panel { background: white; padding: 16px; border-radius: 8px;
+                 box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .download-btn { padding: 8px 16px; background: #1565C0; color: white; border: none;
+                  border-radius: 4px; font-size: 13px; cursor: pointer; }
+  .download-btn:hover { background: #0d4a8a; }
+  .info-note { font-size: 12px; color: #777; margin-top: 8px; font-style: italic; }
+</style>
+</head>
+<body>
+<header>
+  <h1>PERSEUS Carbon Atlas <span class="badge">scenario comparison</span></h1>
+  <nav>
+    <a href="index.html">← Atlas main view</a>
+    <a href="https://github.com/holoros/landis2HPC">GitHub</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h2>Side-by-side scenario comparison</h2>
+  <div class="compare-grid">
+    <div class="compare-panel">
+      <h3>Scenario A</h3>
+      <div class="title" id="title-a">—</div>
+      <div class="controls">
+        <select id="state-a" onchange="updateA()">
+          <option value="WA">Washington</option>
+          <option value="GA">Georgia</option>
+          <option value="ME">Maine</option>
+        </select>
+        <select id="tier-a" onchange="updateA()">
+          <option value="t0">Tier 0 (literature)</option>
+          <option value="t1">Tier 1 best (calibrated)</option>
+        </select>
+      </div>
+      <div class="metric-row" id="metrics-a"></div>
+    </div>
+
+    <div class="compare-panel right">
+      <h3>Scenario B</h3>
+      <div class="title" id="title-b">—</div>
+      <div class="controls">
+        <select id="state-b" onchange="updateB()">
+          <option value="WA">Washington</option>
+          <option value="GA">Georgia</option>
+          <option value="ME">Maine</option>
+        </select>
+        <select id="tier-b" onchange="updateB()">
+          <option value="t1" selected>Tier 1 best (calibrated)</option>
+          <option value="t0">Tier 0 (literature)</option>
+        </select>
+      </div>
+      <div class="metric-row" id="metrics-b"></div>
+    </div>
+  </div>
+
+  <div class="delta-panel">
+    <h2>Delta: B minus A</h2>
+    <div class="delta-grid" id="delta-grid"></div>
+    <p class="info-note">Positive deltas indicate Scenario B values exceed Scenario A. Per-cell deltas are useful for cross-state comparisons; total state deltas (when state same) describe calibration's impact on regional carbon.</p>
+  </div>
+
+  <div class="chart-row">
+    <div class="chart-panel">
+      <h2>Trajectory comparison</h2>
+      <canvas id="trajectoryChart" height="120"></canvas>
+    </div>
+    <div class="chart-panel">
+      <h2>Year-100 biomass distribution</h2>
+      <canvas id="histChart" height="120"></canvas>
+    </div>
+  </div>
+
+  <div style="margin-top: 20px; display: flex; gap: 10px;">
+    <button class="download-btn" onclick="downloadReport()">Download PDF Report</button>
+    <button class="download-btn" onclick="downloadCSV()" style="background:#2E7D32">Download Comparison CSV</button>
+  </div>
+</div>
+
+<script>
+let bundleA = null, bundleB = null;
+let trajChart = null, histChart = null;
+const FILES = {WA: 'WA.json', GA: 'GA.json', ME: 'ME.json'};
+
+const STATE_INFO = {
+  WA: {name: "Washington", color: "#1565C0",
+       t0_traj_med: [138, 261, 376, 474, 562], t1_traj_med: [138, 161, 176, 183, 185]},
+  GA: {name: "Georgia", color: "#C62828",
+       t0_traj_med: [95, 145, 180, 207, 220], t1_traj_med: [95, 117, 132, 140, 143]},
+  ME: {name: "Maine", color: "#2E7D32",
+       t0_traj_med: [75, 140, 200, 252, 290], t1_traj_med: [75, 135, 188, 235, 268]}
+};
+
+async function loadBundle(state) {
+  const r = await fetch(FILES[state]);
+  return await r.json();
+}
+
+async function updateA() {
+  bundleA = await loadBundle(document.getElementById('state-a').value);
+  renderPanel('a', bundleA, document.getElementById('tier-a').value);
+  updateDelta();
+  updateCharts();
+}
+async function updateB() {
+  bundleB = await loadBundle(document.getElementById('state-b').value);
+  renderPanel('b', bundleB, document.getElementById('tier-b').value);
+  updateDelta();
+  updateCharts();
+}
+
+function renderPanel(side, bundle, tier) {
+  const info = STATE_INFO[bundle.state_code];
+  document.getElementById(`title-${side}`).textContent =
+    `${bundle.state} — ${tier === 't0' ? 'Tier 0 (literature)' : bundle.calibration.best_tier}`;
+
+  const yr100 = tier === 't0' ? info.t0_traj_med[4] : info.t1_traj_med[4];
+  const cal = bundle.calibration;
+  const ll = tier === 't0' ? cal.ll_per_cell_t0 :
+              (cal.ll_per_cell_t1 || cal.ll_per_cell_t2);
+  const meanResid = tier === 't0' ? cal.mean_resid_t0 :
+              (cal.mean_resid_t1 || cal.mean_resid_t2);
+
+  document.getElementById(`metrics-${side}`).innerHTML = `
+    <div class="metric"><div class="metric-label">LL / cell</div>
+      <div class="metric-value">${ll.toFixed(2)}</div></div>
+    <div class="metric"><div class="metric-label">Mean log-resid</div>
+      <div class="metric-value">${meanResid.toFixed(2)}</div></div>
+    <div class="metric"><div class="metric-label">Year-100 median</div>
+      <div class="metric-value">${yr100} Mg/ha</div></div>
+    <div class="metric"><div class="metric-label">n plots</div>
+      <div class="metric-value">${bundle.n_plots.toLocaleString()}</div></div>
+  `;
+}
+
+function updateDelta() {
+  if (!bundleA || !bundleB) return;
+  const ta = document.getElementById('tier-a').value;
+  const tb = document.getElementById('tier-b').value;
+  const infoA = STATE_INFO[bundleA.state_code];
+  const infoB = STATE_INFO[bundleB.state_code];
+
+  const yrA = ta === 't0' ? infoA.t0_traj_med[4] : infoA.t1_traj_med[4];
+  const yrB = tb === 't0' ? infoB.t0_traj_med[4] : infoB.t1_traj_med[4];
+  const llA = ta === 't0' ? bundleA.calibration.ll_per_cell_t0 :
+    (bundleA.calibration.ll_per_cell_t1 || bundleA.calibration.ll_per_cell_t2);
+  const llB = tb === 't0' ? bundleB.calibration.ll_per_cell_t0 :
+    (bundleB.calibration.ll_per_cell_t1 || bundleB.calibration.ll_per_cell_t2);
+
+  const grid = document.getElementById('delta-grid');
+  const deltaY = yrB - yrA;
+  const deltaLL = llB - llA;
+  const pctY = ((yrB / yrA - 1) * 100).toFixed(1);
+
+  grid.innerHTML = `
+    <div class="delta ${deltaY >= 0 ? 'delta-positive' : 'delta-negative'}">
+      <div class="delta-label">Year-100 biomass delta (Mg/ha)</div>
+      <div class="delta-value">${deltaY >= 0 ? '+' : ''}${deltaY}</div>
+    </div>
+    <div class="delta ${pctY >= 0 ? 'delta-positive' : 'delta-negative'}">
+      <div class="delta-label">Year-100 percent change</div>
+      <div class="delta-value">${pctY >= 0 ? '+' : ''}${pctY}%</div>
+    </div>
+    <div class="delta ${deltaLL >= 0 ? 'delta-positive' : 'delta-negative'}">
+      <div class="delta-label">LL/cell delta (B − A)</div>
+      <div class="delta-value">${deltaLL >= 0 ? '+' : ''}${deltaLL.toFixed(2)}</div>
+    </div>
+    <div class="delta">
+      <div class="delta-label">Same state?</div>
+      <div class="delta-value">${bundleA.state_code === bundleB.state_code ? '✓ direct' : 'cross-state'}</div>
+    </div>
+  `;
+}
+
+function updateCharts() {
+  if (!bundleA || !bundleB) return;
+  const ta = document.getElementById('tier-a').value;
+  const tb = document.getElementById('tier-b').value;
+  const infoA = STATE_INFO[bundleA.state_code];
+  const infoB = STATE_INFO[bundleB.state_code];
+
+  const years = [0, 25, 50, 75, 100];
+  const dataA = ta === 't0' ? infoA.t0_traj_med : infoA.t1_traj_med;
+  const dataB = tb === 't0' ? infoB.t0_traj_med : infoB.t1_traj_med;
+
+  if (trajChart) trajChart.destroy();
+  const tCtx = document.getElementById('trajectoryChart').getContext('2d');
+  trajChart = new Chart(tCtx, {
+    type: 'line',
+    data: {
+      datasets: [
+        { label: `A: ${bundleA.state} ${ta === 't0' ? 'T0' : 'Tier 1 best'}`,
+          data: years.map((y, i) => ({x: y, y: dataA[i]})),
+          borderColor: infoA.color, backgroundColor: infoA.color + '20',
+          borderWidth: 2.5 },
+        { label: `B: ${bundleB.state} ${tb === 't0' ? 'T0' : 'Tier 1 best'}`,
+          data: years.map((y, i) => ({x: y, y: dataB[i]})),
+          borderColor: infoB.color, backgroundColor: infoB.color + '20',
+          borderWidth: 2.5, borderDash: [4, 4] }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      scales: { x: {type:'linear', title:{display:true, text:'Year'}},
+                y: {title:{display:true, text:'Per-plot median biomass (Mg/ha)'}} } }
+  });
+
+  // Histogram of year-100 biomass values from both scenarios
+  if (histChart) histChart.destroy();
+  const hCtx = document.getElementById('histChart').getContext('2d');
+  const bins = [0, 50, 100, 200, 300, 400, 500, 750, 1000];
+  function binCounts(plots, tier) {
+    const c = new Array(bins.length - 1).fill(0);
+    plots.forEach(p => {
+      const v = (p[tier] && p[tier]['100']) ? p[tier]['100'] * 0.01 : null;
+      if (v == null) return;
+      for (let i = 0; i < bins.length - 1; i++) {
+        if (v >= bins[i] && v < bins[i+1]) { c[i]++; break; }
+      }
+    });
+    return c;
+  }
+  const aCounts = binCounts(bundleA.plots, ta);
+  const bCounts = binCounts(bundleB.plots, tb);
+  const labels = bins.slice(0, -1).map((b, i) => `${b}-${bins[i+1]}`);
+  histChart = new Chart(hCtx, {
+    type: 'bar',
+    data: { labels: labels, datasets: [
+      { label: `A: ${bundleA.state}`, data: aCounts,
+        backgroundColor: infoA.color + '88', borderColor: infoA.color },
+      { label: `B: ${bundleB.state}`, data: bCounts,
+        backgroundColor: infoB.color + '88', borderColor: infoB.color }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false,
+      scales: { y: { title: {display: true, text: 'Plot count'} },
+                x: { title: {display: true, text: 'Year-100 biomass (Mg/ha)'} } } }
+  });
+}
+
+function downloadCSV() {
+  if (!bundleA || !bundleB) return;
+  const lines = [['scenario', 'state', 'tier', 'metric', 'value']];
+  const ta = document.getElementById('tier-a').value;
+  const tb = document.getElementById('tier-b').value;
+  ['A', 'B'].forEach((side, idx) => {
+    const b = side === 'A' ? bundleA : bundleB;
+    const tier = side === 'A' ? ta : tb;
+    const ll = tier === 't0' ? b.calibration.ll_per_cell_t0 :
+      (b.calibration.ll_per_cell_t1 || b.calibration.ll_per_cell_t2);
+    const mr = tier === 't0' ? b.calibration.mean_resid_t0 :
+      (b.calibration.mean_resid_t1 || b.calibration.mean_resid_t2);
+    lines.push([side, b.state, tier, 'LL_per_cell', ll]);
+    lines.push([side, b.state, tier, 'mean_log_residual', mr]);
+    lines.push([side, b.state, tier, 'n_plots', b.n_plots]);
+  });
+  const csv = lines.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'PERSEUS_scenario_comparison.csv';
+  a.click();
+}
+
+function downloadReport() {
+  // Build a printable summary
+  const ta = document.getElementById('tier-a').value;
+  const tb = document.getElementById('tier-b').value;
+  const w = window.open('', '_blank');
+  w.document.write(`<html><head><title>PERSEUS Comparison Report</title>
+    <style>body{font-family:sans-serif;max-width:800px;margin:30px auto;padding:20px;line-height:1.5}
+    h1{color:#222} h2{color:#555;margin-top:24px} table{border-collapse:collapse;width:100%}
+    th,td{padding:8px 12px;border:1px solid #ddd;text-align:left} th{background:#f5f5f5}
+    .meta{color:#777;font-size:12px}</style></head><body>
+    <h1>PERSEUS Carbon Atlas — Scenario Comparison</h1>
+    <p class="meta">Generated ${new Date().toLocaleDateString()} from PERSEUS v1.0 calibrated results</p>
+    <h2>Scenario A: ${bundleA.state} ${ta === 't0' ? 'Tier 0 (literature)' : bundleA.calibration.best_tier}</h2>
+    <p>n plots: ${bundleA.n_plots.toLocaleString()}.
+       LL/cell: ${(ta === 't0' ? bundleA.calibration.ll_per_cell_t0 :
+                  (bundleA.calibration.ll_per_cell_t1 || bundleA.calibration.ll_per_cell_t2)).toFixed(2)}.
+       Mean log-residual: ${(ta === 't0' ? bundleA.calibration.mean_resid_t0 :
+                  (bundleA.calibration.mean_resid_t1 || bundleA.calibration.mean_resid_t2)).toFixed(2)}.</p>
+    <h2>Scenario B: ${bundleB.state} ${tb === 't0' ? 'Tier 0 (literature)' : bundleB.calibration.best_tier}</h2>
+    <p>n plots: ${bundleB.n_plots.toLocaleString()}.</p>
+    <h2>Citation</h2>
+    <p>Weiskittel, A.R., Lucash, M.S., Scheller, R.M., et al. (2026).
+    Multi-state inverse parameterization of LANDIS-II Biomass Succession against the FIA
+    inventory cycle. Environmental Modelling & Software, submitted.
+    github.com/holoros/landis2HPC</p>
+    <button onclick="window.print()" style="padding:10px 20px;font-size:14px">Print / Save as PDF</button>
+    </body></html>`);
+}
+
+// Initial load
+Promise.all([updateA(), updateB()]).then(() => {});
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+{
+  "metadata": {
+    "upload_type": "software",
+    "title": "PERSEUS: Multi-state LANDIS-II calibration framework — v1.0",
+    "creators": [
+      {
+        "name": "Weiskittel, Aaron R.",
+        "affiliation": "Center for Research on Sustainable Forests, University of Maine",
+        "orcid": "0000-0001-7976-9296"
+      },
+      {
+        "name": "Lucash, Melissa S.",
+        "affiliation": "Department of Geography, University of Oregon",
+        "orcid": "0000-0001-9988-9568"
+      },
+      {
+        "name": "Scheller, Robert M.",
+        "affiliation": "Department of Forestry and Environmental Resources, NC State University",
+        "orcid": "0000-0003-1488-0801"
+      }
+    ],
+    "description": "<p>Reproducible calibration framework for LANDIS-II Biomass Succession against the USDA Forest Inventory and Analysis (FIA) multi-cycle hindcast, demonstrated across Maine, Georgia, and Washington forests. Includes:</p><ul><li>Per-plot scenario builder pipeline (single-cell 1×1 30m architecture)</li><li>Four-tier calibration ladder (uniform &theta; → per-ecoregion → per-species CMA-ES)</li><li>Five validated stress + validation tests (k-fold CV, time-out-of-sample, leave-one-ecoregion-out, cross-state, bootstrap CI)</li><li>Six validated disturbance extension parameter files (Original Wind, Original Fire, Climate BDA / spruce budworm / southern pine beetle / mountain pine beetle, Hurricane v3)</li><li>Interactive PERSEUS Carbon Atlas (static HTML, no server required)</li></ul><p>Calibrated best-fit parameter vectors for Maine (Tier 2 per-species, 26 params), Georgia (Tier 1 &theta;=0.30), and Washington (Tier 1 &theta;=0.30 active-growth optimum), plus Washington Tier 1.5 per-ecoregion vector capturing wet-side / dry-side productivity gradient.</p><p>Paper-novel methodological contribution: <strong>calibration degeneracy diagnostic</strong>. At very low &theta;, LANDIS-II produces near-zero growth across the projection horizon; the likelihood minimum becomes a trivial fit where predicted &approx; FIA observed because both stay near the initial condition. The active-growth fraction (proportion of plots with &gt;5% biomass change over 100 yr) is the recommended diagnostic for production calibration selection.</p><p>Built on the LANDIS-II v8 .NET 8 Type.GetType DLL patches (also in this repository under console-patch/) that enable extension loading in the Foundation v1.1 Apptainer image.</p>",
+    "keywords": [
+      "LANDIS-II",
+      "forest landscape modeling",
+      "FIA",
+      "Forest Inventory and Analysis",
+      "calibration",
+      "inverse parameterization",
+      "Biomass Succession",
+      "CMA-ES",
+      "multi-cycle hindcast",
+      "Maine",
+      "Georgia",
+      "Washington",
+      "forest carbon",
+      "scenario projection",
+      "PERSEUS",
+      "spruce budworm",
+      "southern pine beetle",
+      "mountain pine beetle",
+      "hurricane",
+      "climate change",
+      "calibration degeneracy",
+      "active-growth diagnostic"
+    ],
+    "license": "MIT",
+    "access_right": "open",
+    "communities": [
+      {"identifier": "ecoinformatics"},
+      {"identifier": "carbon"}
+    ],
+    "subjects": [
+      {"term": "Forest landscape modeling", "identifier": "https://id.loc.gov/authorities/subjects/sh85050790"},
+      {"term": "Forest inventory", "identifier": "https://id.loc.gov/authorities/subjects/sh85050797"},
+      {"term": "Statistical calibration"}
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "https://github.com/holoros/landis2HPC",
+        "relation": "isSupplementTo",
+        "resource_type": "software",
+        "scheme": "url"
+      },
+      {
+        "identifier": "10.XXXX/em.s.XXXXXX",
+        "relation": "isSupplementTo",
+        "resource_type": "publication-article",
+        "scheme": "doi",
+        "notes": "DOI to be added when methods paper is accepted"
+      }
+    ],
+    "references": [
+      "Scheller, R.M., Domingo, J.B., Sturtevant, B.R., et al. (2007). Design, development, and application of LANDIS-II. Ecological Modelling 201:409-419.",
+      "Bechtold, W.A. and Patterson, P.L. (2005). The enhanced forest inventory and analysis program. USDA Forest Service.",
+      "De Bruijn, A., Gustafson, E.J., Sturtevant, B.R., et al. (2014). Toward more robust projections of forest landscape dynamics. Ecological Modelling 287:44-57.",
+      "Hansen, N. (2006). The CMA evolution strategy: a comparing review. Towards a new evolutionary computation 75-102."
+    ],
+    "notes": "Repository: github.com/holoros/landis2HPC. PERSEUS framework lives in perseus/ subdirectory. Companion methods paper Weiskittel et al. (2026, in prep, submitted to Environmental Modelling & Software).",
+    "version": "1.0.0",
+    "publication_date": "2026-05-17",
+    "language": "eng"
+  }
+}
