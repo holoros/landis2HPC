@@ -16,11 +16,47 @@ SPECIES = ["AE", "BC", "BE", "BG", "BO", "BSW", "CO", "EH", "ERC", "HK",
 PARAM_NAMES = [f"ANPP_{s}" for s in SPECIES] + [f"BMAX_{s}" for s in SPECIES]
 N_PARAMS = len(PARAM_NAMES)  # 54
 
+DEGENERACY_PENALTY = 1e6  # large but finite; CMA-ES treats as "bad" without being unbounded
+MIN_ACTIVE_GROWTH_FRAC = 0.50  # require >=50% of plots with >5% year-100 growth
+
 def write_theta_csv(theta_log, path):
     with open(path, "w", newline="") as f:
         w = csv.writer(f); w.writerow(["param", "value"])
         for n, x in zip(PARAM_NAMES, theta_log):
             w.writerow([n, f"{math.exp(x):.6f}"])
+
+def check_active_growth(tag_dir):
+    """Fraction of per-plot trajectories with >5% biomass growth over the run.
+
+    Reads biomass_trajectory.csv files under tag_dir/runs/plot_*/. A degenerate
+    calibration (CMA-ES pushed theta into zero-growth territory) will show
+    n_active near zero, caught here and penalized.
+    """
+    import glob, csv as _csv
+    files = glob.glob(str(tag_dir / "runs" / "plot_*" / "biomass_trajectory.csv"))
+    if not files:
+        return (0, 0, 0.0)
+    n_active = 0
+    n_total = 0
+    for f in files:
+        try:
+            with open(f) as fp:
+                rdr = _csv.DictReader(fp)
+                rows = list(rdr)
+            by_year = {}
+            for r in rows:
+                try:
+                    by_year[int(r["year"])] = float(r["TotalBiomass_gm2"])
+                except: pass
+            y0 = by_year.get(0); ymax = max((y for y in by_year if y >= 25), default=None)
+            if y0 is None or ymax is None or y0 <= 0:
+                continue
+            ratio = by_year[ymax] / y0
+            if ratio > 1.05: n_active += 1
+            n_total += 1
+        except: continue
+    frac = n_active / max(n_total, 1)
+    return (n_active, n_total, frac)
 
 def evaluate(theta_log, tag, bay, tools):
     tag_dir = bay / tag
@@ -34,9 +70,24 @@ def evaluate(theta_log, tag, bay, tools):
     if not ll_file.exists():
         sys.stderr.write(f"FAIL {tag}: no LL ({proc.stderr[-500:]})\n"); return 1e9
     try:
-        return -float(ll_file.read_text().strip())
+        ll = float(ll_file.read_text().strip())
     except Exception as e:
         sys.stderr.write(f"FAIL {tag}: {e}\n"); return 1e9
+
+    n_active, n_total, frac = check_active_growth(tag_dir)
+    try:
+        with open(tag_dir / "active_growth.txt", "w") as f:
+            f.write(f"n_active={n_active}\nn_total={n_total}\nfrac={frac:.4f}\n")
+    except: pass
+
+    if ll == 0.0 and frac < MIN_ACTIVE_GROWTH_FRAC:
+        sys.stderr.write(f"DEGEN {tag}: LL=0 with active_growth_frac={frac:.2f} < {MIN_ACTIVE_GROWTH_FRAC}; penalized\n")
+        return DEGENERACY_PENALTY
+    if frac < MIN_ACTIVE_GROWTH_FRAC and ll > -100:
+        sys.stderr.write(f"DEGEN {tag}: LL={ll:.2f} with active_growth_frac={frac:.2f} < {MIN_ACTIVE_GROWTH_FRAC}; penalized\n")
+        return DEGENERACY_PENALTY
+
+    return -ll
 
 def main():
     p = argparse.ArgumentParser()

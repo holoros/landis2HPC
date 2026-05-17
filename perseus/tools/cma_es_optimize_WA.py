@@ -24,8 +24,51 @@ def write_theta_csv(theta_log, path):
         for n, x in zip(PARAM_NAMES, theta_log):
             w.writerow([n, f"{math.exp(x):.6f}"])
 
+DEGENERACY_PENALTY = 1e6  # large but finite; CMA-ES treats as "bad" without being unbounded
+MIN_ACTIVE_GROWTH_FRAC = 0.50  # require ≥50% of plots with >5% year-100 growth
+
+def check_active_growth(tag_dir):
+    """Compute the fraction of per-plot trajectories with >5% biomass growth over 100 yr.
+
+    Returns (n_active, n_total, fraction). Reads biomass_trajectory.csv files
+    under tag_dir/runs/plot_*/.
+
+    A degenerate calibration (CMA-ES pushed θ values into zero-growth territory)
+    will show n_active near zero — caught here and penalized.
+    """
+    import glob, os, csv as _csv
+    files = glob.glob(str(tag_dir / "runs" / "plot_*" / "biomass_trajectory.csv"))
+    if not files:
+        return (0, 0, 0.0)
+    n_active = 0
+    n_total = 0
+    for f in files:
+        try:
+            with open(f) as fp:
+                rdr = _csv.DictReader(fp)
+                rows = list(rdr)
+            by_year = {}
+            for r in rows:
+                try:
+                    by_year[int(r["year"])] = float(r["TotalBiomass_gm2"])
+                except: pass
+            y0 = by_year.get(0); ymax = max((y for y in by_year if y >= 25), default=None)
+            if y0 is None or ymax is None or y0 <= 0:
+                continue
+            ratio = by_year[ymax] / y0
+            if ratio > 1.05: n_active += 1
+            n_total += 1
+        except: continue
+    frac = n_active / max(n_total, 1)
+    return (n_active, n_total, frac)
+
 def evaluate(theta_log, tag, bay_dir, tools_dir):
-    """Apply theta, run sweep, read log-likelihood, return -LL (CMA-ES minimizes)."""
+    """Apply theta, run sweep, read log-likelihood, return -LL (CMA-ES minimizes).
+
+    Applies the active-growth constraint: candidates with <50% of plots showing
+    >5% growth over 100 yr are flagged as degenerate (model frozen) and given
+    a penalty score so CMA-ES learns to avoid that region.
+    """
     tag_dir = bay_dir / tag
     tag_dir.mkdir(parents=True, exist_ok=True)
     theta_csv = tag_dir / "theta.csv"
@@ -39,9 +82,27 @@ def evaluate(theta_log, tag, bay_dir, tools_dir):
         return 1e9
     try:
         ll = float(ll_file.read_text().strip())
-        return -ll
     except Exception as e:
         sys.stderr.write(f"FAIL {tag}: cannot parse LL ({e})\n"); return 1e9
+
+    # Active-growth check: catch degenerate (model-frozen) candidates
+    n_active, n_total, frac = check_active_growth(tag_dir)
+    # Write diagnostic to a sidecar file for post-hoc analysis
+    try:
+        with open(tag_dir / "active_growth.txt", "w") as f:
+            f.write(f"n_active={n_active}\nn_total={n_total}\nfrac={frac:.4f}\n")
+    except: pass
+
+    if ll == 0.0 and frac < MIN_ACTIVE_GROWTH_FRAC:
+        # LL=0 with low active-growth → degenerate (predicted ≈ obs because both near IC)
+        sys.stderr.write(f"DEGEN {tag}: LL=0 with active_growth_frac={frac:.2f} < {MIN_ACTIVE_GROWTH_FRAC}; penalized\n")
+        return DEGENERACY_PENALTY
+    if frac < MIN_ACTIVE_GROWTH_FRAC and ll > -100:
+        # Suspiciously good LL with low active growth — also penalize as degenerate
+        sys.stderr.write(f"DEGEN {tag}: LL={ll:.2f} with active_growth_frac={frac:.2f} < {MIN_ACTIVE_GROWTH_FRAC}; penalized\n")
+        return DEGENERACY_PENALTY
+
+    return -ll
 
 def main():
     p = argparse.ArgumentParser()

@@ -8,7 +8,7 @@
 # STATE:    ME | GA | WA
 # CLIM:     baseline | ssp245 | ssp585
 # HARV:     none | baseline | perseus | intensified
-# DIST:     none | wind | fire | bda | bda+wind | bda+fire
+# DIST:     none | wind | fire | bda | bda+wind | bda+fire | hurricane | hurricane+bda
 #
 # Wraps the per-state single-plot builders + adds disturbance extensions.
 
@@ -212,6 +212,54 @@ ds = None
 " 2>/dev/null
     SETUP_BN=$(basename $BDA_SETUP)
     DIST_LINES='"Original Fire"        base-fire.txt
+"Climate BDA"          '"$SETUP_BN"
+    ;;
+  hurricane)
+    # Hurricane v3 (GA-specific). Requires Int32 exposure tifs at 135°/180°/225°
+    # and the EvennessWindReductions CSV. Per-plot exposure value=1 (full exposure)
+    # for single-cell scenarios; landscape-scale runs would use real exposure maps.
+    if [ "$STATE" != "GA" ]; then
+      echo "WARNING: hurricane disturbance only validated for GA; building anyway"
+    fi
+    cp $TOOLS/Hurricane_GA.txt $PLOT_DIR/
+    cp $TOOLS/EvennessWindReductions_GA.csv $PLOT_DIR/
+    # Build the 3 Int32 single-cell exposure tifs (1 = full exposure)
+    apptainer exec --bind /fs/scratch/PUOM0008:/fs/scratch/PUOM0008 \
+      $LANDIS/images/landis-ii_v8_allext_v1.0.sif python3 - <<PY 2>/dev/null
+from osgeo import gdal
+import numpy as np
+for deg in [135, 180, 225]:
+    ds = gdal.GetDriverByName('GTiff').Create(
+        '$PLOT_DIR/Hurricane_exposure_' + str(deg) + '_GA.tif', 1, 1, 1, gdal.GDT_Int32,
+        options=['COMPRESS=DEFLATE'])
+    ds.GetRasterBand(1).WriteArray(np.array([[1]], dtype=np.int32))
+    ds.SetGeoTransform([0.0, 30.0, 0.0, 30.0, 0.0, -30.0])
+    ds = None
+PY
+    mkdir -p $PLOT_DIR/output/hurricane
+    DIST_LINES='"Hurricane"            Hurricane_GA.txt'
+    ;;
+  hurricane+bda)
+    # Hurricane + Climate BDA combined (GA factorial cell)
+    cp $TOOLS/Hurricane_GA.txt $PLOT_DIR/
+    cp $TOOLS/EvennessWindReductions_GA.csv $PLOT_DIR/
+    cp $BDA_SETUP $PLOT_DIR/
+    cp $BDA_AGENT $PLOT_DIR/
+    apptainer exec --bind /fs/scratch/PUOM0008:/fs/scratch/PUOM0008 \
+      $LANDIS/images/landis-ii_v8_allext_v1.0.sif python3 - <<PY 2>/dev/null
+from osgeo import gdal
+import numpy as np
+for deg in [135, 180, 225]:
+    ds = gdal.GetDriverByName('GTiff').Create(
+        '$PLOT_DIR/Hurricane_exposure_' + str(deg) + '_GA.tif', 1, 1, 1, gdal.GDT_Int32,
+        options=['COMPRESS=DEFLATE'])
+    ds.GetRasterBand(1).WriteArray(np.array([[1]], dtype=np.int32))
+    ds.SetGeoTransform([0.0, 30.0, 0.0, 30.0, 0.0, -30.0])
+    ds = None
+PY
+    mkdir -p $PLOT_DIR/output/hurricane $PLOT_DIR/output/climateBda
+    SETUP_BN=$(basename $BDA_SETUP)
+    DIST_LINES='"Hurricane"            Hurricane_GA.txt
 "Climate BDA"          '"$SETUP_BN"
     ;;
   *)
