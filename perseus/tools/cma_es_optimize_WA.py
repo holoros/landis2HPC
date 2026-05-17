@@ -25,7 +25,8 @@ def write_theta_csv(theta_log, path):
             w.writerow([n, f"{math.exp(x):.6f}"])
 
 DEGENERACY_PENALTY = 1e6  # large but finite; CMA-ES treats as "bad" without being unbounded
-MIN_ACTIVE_GROWTH_FRAC = 0.50  # require ≥50% of plots with >5% year-100 growth
+MIN_ACTIVE_GROWTH_FRAC = 0.50  # require >=50% of plots with >5% year-100 growth
+MIN_N_PAIRS = 300  # require >=300 paired plots before accepting LL (sample-size guard)
 
 def check_active_growth(tag_dir):
     """Compute the fraction of per-plot trajectories with >5% biomass growth over 100 yr.
@@ -93,9 +94,10 @@ def evaluate(theta_log, tag, bay_dir, tools_dir):
             f.write(f"n_active={n_active}\nn_total={n_total}\nfrac={frac:.4f}\n")
     except: pass
 
-    # Empty-aggregator check: LL=0 commonly arises when per_plot.csv is empty
-    # (aggregator failed to produce any paired predicted/observed rows). Treat
-    # as a failed candidate so CMA-ES does not drift toward it.
+    # Empty-aggregator + sample-size check: LL=0 commonly arises when per_plot.csv
+    # is empty (aggregator failed). Sample-size degeneracy: trivially small LL
+    # magnitude from very few pairs makes a candidate look "best" to CMA-ES even
+    # though the fit is over n=2-10 plots out of ~800.
     per_plot_csv = tag_dir / "per_plot.csv"
     if per_plot_csv.exists():
         try:
@@ -105,6 +107,9 @@ def evaluate(theta_log, tag, bay_dir, tools_dir):
             n_rows = -1
         if n_rows <= 0:
             sys.stderr.write(f"DEGEN {tag}: per_plot.csv empty (rows={n_rows}, LL={ll}); penalized\n")
+            return DEGENERACY_PENALTY
+        if n_rows < MIN_N_PAIRS:
+            sys.stderr.write(f"DEGEN {tag}: per_plot.csv has only {n_rows} pairs < {MIN_N_PAIRS} (LL={ll}); penalized\n")
             return DEGENERACY_PENALTY
 
     if ll == 0.0 and frac < MIN_ACTIVE_GROWTH_FRAC:

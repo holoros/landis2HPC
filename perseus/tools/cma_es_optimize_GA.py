@@ -18,6 +18,7 @@ N_PARAMS = len(PARAM_NAMES)  # 54
 
 DEGENERACY_PENALTY = 1e6  # large but finite; CMA-ES treats as "bad" without being unbounded
 MIN_ACTIVE_GROWTH_FRAC = 0.50  # require >=50% of plots with >5% year-100 growth
+MIN_N_PAIRS = 300  # require >=300 paired plots before accepting LL (sample-size guard)
 
 def write_theta_csv(theta_log, path):
     with open(path, "w", newline="") as f:
@@ -80,8 +81,7 @@ def evaluate(theta_log, tag, bay, tools):
             f.write(f"n_active={n_active}\nn_total={n_total}\nfrac={frac:.4f}\n")
     except: pass
 
-    # Empty-aggregator check: catches failed-aggregator candidates where
-    # per_plot.csv has no rows so LL defaults to 0.
+    # Empty-aggregator + sample-size check
     per_plot_csv = tag_dir / "per_plot.csv"
     if per_plot_csv.exists():
         try:
@@ -91,6 +91,9 @@ def evaluate(theta_log, tag, bay, tools):
             n_rows = -1
         if n_rows <= 0:
             sys.stderr.write(f"DEGEN {tag}: per_plot.csv empty (rows={n_rows}, LL={ll}); penalized\n")
+            return DEGENERACY_PENALTY
+        if n_rows < MIN_N_PAIRS:
+            sys.stderr.write(f"DEGEN {tag}: per_plot.csv has only {n_rows} pairs < {MIN_N_PAIRS} (LL={ll}); penalized\n")
             return DEGENERACY_PENALTY
 
     if ll == 0.0 and frac < MIN_ACTIVE_GROWTH_FRAC:
