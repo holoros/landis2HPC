@@ -103,6 +103,21 @@ SLURM
   echo "  chunk $c -> job $JID" >> $LOG
   sleep 60
   while squeue -j $JID -h -r 2>/dev/null | grep -q .; do sleep 30; done
+  # Active settling check (v1.0.1): wait until >=90% of expected per-plot trajectories
+  # are present on the shared FS before letting the LL aggregator run. Fixes the
+  # v1.0 race condition where SLURM reported the array job done while the array
+  # tasks were still in flight or had not yet flushed their output.
+  EXPECTED_N=$(wc -l < $PLOT_SUBSET)
+  THRESHOLD=$(( EXPECTED_N * 9 / 10 ))
+  for attempt in $(seq 1 20); do
+    COUNT=$(find $BAY/runs -name biomass_trajectory.csv 2>/dev/null | wc -l)
+    if [ $COUNT -ge $THRESHOLD ]; then
+      echo "  settling: $COUNT / $EXPECTED_N trajectories landed (>= $THRESHOLD)" >> $LOG
+      break
+    fi
+    echo "  settling: $COUNT / $EXPECTED_N landed (waiting for $THRESHOLD, attempt $attempt/20)" >> $LOG
+    sleep 30
+  done
 done
 
 # Compute LL on this candidate's results
