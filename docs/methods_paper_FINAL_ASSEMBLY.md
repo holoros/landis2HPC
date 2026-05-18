@@ -1,41 +1,38 @@
 # Multi-state inverse parameterization of LANDIS-II Biomass Succession against the FIA inventory cycle: a calibration ladder for Maine, Georgia, and Washington forests
 
-**Weiskittel et al. (in prep), 2026-05-16**
+**Weiskittel et al. (in prep), 2026-05-17 (v1.0 final)**
 
-**Final assembly memo.** This document consolidates the assembled methods paper components plus the final results. Use this as the substrate for the integrated draft to be submitted for co-author review.
+**Final assembly memo.** This document consolidates the assembled methods paper components plus the v1.0 final results. Use this as the substrate for the integrated draft to be submitted for co-author review and bioRxiv preprint.
 
 ---
 
-## Final headline numbers
+## Production calibration table (v1.0 final)
 
-**Maine** (n = 3,654 paired cells, 1,216 untreated plots, 13 species):
-- Best calibration: Tier 2 per-species CMA-ES (26 parameters)
-- LL/cell improvement: **+0.59** (from −0.40 → +0.18)
-- Mean log-residual: −0.064 → −0.043 (slight under-prediction → near-zero)
-- 100-yr asymptote: −7.5% under calibration vs literature
+| State | Tier | LL | n_pairs | Per-plot LL | 100-yr asymptote shift |
+|---|---|---|---|---|---|
+| Maine | T2 per-species (26 params) | +34.2 | 612 | +0.056 | −7.5% vs Tier 0 |
+| Georgia | T1 uniform θ = 0.30 | +5.26 | 218 | +0.024 | −35% vs Tier 0 |
+| Washington | T2 per-species (50 params, iter1_cand11) | −174.4 | 805 | −0.217 | −67% vs Tier 0 |
 
-**Georgia** (n = 12,087 paired cells, 5,167 untreated plots, 27 species):
-- Best calibration: Tier 1 uniform θ = 0.30
-- LL/cell improvement: **+5.26** (from −14.07 → −8.81)
-- Mean log-residual: +0.65 → +0.15 (strong over-prediction → modest residual)
-- 100-yr asymptote: ~35% reduction under calibration vs literature
+**Maine** Tier 2 best-fitting multipliers cluster between 0.84 and 2.26 (median ~1.30), with balsam fir at ANPP×2.26 / BMAX×0.54 as the most striking species-level signal — fast early growth tempered by a lowered long-horizon ceiling consistent with budworm-driven stagnation.
 
-**Washington** (n = 9,246 paired cells, 4,461 untreated plots, 25 species):
-- Best calibration: Tier 1 uniform θ = **0.30** (active-growth optimum)
-- LL/cell improvement: **+0.31** (from −0.85 → −0.54)
-- Mean log-residual: +0.256 → +0.011 (near-zero, mean centered)
-- SD compression: 0.555 → 0.417 (25% reduction)
-- 100-yr asymptote: ~67% reduction under calibration vs literature
+**Washington** Tier 2 (iter1_cand11) best-fitting multipliers cluster between 0.31 and 0.91 (median ~0.55), all below 1.0, with wet-side conifers (Douglas-fir, western hemlock, western redcedar, Pacific silver fir) at the lower end and eastern-margin broadleaves (red alder, quaking aspen, paper birch, black cottonwood) at the upper end.
 
-## The methodological calibration degeneracy finding
+**Georgia** Tier 2 attempt produced a CMA-ES result but the per-plot pipeline success rate was inadequate (mean n = 10.3 pairs per candidate, max 82, zero candidates with n ≥ 100). Production GA calibration is Tier 1 uniform θ = 0.30; T2 deferred to future work after a targeted pipeline diagnostic. Memo: `docs/GA_T2_failure_memo.md`.
 
-**This is a paper-novel result.** Our complete WA Tier 1 θ ladder (12 values from 0.10 to 1.00) revealed that the LL minimum at θ=0.20 (LL/cell = −0.530) is a *degenerate solution*: at this productivity multiplier, LANDIS-II generates near-static trajectories where growth ≈ mortality, so predicted biomass remains close to the initial condition across the 100-year projection. The residuals against FIA observations are therefore small *by construction* (both predicted and observed are near IC), not because the model captures growth dynamics.
+## The three-mode calibration degeneracy taxonomy
 
-We diagnose calibration degeneracy through the **active-growth fraction** metric: the proportion of plots showing >5% biomass change between year 0 and year 100. At Tier 0 (θ=1.00) this fraction is 96.1%; at θ=0.30 it is 53.5%; at θ=0.20 it falls to 36.9%. The transition is steep between θ=0.25 (50% active) and θ=0.20 (37% active).
+**This is the paper-novel methodological contribution.** During Tier 2 CMA-ES optimization across all three states we encountered three distinct degeneracy modes that the naive log-likelihood objective does not protect against. Each affected our results in concrete ways, and each generalizes to any landscape-scale model calibration that uses per-plot Monte Carlo runs paired against observational anchor data.
 
-We therefore recommend **θ=0.30 as the WA Tier 1 production calibration** — the lowest θ that preserves majority-active growth — rather than the raw LL minimum at θ=0.20. This costs ΔLL/cell of −0.014 (very small) in exchange for a calibration that simulates actual succession dynamics. Without this active-growth constraint, any LL-only optimizer would converge to the degenerate solution and produce a "calibrated" model that effectively does nothing.
+**Mode 1: active-growth degeneracy.** At very low θ values (multipliers below approximately 0.1), the model produces negligible biomass growth across the projection horizon. Hindcast predicted values approximate observed values not because the calibration is correct but because the model is frozen at IC. The diagnostic is the *active-growth fraction* — the proportion of paired plots showing >5% biomass change between LANDIS year 0 and year ≥25. At WA Tier 0 (θ=1.00) this fraction is 96.1%; at θ=0.30 it is 53.5%; at θ=0.20 it falls to 36.9%. The transition is steep between θ=0.25 (50% active) and θ=0.20 (37% active). We require the fraction to exceed 0.50 across the candidate plot set; below that, the candidate receives a large finite penalty.
 
-**This finding strengthens the methods paper substantially.** It identifies a calibration pathology that has not been discussed in the LANDIS-II calibration literature, provides a clean diagnostic (active-growth fraction), and reframes the recommended Tier 1 procedure as: optimize LL subject to active-growth constraint.
+**Mode 2: empty-aggregator degeneracy.** When the per-plot LANDIS sub-pipeline fails for all candidate plots, the aggregator produces a zero-row per-plot results CSV. The default behavior of statistical likelihood functions is to return LL = 0 for empty data, which is numerically greater than any negative LL from a successful candidate. CMA-ES correctly identifies this as the "best" candidate despite the fit being undefined. The diagnostic is a simple sentinel: check the candidate's per_plot.csv for ≥ 1 data row before accepting LL.
+
+**Mode 3: sample-size degeneracy.** When the per-plot pipeline succeeds for a small but non-zero fraction of plots (e.g., n = 2 to 50 out of a 779-plot target subset), the resulting Gaussian LL has a trivially small magnitude because LL scales with sample size. A candidate whose fit is genuinely poor over n = 2 plots may have LL = −0.85, while a candidate whose fit is excellent over n = 800 plots will have LL = −174. The total-LL minimizer prefers the first. The diagnostic is the minimum-sample-size threshold MIN_N_PAIRS ≥ 300, below which the candidate receives the penalty. The Georgia Tier 2 chain revealed this mode dramatically (47% of candidates with n = 0, max n = 82, mean n = 10.3); the Washington Tier 2 chain by contrast had 93% of candidates with n ≥ 300.
+
+**Recommendation: per-plot LL normalization.** A complementary safeguard against all three modes is to formulate the optimization target as LL / n_pairs rather than total LL. The v1.0 implementation retains total LL as the CMA-ES objective with the three guards as hard floors, but future work should switch to per-plot LL directly. The full taxonomy and guard logic are in `perseus/tools/cma_es_optimize_WA.py` and the parallel GA driver.
+
+**This three-mode taxonomy has not appeared in the forest landscape modeling calibration literature.** It generalizes to any inverse-parameterization framework that uses per-plot Monte Carlo runs paired against landscape-scale observational anchors. We recommend its addition to the standard calibration toolkit for forest landscape models.
 
 ## Stress + validation tests summary (all five executed)
 
