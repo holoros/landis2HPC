@@ -21,16 +21,27 @@ cat theta_best/WA_tier1_theta_best.csv
 cat theta_best/GA_tier1_theta_best.csv
 ```
 
-## Headline findings (2026-05-17)
+## Production calibrations (v1.0 final — 2026-05-17)
 
-| State | Best calibration | Optimum | LL/cell improvement | 100-yr asymptote change |
-|---|---|---:|---:|---:|
-| Maine | Tier 2 per-species CMA-ES (26 params) | — | +0.59 vs T0 | −7.5% |
-| Georgia | Tier 1 uniform θ | 0.30 | +5.26 vs T0 | −35% |
-| Washington | Tier 1 uniform θ (active-growth optimum) | 0.30 | +0.31 vs T0 | −67% |
+| State | Tier | LL | n paired plots | Per-plot LL | 100-yr asymptote vs T0 |
+|---|---|---:|---:|---:|---:|
+| Maine | T2 per-species (26 params) | +34.2 | 612 | +0.056 | −7.5% |
+| Georgia | T1 uniform θ = 0.30 | +5.26 | 218 | +0.024 | −35% |
+| Washington | T2 per-species iter1_cand11 (50 params) | −174.4 | 805 | −0.217 | −67% |
 
-Mean log-residuals approach zero under calibration (ME −0.043, GA +0.15, WA +0.011).
-Variance compression (e.g., WA SD 0.555 → 0.417, 25% reduction).
+> GA Tier 2 attempted in v1.0; deferred pending pipeline diagnostic. Root cause resolved in v1.0.1; GA T2 v2 re-run in flight on Cardinal. See `docs/GA_T2_root_cause_resolved.md` and `../CHANGELOG.md`.
+
+**Cross-state directional asymmetry (anchor result).** Literature LANDIS-II Biomass Succession parameters are biased in *opposite directions* across the three regions: Maine systematically *under*-estimated regional growth (multipliers cluster 0.84–2.26, median ~1.30); Georgia and Washington systematically *over*-estimated regional growth. Calibration changes the 100-year per-cell biomass asymptote by 7.5%, 35%, and 67% respectively — substantial for any state-scale carbon analysis using uncalibrated LANDIS-II.
+
+**Paper-novel methodological contribution: three-mode calibration degeneracy taxonomy.**
+
+| Mode | Mechanism | Guard |
+|---|---|---|
+| Active-growth | Very low θ → near-zero growth → trivial IC fit | active-growth fraction ≥ 0.50 |
+| Empty-aggregator | Per-plot pipeline failure → empty per_plot.csv → LL = 0 default | non-empty per_plot.csv |
+| Sample-size | Few successful pairs → trivially small LL magnitude → CMA-ES misled | MIN_N_PAIRS ≥ 300 |
+
+Per-plot LL normalization (LL/n) recommended as a complementary safeguard. Full taxonomy in Methods Section 2.6 of the manuscript; guards implemented in `tools/cma_es_optimize_{WA,GA}.py`.
 
 ## Repository layout
 
@@ -62,10 +73,11 @@ perseus/
 │   └── EvennessWindReductions_GA.csv    # Hurricane wind reduction table
 │
 ├── theta_best/                  # Per-state best-fit calibration vectors
-│   ├── ME_tier2_theta_best.csv          # 26-parameter Maine Tier 2 (per-species)
-│   ├── WA_tier1_theta_best.csv          # Washington Tier 1 (active-growth)
-│   ├── GA_tier1_theta_best.csv          # Georgia Tier 1
-│   └── WA_tier15_per_eco.csv            # Washington Tier 1.5 per-ecoregion
+│   ├── ME_tier2_theta_best.csv          # 26-parameter Maine Tier 2 (production)
+│   ├── GA_tier1_theta_best.csv          # Georgia Tier 1 uniform theta=0.30 (production; T2 deferred)
+│   ├── WA_tier2_theta_best.csv          # 50-parameter Washington Tier 2 iter1_cand11 (production)
+│   ├── WA_tier1_theta_best.csv          # Washington Tier 1 reference (theta=0.30 active-growth)
+│   └── WA_tier15_per_eco.csv            # Washington Tier 1.5 per-ecoregion reference
 │
 ├── figures/                     # 16 publication-quality PNGs
 │   ├── methods_figure1_three_state_map.png
