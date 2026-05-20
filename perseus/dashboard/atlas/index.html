@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>PERSEUS Carbon Atlas v1</title>
+<title>PERSEUS Carbon Atlas v1.0</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -51,7 +51,7 @@
 </head>
 <body>
 <header>
-  <h1>PERSEUS Carbon Atlas <span class="badge">v1 — real data</span></h1>
+  <h1>PERSEUS Carbon Atlas <span class="badge">v1.0 production</span></h1>
   <span style="font-size:11px; color:#888;">
     Calibrated LANDIS-II forest biomass projections | Weiskittel et al. (in prep)
   </span>
@@ -84,11 +84,17 @@
     <h2>Cross-state comparison</h2>
     <div id="cross-state" style="font-size: 12px;"></div>
 
-    <div class="info-panel" id="degeneracy-note" style="display:none;">
-      <strong>Calibration degeneracy diagnostic:</strong> WA Tier 1 LL minimum
-      occurs at θ=0.20 but with only 37% of plots showing active growth.
-      Recommended optimum is <strong>θ=0.30</strong> (54% active growth), the
-      "active-growth optimum" — where the model still simulates real succession.
+    <div class="info-panel" id="degeneracy-note">
+      <strong>Three-mode calibration degeneracy pathology (v1.0):</strong>
+      <ol style="margin: 6px 0 0 18px; padding: 0; font-size: 12px; line-height: 1.5;">
+        <li><strong>Active-growth:</strong> very low &theta; freezes the model; guard requires &ge;50% of plots with &gt;5% growth.</li>
+        <li><strong>Empty-aggregator:</strong> per-plot pipeline failure yields LL=0 default; guard requires non-empty per_plot.csv.</li>
+        <li><strong>Sample-size:</strong> few successful pairs yield trivially small LL magnitudes; guard requires &ge;300 paired observations.</li>
+      </ol>
+      <small style="display:block; margin-top:6px; color:#666;">
+        Production calibrations: ME T2 per-species (LL=+34.2, n=612); GA T1 &theta;=0.30 (LL=+5.26, n=218; T2 deferred);
+        WA T2 per-species iter1_cand11 (per-plot LL=-0.217 over n=805).
+      </small>
     </div>
 
     <button class="download" onclick="downloadCSV()">Download per-plot CSV</button>
