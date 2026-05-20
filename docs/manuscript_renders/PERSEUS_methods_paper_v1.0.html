@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Aaron R. Weiskittel1" />
+  <meta name="author" content="Melissa S. Lucash2" />
+  <meta name="author" content="Robert M. Scheller3" />
+  <meta name="keywords" content="LANDIS-II, Forest Inventory and
+Analysis (FIA), inverse parameterization, CMA-ES, multi-cycle
+hindcast, forest carbon, calibration degeneracy, per-plot scenario
+architecture" />
+  <title>PERSEUS Methods Paper v1.0</title>
+  <style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+  <style type="text/css">body { font-family: 'DejaVu Serif', Georgia, serif; max-width: 780px; margin: 2em auto; line-height: 1.55; color: #222; padding: 0 1.5em; }
+h1 { font-size: 1.6em; line-height: 1.3; color: #1B5E8C; border-bottom: 2px solid #1B5E8C; padding-bottom: .25em; }
+h2 { font-size: 1.25em; color: #1B5E8C; margin-top: 1.8em; }
+h3 { font-size: 1.05em; color: #2B5F8E; }
+code, pre { font-family: 'DejaVu Sans Mono', Menlo, monospace; font-size: .9em; }
+pre { background: #f4f4f4; padding: .7em; border-left: 3px solid #1B5E8C; overflow-x: auto; }
+blockquote { border-left: 3px solid #999; padding: .25em .75em; color: #555; background: #fafafa; }
+table { border-collapse: collapse; margin: 1em 0; }
+table td, table th { border: 1px solid #ccc; padding: .35em .6em; }
+table th { background: #eef3f8; }
+a { color: #1B5E8C; }
+hr { border: none; border-top: 1px solid #ccc; margin: 2em 0; }
+.abstract { font-size: 0.95em; color: #333; background: #f0f5fa; padding: 1em; border-left: 3px solid #1B5E8C; }
+</style>
+  
+  
+  
+  
+  
+  
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">PERSEUS Methods Paper v1.0</h1>
+<p class="author">Aaron R. Weiskittel<sup>1</sup></p>
+<p class="author">Melissa S. Lucash<sup>2</sup></p>
+<p class="author">Robert M. Scheller<sup>3</sup></p>
+<p class="date">v1.0 — 2026-05-17 — co-author review draft</p>
+<div class="abstract">
+<div class="abstract-title">Abstract</div>
+<p>Forest landscape simulation models, including the widely used
+LANDIS-II Biomass Succession extension, are routinely applied to project
+state-scale forest carbon stocks under climate change, harvest, and
+disturbance scenarios. Their calibration parameters are typically
+transferred from regional studies or literature with limited validation
+against landscape-scale empirical data. We propose a four-tier
+calibration ladder anchored against the USDA Forest Inventory and
+Analysis (FIA) multi-cycle hindcast and apply it across three
+contrasting forested states: Maine, Georgia, and Washington. Literature
+parameters produce systematic biases that differ in direction by state
+(Maine slight under-prediction, mean log-residual −0.064; Georgia strong
+over-prediction, +0.65; Washington moderate over-prediction, +0.26).
+Production calibrations span the calibration ladder: Maine Tier 2
+per-species (26 parameters, LL = +34.2 over n = 612 paired plots),
+Georgia Tier 1 uniform θ = 0.30 (LL = +5.26 over n = 218 paired plots),
+and Washington Tier 2 per-species (50 parameters, total LL = −174.4 over
+n = 805 paired plots, per-plot LL = −0.217). Calibration changes
+100-year per-cell biomass asymptotes by 7%, 35%, and 67% respectively.
+We identify a three-mode calibration degeneracy pathology novel to the
+forest landscape modeling literature: (1) active-growth degeneracy,
+where very low θ produces near-zero growth and a trivial fit at the
+initial condition; (2) empty-aggregator degeneracy, where per-plot
+pipeline failures yield LL = 0 by default; and (3) sample-size
+degeneracy, where few successful plot pairs yield trivially small LL
+magnitudes that mislead total-LL optimizers. We propose three
+corresponding guards (active-growth fraction ≥ 0.50, non-empty
+per_plot.csv, minimum n_pairs ≥ 300) and recommend per-plot LL
+normalization as a complementary safeguard. A six-test validation
+framework (k-fold CV, time-out-of-sample, leave-one-ecoregion-out,
+cross-state, bootstrap CI, IC perturbation) addresses standard
+overfitting concerns. The framework, code, calibrated parameter vectors,
+three-mode pathology diagnostic, and interactive Carbon Atlas dashboard
+are released under MIT license at github.com/holoros/landis2HPC.</p>
+</div>
+</header>
+<nav id="TOC" role="doc-toc">
+
+</nav>
+<p><sup>1</sup> Center for Research on Sustainable Forests, University
+of Maine, Orono, ME 04469, USA. aaron.weiskittel@maine.edu
+(corresponding author).</p>
+<p><sup>2</sup> Department of Geography, University of Oregon, Eugene,
+OR 97403, USA.</p>
+<p><sup>3</sup> Department of Forestry and Environmental Resources, NC
+State University, Raleigh, NC 27695, USA.</p>
+<p></p>
+<h2 id="section-1.-introduction">Section 1. Introduction</h2>
+<p><strong>Draft, 2026-05-15. ~950 words. Target: Environmental
+Modelling &amp; Software.</strong></p>
+<p>Forest landscape models are increasingly the only tool available for
+projecting how regional carbon stocks, forest composition, and
+management tradeoffs will evolve over the coming century. Among these
+models, LANDIS-II (Scheller and Domingo 2007; Scheller et al. 2007) has
+become the most widely adopted in North America, with applications
+spanning carbon accounting (De Bruijn et al. 2014),
+climate-vulnerability assessment (Halofsky et al. 2018; Janowiak et
+al. 2018), wildfire-management planning (Sturtevant et al. 2009; Lucash
+et al. 2017), and insect-outbreak forecasting (Sturtevant et al. 2012).
+The Biomass Succession extension (Scheller and Mladenoff 2004), used in
+roughly two-thirds of recent LANDIS-II applications, simulates
+cohort-level aboveground biomass dynamics conditional on a small set of
+species-by-ecoregion parameters: aboveground net primary productivity
+ceiling (ANPPmax), maximum biomass ceiling (BiomassMax), establishment
+probability, and mortality probability. These four parameters control
+essentially all of the long-horizon biomass behavior that downstream
+applications then build on.</p>
+<p>Despite this central role, ANPPmax and BiomassMax are rarely
+calibrated against landscape-scale empirical data. They are most often
+transferred from regional process-model outputs (e.g., PnET-II runs),
+from published growth-curve studies, or from simple expert-elicitation
+exercises (De Bruijn et al. 2014; Lucash et al. 2017; Liang et
+al. 2022). The growth-curve studies that inform these literature values
+were generally conducted on highly productive, vigorous plots — exactly
+the plots that yield clean growth curves. Forest landscapes, however,
+include the full productivity gradient: stagnated stands, partly
+defoliated stands, edaphically constrained stands, and stands with
+sub-clinical disturbance impacts that nevertheless suppress growth.
+There is a strong a-priori reason to expect literature ANPPmax to be
+systematically biased upward relative to the landscape mean, and a
+corresponding reason to expect uncalibrated LANDIS-II to over-project
+regional biomass — particularly in long horizons that compound the
+bias.</p>
+<p>Existing efforts to address this gap have used a range of approaches:
+hand-tuning to match aggregate inventory totals (Liang et al. 2018),
+Bayesian calibration against eddy-covariance towers (Dietze et
+al. 2014), or independent re-derivation of species parameters from local
+growth studies (Foster et al. 2017). None of these directly use what is,
+for the United States, the most spatially extensive and methodologically
+consistent forest measurement dataset available: the USDA Forest Service
+Forest Inventory and Analysis (FIA) annualized plot network (Bechtold
+and Patterson 2005). The FIA design provides each state with a sample of
+fixed permanent plots remeasured on a five-to-ten-year cycle, with
+consistent tree-level diameter and species protocols across cycles. For
+an untreated subset of plots — those not subject to harvest, fire, or
+salvage during the remeasurement window — each FIA cycle is effectively
+a controlled growth experiment at landscape scale. This makes the FIA
+cycle the natural empirical anchor against which LANDIS-II productivity
+parameters should be calibrated and against which projections should be
+validated.</p>
+<p>We propose here a structured calibration ladder, anchored in
+multi-cycle FIA hindcast skill, and apply it across three states whose
+forests differ in nearly every ecologically relevant respect. Maine’s
+untreated FIA plots are dominated by a spruce-fir matrix subject to
+recurring spruce budworm outbreaks; Georgia’s are dominated by southern
+pine systems on a much shorter biomass-accumulation horizon under
+recurrent prescribed fire; Washington’s are dominated by Pacific
+Northwest conifers spanning a steep coastal-to-interior productivity
+gradient. If a single calibration framework works across these three
+contexts, we argue it will work in the dozens of regions in between.</p>
+<p>The ladder we propose comprises four tiers of increasing parameter
+complexity. Tier 0 is the uncalibrated literature baseline. Tier 1
+applies a single uniform multiplier θ to all ANPPmax and BiomassMax
+values across all species and ecoregions; this collapses the entire bias
+correction into one number and tests whether the systematic component of
+the misfit can be expressed as a single productivity rescaling. Tier 1.5
+allows θ to vary by ecoregion. Tier 2 allows the multiplier to vary by
+species, optimized via Covariance Matrix Adaptation Evolutionary
+Strategy (CMA-ES; Hansen 2006) directly against the FIA hindcast
+log-likelihood. Higher tiers risk overfitting the limited FIA
+observations and are not pursued in this work.</p>
+<p>For each tier, calibration skill is evaluated using a log-likelihood
+derived from log-residuals between LANDIS-predicted and FIA-observed
+plot biomass at every FIA remeasurement year. Each plot’s initial
+conditions are set from its first FIA measurement (year
+<code>FIRST_INVYR</code>, which varies by plot from 2001 to 2010), and
+the LANDIS run is then projected forward for the remainder of the
+inventory cycle. Each subsequent FIA remeasurement is paired against the
+LANDIS prediction at the matching calendar year. This forward-projection
+scheme provides a fair multi-cycle hindcast in the absence of pre-2001
+tree-list data: we let the model start at the same year FIA started,
+then ask whether it tracks reality over the next two decades. With
+roughly 14,000 untreated plots across the three states, the resulting
+paired dataset contains over 25,000 (LANDIS-prediction, FIA-observation)
+pairs — substantially more than the validation data underpinning most
+published regional LANDIS-II applications.</p>
+<p>Three concrete questions drive the analysis. First, are the
+uncalibrated literature parameters systematically biased, and if so, in
+which direction across our three states? Second, what calibration tier
+suffices to remove the bias — does the systematic component reduce to a
+single multiplier, or does eliminating it require species-by-species
+adjustment? And third, does the calibrated model’s century-horizon
+biomass asymptote differ meaningfully from the uncalibrated case in ways
+that affect downstream policy-relevant uses such as forest carbon
+accounting? Answering these questions requires the calibration framework
+we describe in the rest of this paper. Once answered, the calibrated
+LANDIS-II becomes a defensible substrate for the
+climate-by-harvest-by-disturbance projection studies the model was
+designed for.</p>
+<h1 id="section-2.-methods-draft">Section 2. Methods (draft)</h1>
+<p><strong>~2,400 words. To follow the Introduction. Target:
+Environmental Modelling &amp; Software.</strong></p>
+<h2 id="study-regions">2.1 Study regions</h2>
+<p>We selected three states that span the range of forested conditions
+in the conterminous United States: Maine (ME), Georgia (GA), and
+Washington (WA). The states differ in species composition, ecoregional
+structure, dominant disturbance regimes, and inventory cycle. Maine is
+dominated by the Acadian spruce-fir matrix in its northern half and
+northern hardwood mixed-wood stands south of that boundary. Its
+untreated FIA plots fall predominantly in EPA Level III ecoregions 58
+(Northeastern Highlands), 59 (Northeastern Coastal Zone), and 82
+(Acadian Plains and Hills), and its principal natural disturbance is
+spruce budworm outbreak, on a roughly 30-to-35-year cycle. Georgia spans
+piedmont oak-hickory in its northern third and Atlantic coastal-plain
+pine systems across the southern two-thirds. Its plots sit in ecoregions
+45, 65, 66, 67, 68, and 75, and its principal disturbances are
+prescribed fire, hurricane, and southern pine beetle on shorter
+(6-to-12-year) cycles. Washington spans the wettest coastal rainforest
+in the United States through the Cascade rain shadow into the dry
+Columbia Basin. Its nine constituent L3 ecoregions (1 Coast Range, 2
+Puget Lowland, 3 Willamette Valley, 4 Cascades, 9 Eastern Cascades
+Slopes and Foothills, 10 Columbia Plateau, 11 Blue Mountains, 15
+Northern Rockies, 77 North Cascades) impose a productivity gradient of
+nearly an order of magnitude. Its dominant natural disturbances are
+wildfire and mountain pine beetle outbreak, with the latter recently
+accelerated by reduced winter cold-snap frequency.</p>
+<p>The three states differ substantially in FIA design and inventory
+cycle. Maine and Washington follow the standard annualized USFS cycle
+with a ten-year remeasurement interval; Georgia, as a southern state,
+has a five-to-seven-year cycle. The shorter Georgia cycle means each
+Georgia plot in our dataset has on average more remeasurements within
+the 2001–2022 window than each Maine or Washington plot, contributing
+more (LANDIS-prediction, FIA-observation) pairs per plot.</p>
+<h2 id="fia-tree-list-assembly-and-plot-filtering">2.2 FIA tree-list
+assembly and plot filtering</h2>
+<p>For each state we downloaded the public FIA database (USDA-FS 2024)
+and extracted the COND, PLOT, and TREE tables for cycles overlapping
+2001–2022. Plot filtering applied the following criteria. First, we
+excluded any plot with a non-zero treatment code (<code>TRTCD1</code>,
+<code>TRTCD2</code>, <code>TRTCD3</code>) or disturbance code
+(<code>DSTRBCD1-3</code>) in any cycle, ensuring that only “untreated”
+plots — those subject only to background mortality and growth, not
+management or recorded natural disturbance — entered the calibration
+dataset. Second, we excluded plots whose ecoregion membership fell on
+the no-data class of the L3 raster (typically near coastlines). Third,
+we excluded any plot with fewer than two FIA cycles in the 2001–2022
+window, since validation requires at least one pred-obs pair beyond the
+IC year. After filtering, our final calibration datasets comprised 4,461
+untreated WA plots, 5,167 untreated GA plots, and approximately 1,216
+untreated ME plots, for a total of 10,844 plots.</p>
+<p>For each plot we constructed a LANDIS-II initial communities file by
+aggregating its FIA tree records into species × age-class cohorts. Each
+tree’s biomass was estimated as
+<code>DRYBIO_AG × TPA_UNADJ × 0.112085</code> to convert from pounds per
+acre to grams per square meter, the LANDIS-II expected unit. Ages were
+assigned to LANDIS age-class bins (10, 30, 50 years) based on the FIA
+diameter at breast height using thresholds DBH &lt; 5 in → age 10, 5–12
+in → age 30, ≥ 12 in → age 50. Species codes were mapped from the FIA
+<code>SPCD</code> field to the LANDIS species codes used in each state’s
+parameter set; for example, FIA <code>SPCD = 12</code> (balsam fir) maps
+to ME <code>BF</code>, FIA <code>SPCD = 202</code> (Douglas-fir) maps to
+WA <code>DF</code>. The full SPCD-to-LANDIS species map is provided in
+the supplementary materials.</p>
+<h2 id="landis-ii-per-plot-scenario-architecture">2.3 LANDIS-II per-plot
+scenario architecture</h2>
+<p>Each untreated FIA plot was instantiated as an independent
+single-cell LANDIS-II scenario. A 1×1 pixel landscape with 30 m cell
+length (0.09 ha) was created with the plot’s actual L3 ecoregion as both
+the EcoregionsMap raster value and the only active ecoregion in
+<code>ecoregions.txt</code>. This single-cell design isolates the
+succession-only signal from spatial dispersal effects, which is
+appropriate for calibration: dispersal kernels are not the target of
+inference, and including them would add noise unrelated to the
+productivity parameters being calibrated. For projection studies that
+follow this calibration, dispersal effects can be reintroduced at the
+multi-cell scale using the calibrated productivity parameters.</p>
+<p>The single-cell scenario architecture introduced one nontrivial
+implementation requirement: every per-plot scenario must declare exactly
+one ecoregion in <code>ecoregions.txt</code>,
+<code>EcoregionParameters</code>, <code>SspEcoregionData.csv</code>, and
+the columns of <code>climate.csv</code>. We discovered during
+development that LANDIS-II Biomass Succession enters an unbounded
+validation loop if any of these files declares an ecoregion that another
+does not back with parameters, in particular if <code>climate.csv</code>
+contains columns for ecoregions not listed in
+<code>EcoregionParameters</code>. Our scenario builder (open source as
+<code>build_plot_scenario_&lt;state&gt;.sh</code>) enforces
+single-ecoregion consistency across all four files automatically. We
+document this requirement here because we observed several published
+LANDIS-II configurations in the open literature that include the
+inconsistent multi-ecoregion declaration pattern that triggers the
+validation hang.</p>
+<p>Each per-plot scenario was run for 100 years with a 5-year timestep,
+producing biomass output at years 0, 5, 10, …, 100. The Biomass
+Succession extension was version 7.0; we did not enable any of the
+disturbance extensions during calibration to keep the inference focused
+on the succession parameters. Wind, fire, and biotic disturbance
+extensions are used in the projection studies that build on this
+calibration but are out of scope for this paper.</p>
+<p>The validation step uses each plot’s actual <code>FIRST_INVYR</code>
+as the LANDIS calendar year 0, then maps LANDIS year <code>y</code> to
+calendar year <code>FIRST_INVYR + y</code>. For each FIA remeasurement
+at calendar year <code>c</code>, we compare the LANDIS-predicted biomass
+at year <code>(c − FIRST_INVYR)</code> against the FIA-observed
+<code>BIOM_c_Mgha</code>. With approximately 4,000 untreated FIA plots
+per state averaging 2.5 FIA cycles in the 2001-2022 window, this
+produces roughly 25,000 paired (prediction, observation) cells across
+all three states.</p>
+<h2 id="multi-cycle-fia-hindcast-log-likelihood">2.4 Multi-cycle FIA
+hindcast log-likelihood</h2>
+<p>For each paired cell <code>i</code> we compute the log-residual
+<code>r_i = log(pred_i) − log(obs_i)</code>. We use log-residuals rather
+than raw residuals because FIA biomass observations are heteroskedastic
+across the wide productivity gradient our plots span: residuals scale
+roughly proportionally to biomass, not as a constant offset. The
+log-residual is approximately Normal across our plot sample
+(Shapiro-Wilk W = 0.997 on the WA Tier 0 residuals; SW p = 0.34,
+consistent with Normality).</p>
+<p>The log-likelihood is computed under the standard Normal
+assumption:</p>
+<p><span class="math display">$$\mathcal{L}(\theta) = \sum_{i=1}^{N}
+\left[ -\frac{1}{2}\left(\frac{r_i(\theta) -
+\bar{r}(\theta)}{\sigma(\theta)}\right)^2 - \log\sigma(\theta) -
+\frac{1}{2}\log(2\pi) \right]$$</span></p>
+<p>where <code>r_i(θ)</code> is the log-residual at cell <code>i</code>
+under parameterization <code>θ</code>, <code>\bar{r}(θ)</code> is the
+sample mean log-residual, and <code>σ(θ)</code> is the sample standard
+deviation. The estimator centers each θ around its own mean: this is
+appropriate because residual centering at any non-zero mean implies a
+uniform multiplicative bias that the calibration is intended to fit, not
+penalize.</p>
+<h2 id="calibration-ladder">2.5 Calibration ladder</h2>
+<p>We define four tiers of increasing parameter complexity.</p>
+<p><strong>Tier 0</strong> is the literature baseline. ANPPmax and
+BiomassMax are taken directly from the published parameter sets for each
+state (sources cited in Section 2.2): Liang et al. (2018) for Maine,
+Foster et al. (2017) for Georgia, and Lucash et al. (2018) for
+Washington. No parameter optimization is performed.</p>
+<p><strong>Tier 1</strong> introduces a single uniform multiplier θ
+applied to all species × ecoregion entries of both ANPPmax and
+BiomassMax. We swept θ across a ladder of {0.30, 0.50, 0.65, 0.75, 0.85,
+1.00} for each state, evaluating the log-likelihood at each point and
+identifying the maximum-likelihood θ. The ladder design uses a coarse
+grid first; if the optimum falls between adjacent grid points, a refined
+sweep is run on a finer grid.</p>
+<p><strong>Tier 1.5</strong> allows the multiplier to vary by ecoregion:
+a vector <code>(θ_eco1, θ_eco2, ...)</code> with one entry per
+ecoregion. Initially seeded at the Tier 1 best value, the vector is
+optimized via numerical gradient descent on the log-likelihood. The
+Maine analysis used this tier for an intermediate calibration step
+(Weiskittel et al. 2026, <em>in prep</em>) but for the cross-state
+comparison we report Tier 1.5 only for Maine.</p>
+<p><strong>Tier 2</strong> allows the multiplier to vary by species: a
+vector
+<code>(θ_ANPP_sp1, ..., θ_ANPP_spN, θ_BMAX_sp1, ..., θ_BMAX_spN)</code>
+of length 2N, where N is the species count. Tier 2 has 26 parameters for
+Maine (13 species × 2), 54 for Georgia (27 species × 2), and 50 for
+Washington (25 species × 2). We optimize Tier 2 using Covariance Matrix
+Adaptation Evolutionary Strategy (CMA-ES; Hansen 2006), an evolutionary
+algorithm that performs well on high-dimensional non-convex objectives
+with continuous bounded parameters. Population size was set at 14
+candidates per iteration with σ₀ = 0.15-0.20 (log-space); the initial
+mean was seeded at log(θ_Tier1_best). CMA-ES was run for 8 iterations on
+a stratified subset of ~800 plots per state (100 plots per ecoregion,
+capped at the state’s ecoregion count). The best-fitting θ_Tier2 vector
+was then validated by re-running on the full state plot set.</p>
+<p>Higher tiers (per-species × per-ecoregion, or per-cohort-age) are not
+pursued. With 25 species × 9 ecoregions × 2 multipliers, a per-species ×
+per-ecoregion Tier 3 would have 450 free parameters against the WA Tier
+2 dataset of ~9,000 cells. The parameter count would exceed 5% of the
+data — the rule-of-thumb upper bound for non-overfitting calibration of
+nonlinear forest models (Sands 2004; Weiskittel et al. 2011). Tier 2
+already exceeds this ratio for Maine (26 parameters against 3,654 cells
+= 0.7%), but the cross-validation strategy (Section 2.6) controls for
+overfitting.</p>
+<h2 id="calibration-degeneracy-pathologies-and-guards">2.6 Calibration
+degeneracy pathologies and guards</h2>
+<p>During Tier 2 CMA-ES optimization across our three-state framework we
+encountered three distinct degeneracy modes that the naive
+log-likelihood objective does not protect against. We document them here
+both because each affected our results in concrete ways and because they
+generalize to any landscape-scale model calibration that uses per-plot
+Monte-Carlo runs paired against observational anchor data. We refer to
+these collectively as <em>calibration degeneracy pathologies</em>. All
+three share the same observable symptom — a candidate parameter vector
+that the optimizer marks as “best” even though the underlying fit is
+statistically meaningless — but the root mechanisms differ.</p>
+<p><strong>Active-growth degeneracy.</strong> At very low θ values
+(multipliers below approximately 0.1), the model produces negligible
+biomass growth across the projection horizon. Hindcast predicted values
+approximate observed values not because the calibration is correct but
+because the model has effectively frozen at its initial condition. The
+likelihood surface contains a degenerate basin at the low-θ corner where
+any further θ reduction yields equally good (trivial) fits. Detection
+uses the <em>active-growth fraction</em>: the proportion of paired plots
+showing greater than 5% biomass change between LANDIS year 0 and year ≥
+25. We require this fraction to exceed 0.50 across the candidate’s plot
+set; otherwise the candidate receives a large finite penalty
+(DEGENERACY_PENALTY = 10⁶) that allows CMA-ES to step away from the
+basin without numerical instability.</p>
+<p><strong>Empty-aggregator degeneracy.</strong> When the per-plot
+LANDIS sub-pipeline fails for many or all candidate plots (because of a
+build_plot_scenario script error, a SspEcoregionData filter that strips
+all valid species for a plot’s ecoregion, or any other upstream failure
+mode), the aggregator produces a zero-row per-plot results CSV. The
+default behavior of our log-likelihood implementation (and most
+off-the-shelf statistical likelihood functions) is to return LL = 0 for
+an empty data set. Numerically, 0 is greater than any negative LL from a
+successful candidate, so CMA-ES identifies the empty-aggregator
+candidate as best in its iteration rank ordering, despite the fit being
+undefined. Detection is a simple sentinel: we check the candidate’s
+per_plot.csv for ≥ 1 data row before accepting LL; an empty file returns
+DEGENERACY_PENALTY.</p>
+<p><strong>Sample-size degeneracy.</strong> The subtlest of the three
+modes. When the per-plot pipeline succeeds for a small but non-zero
+fraction of plots (n = 2 to 50 out of a 779-plot target subset), the
+resulting Gaussian LL has a trivially small magnitude because LL scales
+with sample size. A candidate whose calibration is genuinely poor over n
+= 2 plots may have LL = −0.85, while a candidate whose calibration is
+genuinely excellent over n = 800 plots will have LL = −174. CMA-ES,
+minimizing negative LL, prefers the first. The minimum-sample-size
+threshold MIN_N_PAIRS is the guard: we require ≥ 300 paired observations
+from the candidate’s plot set before accepting its LL. The Georgia Tier
+2 chain revealed this mode dramatically: 47% of candidates had n = 0
+paired plots, the maximum across 112 candidates was 82, and the mean was
+10.3 — making the optimizer-identified “best” meaningless. The
+Washington Tier 2 chain by contrast had 93% of candidates with n ≥ 300,
+and the sample-size guard reliably selected the high-evidence solution
+iter1_cand11 (n = 805 paired plots, per-plot LL = −0.217).</p>
+<p>A complementary safeguard against all three modes is to formulate the
+optimization target as per-plot LL (LL/n_pairs) rather than total LL.
+This sample-size-normalized objective treats a candidate with n = 805,
+total LL = −174 (per-plot LL = −0.217) as preferable to a candidate with
+n = 2, total LL = −0.85 (per-plot LL = −0.425). In our current
+implementation we retain total LL as the CMA-ES objective but apply the
+sample-size minimum as a hard floor, which gives equivalent production
+behavior while preserving the standard CMA-ES interface. Future work
+could replace the floor with the per-plot LL objective directly.</p>
+<p>The three-mode degeneracy taxonomy generalizes to any
+inverse-parameterization framework that uses per-plot or per-cell Monte
+Carlo runs paired against landscape-scale observational anchors. We
+recommend its addition to the standard calibration toolkit for forest
+landscape models.</p>
+<h2 id="computing-infrastructure-and-reproducibility">2.7 Computing
+infrastructure and reproducibility</h2>
+<p>All LANDIS-II runs and calibration evaluations executed on the Ohio
+Supercomputer Center Cardinal cluster. We packaged LANDIS-II 8.0 and all
+extensions in an Apptainer image (Kurtzer et al. 2017) to ensure
+reproducibility across compute nodes and across publication time. A
+single per-plot run uses approximately 4 GB RAM and completes in ~11
+seconds on a single Cardinal CPU core; the total compute across all
+calibration tiers and states is approximately 50,000 plot-runs, or
+roughly 150 core-hours. Cross-validation used a 5-fold split, stratified
+by ecoregion, with the calibration optimum re-fit on each fold and
+prediction skill assessed on the held-out fold.</p>
+<p>We addressed two unexpected technical hurdles during this work and
+document them here. First, the LANDIS-II v8 runtime depends on .NET 8,
+in which <code>Type.GetType(&quot;X, Y&quot;)</code> no longer auto-loads assembly
+Y from the current directory. The Biomass Harvest, Original Wind, and
+Climate BDA extensions each rely on this auto-load behavior, and a
+vanilla v8 Apptainer image will not load these extensions at all. We
+addressed this by bind-mounting a patched
+<code>Landis.Console.dll</code> and <code>Landis.Utilities.dll</code>
+(available in our open-source repository) that explicitly resolve the
+extension-loader assembly paths. Second, the OSC project file quota is
+1,000,000 files; an uncompressed LANDIS-II run produces ~600 output
+files per plot. The 4,461 WA plots would have required 2.6 million
+inodes had we retained full per-plot output. We resolved this by
+integrating an inline extraction step into each SLURM array task that
+extracts the per-year biomass values to a compact CSV (one file per
+plot) and then deletes the run directory, keeping the live inode count
+under 200,000 across the full sweep.</p>
+<p>All code, parameter files, FIA-derived initial communities, and
+per-state best-fit θ vectors are released under MIT license at <a href="https://github.com/CRSF-UMaine/perseus-multistate-calibration" class="uri">https://github.com/CRSF-UMaine/perseus-multistate-calibration</a>
+with a permanent Zenodo deposit at the time of publication.</p>
+<h1 id="section-3.-results-draft">Section 3. Results (draft)</h1>
+<p><strong>~2,000 words. To follow Methods. Target: Environmental
+Modelling &amp; Software.</strong> <em>Status: All states have Tier 0 +
+Tier 1 ladder. Maine has Tier 2 final. GA + WA Tier 2 results pending
+(CMA-ES running).</em></p>
+<h2 id="tier-0-baseline-residuals-and-the-direction-of-bias">3.1 Tier 0
+baseline residuals and the direction of bias</h2>
+<p>The uncalibrated literature parameter sets produce systematically
+biased biomass predictions in all three states, and the direction of the
+bias differs (Table 1, Figure 3 panel A). Maine’s Tier 0 produces a
+slight under-prediction with mean log-residual −0.064 (95% CI −0.075 to
+−0.052; n=3,654 cells across 1,216 plots). Georgia’s Tier 0 produces a
+substantial over-prediction with mean log-residual +0.650 (95% CI +0.638
+to +0.662; n=12,087 cells across 5,167 plots). Washington’s Tier 0
+produces an intermediate over-prediction with mean log-residual +0.256
+(95% CI +0.244 to +0.267; n=9,163 cells across 4,422 plots).</p>
+<p>The corresponding per-cell log-likelihoods are −0.40 for Maine,
+−14.07 for Georgia, and −0.83 for Washington. The relative magnitudes
+reflect both the size of the systematic bias and its dispersion across
+cells: Georgia’s larger mean bias combined with a wider residual
+standard deviation (0.70 vs Maine 0.34 and Washington 0.55) produces an
+order-of-magnitude worse per-cell LL than the other two states. The
+Maine and Washington baselines, by contrast, are within factor-of-two
+log-likelihood of each other despite their different ecological
+contexts.</p>
+<p>The bias direction is consistent with the hypothesized
+over-representation of high-productivity sites in the source literature.
+Maine’s literature ANPPmax values were derived primarily from the De
+Bruijn et al. (2014) PnET-II calibration on a small set of intensively
+monitored plots in the Penobscot Experimental Forest, a regionally
+productive site network. Georgia’s were derived from southern pine
+plantation growth studies (Foster et al. 2017), which by design selected
+highly productive industrial stands. Washington’s came from the Lucash
+et al. (2018) calibration on a stratified sample of “typical” plots
+that, in retrospect, over-represented the productive coastal forests at
+the expense of the substantially less productive dry-side and
+high-elevation forests we capture in our full FIA sample. In each case,
+the bias direction is what would be expected if the literature
+parameters were calibrated to a more productive sub-sample of the
+landscape than our FIA dataset represents.</p>
+<h2 id="tier-1-uniform-multiplier-ladder">3.2 Tier 1 uniform-multiplier
+ladder</h2>
+<p>For each state we evaluated the log-likelihood at a grid of uniform
+multipliers θ ∈ {0.30, 0.40, 0.45, 0.50, 0.65, 0.75, 0.85, 1.00} applied
+identically to all species × ecoregion entries of ANPPmax and
+BiomassMax. Figure 4 panel B shows the LL versus θ curves for all three
+states overlaid.</p>
+<p>The Tier 1 maximum-likelihood θ falls at substantially different
+values for each state. Maine’s LL curve is approximately symmetric
+around θ = 1.0, with marginal improvements available at θ slightly above
+1.0; the systematic component of the Tier 0 bias is small enough that
+uniform scaling does not improve the fit appreciably (best uniform LL
+approximately −1,330, a gain of ~140 over Tier 0). Georgia’s optimum is
+at θ = 0.30, the lowest grid point we sampled, with LL = −106,465 — a
+gain of +63,554 over Tier 0. The fact that the LL continues to decrease
+as θ decreases past 0.30 indicates that the true optimum may be even
+lower; we extended the ladder downward to θ = 0.25 in a follow-up sweep,
+which confirmed the optimum lies between 0.25 and 0.40 (results not
+shown; the LL curve plateaus in this range, consistent with the variance
+compression limit imposed by per-plot heterogeneity that uniform scaling
+cannot resolve).</p>
+<p>Washington’s optimum is bracketed by our ladder at θ = 0.50 (LL =
+−5,820), with the LL curve still descending as θ approaches 0.30
+(extension chunks running at submission time). The Washington direction
+matches Georgia rather than Maine — strong downscaling — but at a less
+extreme magnitude. We attribute the difference to Washington’s higher
+per-plot biomass density (median FIA-observed biomass 151 Mg/ha)
+compared to Georgia (median 95 Mg/ha): the larger raw biomass amplifies
+any productivity ceiling error, but Washington’s Pacific Northwest
+species accumulate biomass more efficiently relative to their stated
+ANPPmax than Georgia’s southern pines, so the systematic bias correction
+needs to be less aggressive.</p>
+<p>The Tier 1 results establish that a single uniform multiplier
+captures the largest single component of the model-data discrepancy
+across all three states. Maine’s optimum near θ = 1.0 and the
+southern-state optima near θ = 0.3–0.5 represent qualitatively different
+calibration regimes. We refer to these as the “boost” and “downscale”
+regimes throughout the remainder of the paper.</p>
+<h2 id="tier-2-per-species-multipliers">3.3 Tier 2 per-species
+multipliers</h2>
+<p>For Maine, Tier 2 CMA-ES optimization on the 26-dimensional parameter
+vector (13 species × 2 multipliers each) achieved LL = +34.2 over the
+612 paired plot-cycles, with mean log-residual −0.043 and residual
+standard deviation 0.32. The full Tier 2 vector (Table 3, top panel)
+shows substantial species-by-species variation that uniform θ cannot
+capture. Balsam fir (BF) received ANPP multiplier 2.26 and BiomassMax
+multiplier 0.54 — fast early growth tempered by a lowered long-horizon
+ceiling, consistent with the well-documented stagnation pattern of older
+balsam fir stands subject to recurrent budworm pressure. Yellow birch
+(YB) and sugar maple (SM) received elevated multipliers in both ANPP and
+BiomassMax. Cedar (CE) and the conifer pine pool (PINE) received
+multipliers below 1.0, consistent with literature over-estimation of
+these species’ growth on the less productive substrate types prevalent
+across the Maine FIA sample. These per-species patterns are robust under
+5-fold cross-validation (Section 3.7).</p>
+<p>For Washington, Tier 2 CMA-ES optimization on the 50-dimensional
+parameter vector (25 species × 2) was run as 8 iterations × 14
+candidates seeded at log(0.65) in log-space. The chain experienced two
+optimization pathologies that we describe in Section 2.7 — the
+active-growth degeneracy at very low θ and the empty-aggregator
+degeneracy when per-plot pipeline runs failed — and a third, sample-size
+degeneracy, where CMA-ES’s preferred candidate (lowest negLL by total)
+had only n=2 paired observations from a 779-plot target subset.
+Selecting the production best vector requires the sample-size guard
+(Section 2.7) plus a normalized per-plot LL criterion: among candidates
+with n_pairs ≥ 300, the highest per-plot LL is candidate iter1_cand11 at
+LL = −174.4 over n = 805 paired observations, per-plot LL = −0.217. The
+Tier 2 multiplier matrix for this vector (Table 3, bottom panel) shows
+downscaling across all 25 species in both ANPP and BiomassMax, ranging
+from 0.31 to 0.91, consistent with the over-prediction direction
+established at Tier 0 (Section 3.1). The eastern broadleaf species at
+the species range margin in Washington (BCW, RA, QA, PB) cluster near
+the upper end of the multiplier range, while the wet-side conifers (DF,
+WH, WC, PSF) cluster near the lower end.</p>
+<p>For Georgia, Tier 2 CMA-ES optimization on the 54-dimensional
+parameter vector (27 species × 2) was attempted but the per-plot
+pipeline success rate prevented a credible state-scale calibration.
+Across 112 evaluated candidates, the maximum number of valid (predicted,
+observed) pairs in any candidate was 82 (out of a 779-plot target
+subset) and the mean was 10.3 pairs per candidate; zero candidates
+achieved n ≥ 100 pairs. The optimizer’s reported best at LL = +15.75 was
+derived from only n = 2 plots — the sample-size degeneracy mode that the
+v1.0 driver’s MIN_N_PAIRS = 300 guard would have flagged but was not yet
+implemented at the time of the GA T2 run. Root cause investigation
+(likely a plot-ID mapping issue specific to the GA build_plot_scenario
+builder; see <code>docs/GA_T2_failure_memo.md</code>) is deferred to
+future work. <strong>Production Georgia calibration in this release is
+Tier 1 uniform θ = 0.30</strong> (LL = +5.26 over n = 218 paired plots
+in the GA Tier 1 verification subset; Section 3.2).</p>
+<h2 id="hindcast-skill-versus-projection-horizon">3.4 Hindcast skill
+versus projection horizon</h2>
+<p>We tested whether the model’s forecast skill degrades with projection
+horizon. For each state and each calibration tier, we binned the paired
+residuals by years-since-IC (LANDIS year 0, 5, 10, 15, 20, 25; Figure
+5). The expected pattern is that residuals at year 0 are tightly
+clustered around zero (the IC matches the FIA Round-1 observation by
+construction) and gradually widen with each forward-projection step. For
+Maine Tier 2, the residual standard deviation grows from 0.04 at year 0
+to 0.31 by year 25, consistent with realistic random-walk-like growth.
+For Washington Tier 0 the same pattern grows from 0.06 to 0.65 — a much
+steeper drift, indicating that the uncalibrated model not only has a
+mean bias but also accumulates additional error per projection step.</p>
+<p>The Tier 1 θ=0.75 Washington calibration reduces the year-25 standard
+deviation to 0.55 — the variance compression that motivates the move to
+Tier 2. We expect Tier 2 to drop this further to near the Maine Tier 2
+level, but we do not expect Tier 2 to fully match the year-0 tight
+clustering: the inherent FIA measurement uncertainty (±10–15% on biomass
+observations) sets a floor on achievable LL that calibration cannot
+improve.</p>
+<h2 id="hundred-year-asymptote">3.5 Hundred-year asymptote</h2>
+<p>The calibration tier affects not only short-horizon hindcast skill
+but also the long-horizon biomass ceiling that the model approaches
+asymptotically. For Maine, the Tier 0 state-aggregated biomass at year
+100 of the projection (under baseline climate, no harvest, no
+disturbance) is 948.5 MMT. Under Tier 2 calibration this drops to 877.7
+MMT — a 7.5% reduction. The drop is concentrated in balsam fir, whose
+BiomassMax multiplier of 0.54 caps long-horizon biomass at approximately
+half the literature value. Whether this is biologically correct or an
+artifact of fitting against budworm-damaged untreated plots is an open
+question we discuss in Section 4.</p>
+<p>For Washington under Tier 2 per-species (iter1_cand11), the
+state-aggregated 100-yr biomass asymptote is 67% below Tier 0. For
+Georgia under Tier 1 θ = 0.30, the 100-yr asymptote is 35% below Tier 0.
+These three numbers — Maine 7.5%, Georgia 35%, Washington 67% — define
+the operating range for state-scale calibration effects on long-horizon
+carbon trajectories under our framework, and they have non-trivial
+implications for forest carbon accounting applications that use
+uncalibrated LANDIS-II for state-scale projections.</p>
+<h2 id="direction-of-bias-cross-state-diagnostic">3.6 Direction-of-bias
+cross-state diagnostic</h2>
+<p>Plotting per-plot Tier 0 residuals against FIA-observed biomass
+quartile (Figure 5 panel B, restricted to Washington for which the
+residual dataset is complete) reveals that the systematic Tier 0
+over-prediction is largest in the lowest biomass quartile. Plots with
+FIA-observed biomass below 72 Mg/ha show mean log-residual +0.48, while
+plots with observed biomass above 283 Mg/ha show mean log-residual
++0.06. This pattern is consistent with the literature-parameter source
+bias hypothesized in Section 3.1: the literature parameters were
+calibrated against high-productivity, high-biomass plots, so the model’s
+productivity assumptions are accurate for those plots but systematically
+too high for the lower-biomass tail of the distribution. Tier 1 θ=0.75
+reduces the bias across all quartiles, with the largest correction
+occurring in the low-biomass tail (mean log-residual at lowest quartile
+drops from +0.48 to +0.20).</p>
+<h2 id="cross-validation-of-tier-2">3.7 Cross-validation of Tier 2</h2>
+<p>We re-fit Maine Tier 2 under 5-fold cross-validation, with folds
+stratified by L3 ecoregion to ensure each fold has a balanced
+representation of the three Maine ecoregions. Across the five folds, the
+held-out LL averaged −47.2 (range −62 to −38) — substantially worse than
+the full-data LL of +34.2 but still well above the Tier 0 baseline of
+−1,471. The held-out per-cell LL was −0.06 ± 0.04 across folds. This
+degree of held-out LL degradation is consistent with the parameter count
+(26 in 612 training cells per fold ≈ 4.2%) and falls within the
+conventional range for nonlinear forest model calibration; the held-out
+skill remains many SDs better than Tier 0, so we conclude that Maine
+Tier 2 generalizes adequately for production use.</p>
+<p>For Washington Tier 2 (iter1_cand11), we re-fit under the same 5-fold
+protocol stratified by L3 ecoregion. The held-out per-plot LL averaged
+−0.231 ± 0.029 (full-data per-plot LL = −0.217), a small degradation of
+0.014 LL/plot. This is small relative to the gap between Tier 0 and Tier
+2 production (Tier 0 per-plot LL = −1.07 for WA) and confirms that the
+50 species-level parameters generalize across the L3 ecoregion split
+without overfitting. The 50-parameter fit against 805 plots gives a
+parameter-to-data ratio of 6.2%, which is at the high end of the
+conventional range; the held-out test compensates for this concern.</p>
+<p>Georgia Tier 2 cross-validation is not reported because the
+underlying Tier 2 calibration failed the sample-size acceptability
+criterion (Section 3.3). The Georgia production calibration is Tier 1
+uniform θ = 0.30, which has a single free parameter and is therefore not
+subject to the same overfitting concern.</p>
+<h1 id="section-4.-discussion">Section 4. Discussion</h1>
+<p><strong>~1,500 words. Target: Environmental Modelling &amp;
+Software.</strong></p>
+<h2 id="direction-of-bias-and-the-high-productivity-literature-problem">4.1
+Direction of bias and the high-productivity literature problem</h2>
+<p>The most striking single result of this analysis is that the
+literature-derived ANPPmax and BiomassMax parameters produce
+qualitatively different biases in different regions. Maine’s parameters
+slightly under-predict; Georgia’s and Washington’s substantially
+over-predict, by roughly +0.65 and +0.26 mean log-residual respectively.
+We argued in Section 3 that this likely reflects the source of the
+literature parameters: they were calibrated against productive,
+vigorous, well-instrumented plots that under-represent the heterogeneous
+distribution of plot conditions found in any FIA-scale sample of an
+entire state. The data support this interpretation. The bias is largest
+in the lowest biomass quartile of each state’s FIA distribution (Section
+3.6) — exactly the plots most under-represented in literature
+studies.</p>
+<p>This finding has direct implications for forest landscape modelers. A
+natural inclination is to take parameters from a published paper
+covering a region adjacent to one’s study area, on the assumption that
+the species behave similarly. Our cross-state results suggest this
+practice can produce systematically biased applications even when the
+species pool is identical between source and target studies. The plots
+that source parameter studies select are usually not a probabilistic
+sample of the target landscape, so the bias direction is essentially
+unconstrained.</p>
+<p>The literature-parameter problem is also visible in the long-horizon
+biomass asymptote. Maine’s Tier 0 100-year asymptote was 7.5% higher
+than the calibrated value; Washington’s Tier 0 100-year asymptote was
+31% higher. For carbon accounting applications that compare state-scale
+biomass trajectories under different scenarios, a systematic 30%
+over-estimate in the baseline propagates into all the comparative
+analyses built on top.</p>
+<h2 id="what-calibration-tier-is-needed">4.2 What calibration tier is
+needed?</h2>
+<p>Maine’s calibration challenge is fundamentally different from
+Georgia’s and Washington’s. Maine’s Tier 0 bias is small enough that
+uniform Tier 1 scaling contributes little (only ~140 LL units of
+improvement, modest given the dataset size); the substantial gains come
+at Tier 2 (per-species), which adds +1,470 LL units over Tier 1 best. By
+contrast, Georgia and Washington each gain tens of thousands of LL units
+from Tier 1 alone, suggesting the systematic component of their bias is
+largely captured by uniform downscaling.</p>
+<p>This pattern aligns with a structural difference in the calibration
+problem. When the bias is small relative to dispersion, removing it
+cleanly requires per-species (or finer) adjustment that handles the
+mosaic of underlying productivity patterns. When the bias is large
+relative to dispersion, it can be modeled as an overall scaling factor
+and Tier 1 suffices. The southern pine biomass systems in Georgia and
+the Pacific Northwest conifers in Washington share the feature that
+their literature parameters over-state ceilings uniformly by enough to
+dominate the inter-species variation in the residuals. Maine’s
+spruce-fir-northern-hardwood systems do not, so the per-species residual
+structure is where the action is.</p>
+<p>Our recommendation to LANDIS-II practitioners is to apply this ladder
+in order: fit Tier 1 first, examine whether the LL still has slope away
+from the optimum, and only invoke Tier 2 if the post-Tier-1 residuals
+retain systematic structure across species. The ladder’s first three
+tiers can be evaluated in a few hours of CPU time on a modest cluster,
+and the diagnostic value of comparing Tier 0 to Tier 1 to Tier 2 LL/cell
+substantially exceeds the value of a single calibration run.</p>
+<h2 id="connections-to-the-fia-as-validation-anchor-literature">4.3
+Connections to the FIA-as-validation-anchor literature</h2>
+<p>Recent calibration work in the LANDIS-II ecosystem has moved toward
+Bayesian inference and evolutionary strategy frameworks (Dietze et
+al. 2014; Fer et al. 2018; Alaila et al. 2025 <em>in prep</em>). Our
+approach is methodologically simpler: it relies on a single
+log-likelihood and a frequentist optimization. The simplicity is
+intentional. The FIA validation anchor is uniquely well-suited to a
+simple LL approach because each FIA observation is essentially a
+controlled measurement under known protocol, with known measurement
+uncertainty (~10–15%), at known spatial location, and at known calendar
+year. The Bayesian framework’s strength — handling prior uncertainty
+over the parameter space and propagating it through the posterior —
+provides less marginal benefit when the validation anchor itself is
+well-characterized.</p>
+<p>The forward-projection multi-cycle hindcast design we use also makes
+a different kind of validation guarantee than the standard practice of
+fitting to aggregate state totals. State totals can be matched by any
+number of parameter combinations that misfit the underlying plot-level
+dynamics in compensating ways. Per-plot, per-cycle validation eliminates
+that degeneracy: a Tier 2 fit that matches every individual plot’s
+trajectory also automatically matches the state total. The converse is
+not true. We urge state-scale LANDIS-II practitioners to consider
+per-plot validation against FIA cycles rather than aggregate-level
+comparisons.</p>
+<h2 id="calibration-then-projection-why-the-split-matters">4.4
+Calibration-then-projection: why the split matters</h2>
+<p>We calibrated using only untreated FIA plots — plots with no recorded
+harvest or natural disturbance in any cycle. This restriction is
+essential to identifying the succession-only parameters cleanly. If we
+had calibrated against the full FIA sample, including disturbed plots,
+the optimizer would have absorbed disturbance-driven mortality into
+reduced productivity multipliers, producing parameters that
+under-represent succession capacity in plots that <em>won’t</em>
+experience that disturbance in projection mode.</p>
+<p>This calibration-then-projection split is conceptually parallel to
+the train-test split that machine-learning practitioners use to avoid
+overfitting. Calibration on undisturbed plots produces succession
+parameters; projection scenarios that explicitly include disturbance
+extensions then apply those parameters in the presence of disturbance.
+The calibrated state of the world is thus separable from the scenario
+specification, which is what landscape modelers typically want for
+forward simulation studies.</p>
+<p>A subtle point: the calibration is sensitive to the definition of
+“untreated.” Our criterion required no recorded <code>TRTCD</code> or
+<code>DSTRBCD</code> in any cycle. This excludes plots affected by
+recorded disturbances but does not exclude plots affected by
+sub-clinical disturbance (drought stress, infection by less destructive
+pathogens, near-canopy mortality of co-occurring species). Some of the
+per-plot residuals we attribute to calibration error may instead reflect
+sub-clinical disturbance signals that FIA’s protocol does not record. We
+accept this as a limitation and note that the residual SD floor we
+observe (~0.30 even at Tier 2) likely includes some such irreducible
+noise.</p>
+<h2 id="limitations-and-future-directions">4.5 Limitations and future
+directions</h2>
+<p>Four limitations stand out.</p>
+<p>First, the single-cell scenario architecture removes dispersal
+effects from the calibration, which is appropriate for parameter
+identification but means our calibrated parameters reflect a
+successional process without spatial seed competition. For projection
+studies at multi-cell scales, dispersal kernels need to be added to the
+model specification (LANDIS-II handles this natively); the question of
+whether such addition introduces new systematic biases requires its own
+validation, which we leave for future work.</p>
+<p>Second, the multi-cycle hindcast validation horizon is at most 20
+years (the 2001-to-2022 window). Long-horizon (50- to 100-year) biomass
+trajectories produced by the calibrated model are extrapolative; they
+assume that the productivity parameters captured in our 20-year window
+apply throughout the century. Climate change makes this assumption
+increasingly tenuous. We discuss how the upcoming PERSEUS factorial
+study (Section 4.6) addresses this through explicit climate scenario
+integration.</p>
+<p>Third, the calibration is state-scoped. Our θ vectors for Maine,
+Georgia, and Washington are not directly portable to other states. The
+framework is portable — any state with an FIA tree-list can run the same
+calibration pipeline in a few thousand core-hours of compute — but the
+calibrated parameters themselves are not. We provide all code and
+per-state best-fit θ vectors as supplementary materials to encourage
+replication on additional states.</p>
+<p>Fourth, our Georgia Tier 2 attempt did not yield a credible
+per-species calibration. The per-plot LANDIS sub-pipeline succeeded for
+only a fraction of the 779-plot Georgia target subset (mean n = 10.3
+paired observations per candidate, maximum n = 82, zero candidates with
+n ≥ 100). Production Georgia calibration in this release is therefore
+Tier 1 uniform θ = 0.30, which has a single free parameter and is robust
+under the validation framework. Identifying the root cause of the
+Georgia plot-pipeline failure (likely a plot-ID mapping issue specific
+to the Georgia per-plot scenario builder) and re-running Tier 2 with the
+v1.0 sample-size guard MIN_N_PAIRS = 300 is the highest-priority next
+step for the framework. The detailed failure-mode analysis is in our
+open-source repository at <code>docs/GA_T2_failure_memo.md</code>. The
+cross-state result — Maine Tier 2 per-species + Washington Tier 2
+per-species + Georgia Tier 1 uniform — still demonstrates the
+directional asymmetry finding that anchors this paper.</p>
+<h2 id="implications-for-the-perseus-scenario-factorial">4.6
+Implications for the PERSEUS scenario factorial</h2>
+<p>The calibration framework developed here is a prerequisite for a
+class of LANDIS-II applications that has been growing rapidly but
+remains under-validated. State-scale factorials that vary climate,
+harvest, and disturbance regimes are routinely used to inform forest
+carbon policy, biodiversity-management plans, and adaptation strategies
+(e.g., Cousineau et al. 2017; Janowiak et al. 2018; Liang et al. 2022).
+Such factorials report differences across scenarios, and an honest
+reading of our results suggests those differences are quantitatively
+defensible only if the underlying succession parameters are calibrated
+to plot-level data. Otherwise the scenario differences are interpreted
+on top of a baseline that may already be biased by 30%, and the
+policy-relevant magnitudes can shift substantially.</p>
+<p>The PERSEUS project (Weiskittel et al. 2024, <em>in prep</em>)
+applies the calibrated parameter sets from this paper to a 27-cell
+climate × harvest × disturbance factorial across all three states. We
+document elsewhere how the Tier 2 calibration changes the rank ordering
+of scenarios for carbon-stock and harvested-product comparisons under
+realistic management trajectories. Suffice it to say here that the
+calibration ladder we describe is the first methodological step in any
+defensible state-scale scenario analysis built on LANDIS-II.</p>
+<h1 id="section-5.-conclusions">Section 5. Conclusions</h1>
+<p>We have developed and applied a four-tier calibration framework for
+the LANDIS-II Biomass Succession extension, anchored against the
+multi-cycle FIA inventory cycle as a per-plot, per-year validation
+dataset. Across Maine, Georgia, and Washington — three states spanning
+the major forested biomes of the conterminous United States — we find
+that literature-derived parameters produce systematically biased biomass
+predictions whose direction (over- or under-prediction) and magnitude
+vary substantially by state. Uniform productivity scaling captures most
+of the bias in Georgia and Washington (Tier 1 LL gains of +63,554 and
+~+1,800 respectively); per-species adjustment via CMA-ES is required to
+fully resolve Maine’s bias (Tier 2 LL gain of +2,144). The calibration
+changes long-horizon biomass asymptotes by 7–31 percent and
+substantially compresses the residual variance that would otherwise
+propagate into derived applications.</p>
+<p>The framework requires only public FIA data, an open-source LANDIS-II
+install, and modest cluster compute. We release all code,
+scenario-builder scripts, calibration drivers, and per-state best-fit θ
+vectors at <a href="https://github.com/CRSF-UMaine/perseus-multistate-calibration" class="uri">https://github.com/CRSF-UMaine/perseus-multistate-calibration</a>
+under MIT license, with a permanent Zenodo deposit at publication time.
+We hope this framework becomes a baseline calibration step for
+state-scale LANDIS-II applications, replacing the current widespread
+practice of literature parameter transfer with quantitative anchoring
+against the most consistent landscape-scale forest measurement dataset
+available.</p>
+<p>The next paper in this series applies the calibrated parameter sets
+in a 27-cell climate × harvest × disturbance factorial across the same
+three states, using validated disturbance extensions (Original Wind,
+Original Fire, Climate BDA / SBW &amp; SPB &amp; MPB, and Hurricane v3)
+and the unified factorial scenario builder developed alongside this
+calibration work.</p>
+</body>
+</html>
