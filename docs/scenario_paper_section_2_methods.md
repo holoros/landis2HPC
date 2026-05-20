@@ -5,7 +5,17 @@
 
 ## 2.1 Calibration source
 
-The succession parameters used in this study are the Tier 2 (per-species) calibrations developed in our companion methods paper (Weiskittel et al. *in prep*) and summarized briefly here. Each of the three states (Maine, Georgia, Washington) has a state-specific θ vector of species × {ANPPmax, BiomassMax} multipliers fit to the FIA multi-cycle hindcast against untreated FIA plots in 2001–2022. Maine uses Tier 2 per-species multipliers (26 parameters); Georgia uses Tier 1 uniform θ=0.30; Washington uses Tier 1 uniform θ=0.40, with leave-one-ecoregion-out diagnostics suggesting modest further refinement is possible at Tier 1.5 (per-ecoregion). For consistency across the factorial, we use each state's identified best calibration tier from the companion paper without further re-fitting. The methods paper presents 6 stress + validation tests (k-fold CV, time-out-of-sample, leave-one-ecoregion-out, cross-state, bootstrap CI, and IC perturbation) that establish the robustness of these parameter sets.
+The succession parameters used in this study are the v1.0 production calibrations developed in our companion methods paper (Weiskittel et al. *in prep*) and summarized in Table 1. Each of the three states (Maine, Georgia, Washington) has a state-specific calibration vector fit to the FIA multi-cycle hindcast against untreated FIA plots in 2001–2022. Maine and Washington use Tier 2 per-species multipliers (26 and 50 free parameters respectively); Georgia uses Tier 1 uniform θ = 0.30 (Tier 2 deferred from the v1.0 release pending a pipeline diagnostic, with re-run in flight at submission time).
+
+Table 1. PERSEUS v1.0 production calibrations applied across the scenario factorial. Per-plot LL values are reported on the multi-cycle hindcast paired-plot sample described in the companion methods paper Section 2.4.
+
+| State | Tier | LL | n paired plots | Per-plot LL | 100-yr asymptote vs T0 |
+|---|---|---:|---:|---:|---:|
+| Maine | T2 per-species (26 params) | +34.2 | 612 | +0.056 | −7.5% |
+| Georgia | T1 uniform θ = 0.30 | +5.26 | 218 | +0.024 | −35% |
+| Washington | T2 per-species (50 params, iter1_cand11) | −174.4 | 805 | −0.217 | −67% |
+
+The companion methods paper presents six stress + validation tests (k-fold CV, time-out-of-sample, leave-one-ecoregion-out, cross-state, bootstrap CI, IC perturbation) that establish parameter set robustness. It also reports a three-mode calibration degeneracy pathology (active-growth, empty-aggregator, sample-size) and three driver guards that we recommend as standard practice for any inverse-parameterization framework using per-plot Monte Carlo runs anchored against landscape-scale observations.
 
 ## 2.2 Scenario factorial design
 
