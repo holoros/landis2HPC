@@ -15,7 +15,8 @@ LANDIS=/fs/scratch/PUOM0008/crsfaaron/landis2
 TOOLS=$LANDIS/tools
 STATE=$LANDIS/states/WA
 PERSEUS=$STATE/perseus
-BAY=$PERSEUS/bayesian/wa_t2_v1/$TAG
+CHAIN=${TAG%%_iter*}  # wa_t2_v1_iter0_cand0 -> wa_t2_v1; wa_t2_v2_iter0_cand0 -> wa_t2_v2
+BAY=$PERSEUS/bayesian/$CHAIN/$TAG
 INPUTS=$STATE/inputs
 PLOT_SUBSET=$PERSEUS/wa_t2_plotsubset.txt
 
@@ -112,6 +113,20 @@ SLURM
   # Wait for this chunk to finish before submitting next (avoid 1000-job limit)
   sleep 60
   while squeue -j $JID -h -r 2>/dev/null | grep -q .; do sleep 30; done
+  # Active settling check (v1.0.1): wait until >=90% of expected per-plot trajectories
+  # are present on the shared FS before letting the LL aggregator run. Defense-in-depth
+  # against the race condition that caused the GA T2 v1 sample-size degeneracy.
+  EXPECTED_N=$(wc -l < $PLOT_SUBSET)
+  THRESHOLD=$(( EXPECTED_N * 9 / 10 ))
+  for attempt in $(seq 1 20); do
+    COUNT=$(find $BAY/runs -name biomass_trajectory.csv 2>/dev/null | wc -l)
+    if [ $COUNT -ge $THRESHOLD ]; then
+      echo "  settling: $COUNT / $EXPECTED_N trajectories landed (>= $THRESHOLD)" >> $LOG
+      break
+    fi
+    echo "  settling: $COUNT / $EXPECTED_N landed (waiting for $THRESHOLD, attempt $attempt/20)" >> $LOG
+    sleep 30
+  done
 done
 
 # Aggregate biomass_trajectory.csv files into a per_plot.csv
