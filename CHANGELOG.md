@@ -2,6 +2,36 @@
 
 All notable changes to the multi-state LANDIS-II calibration framework are documented in this file. The framework follows a tag-based release model on `github.com/holoros/landis2HPC`.
 
+## v1.2 — 2026-05-21
+
+Minnesota Tier 2 landed (fourth production state); Forest Intelligence GUI and a phase 3 scenario backend shipped; three real-data analyses added. Wisconsin and Michigan chains still finishing.
+
+### Production calibrations
+The MN Tier 2 chain (job 10124727) completed 8 CMA-ES iterations (112 candidates).
+
+| State | Tier | Total LL | n_pairs | Per-plot LL |
+|---|---|---|---|---|
+| Minnesota | T2 per-species v1 (iter7_cand0) | −2556.1 | 2741 | −0.9325 |
+
+PERSEUS now has four production states (ME, GA, WA, MN). WI and MI are at iter6 and iter5 and will be harvested on completion, at which point the six-state synthesis (regional sign-flip across all six, per-species structure where data supports it, statewide carbon trajectories) runs automatically.
+
+### Added (Forest Intelligence GUI)
+- `perseus/dashboard/perseus_forest_intelligence_v1.html`: self-contained CTrees-style app. Default Maine, scenario presets (no management, working forest, moderate climate, high climate plus disturbance, custom), dark-basemap map with real FIA plot coordinates colored by observed / projected / net change, statewide growth curves with climate-scenario overlays, scenario pin and compare with a year-100 delta readout, indicative statewide carbon KPI, Tier 1 calibration ladder with optimum highlight, and a WA Tier 1.5 per-ecoregion theta panel (wet-to-dry gradient). Washington uses real per-plot Tier 1 trajectories; other states use a Chapman-Richards model fallback labeled measured vs modeled.
+- `docs/GUI_v1_architecture.md`: vision, three surfaces, five-phase roadmap.
+
+### Added (phase 3 backend)
+- `perseus/backend/`: a FastAPI seed (config, cardinal_jobs, app, requirements, README) that submits a single-plot scenario to Cardinal as a SLURM job over SSH and returns the biomass trajectory. SSH-to-sbatch path smoke-tested with a canary job. Needs OSC auth, a job database, and a results cache before exposure.
+- `perseus/tools/aggregate_atlas_trajectories.py`: merges per-plot t0/t1 LANDIS trajectories into atlas JSON (GA/ME export merge step).
+
+### Added (analyses)
+- `docs/WA_calibration_effect_memo.md` + figure: WA calibration lowers median year-100 biomass 562 to 185 Mg/ha (67%), a level correction not a growth shutdown (53% of plots still accrue).
+- `docs/crossstate_literature_bias_memo.md` + figure: regional sign-flip in literature bias (ME scales up, WA/GA scale down).
+- `docs/me_tier2_multiplier_structure_memo.md` + figure: ME per-species ANPP vs biomass-ceiling structure; balsam fir the fast-growing short-lived outlier.
+
+### Changed
+- README refreshed to four production states, GUI, backend, and analyses.
+- Readiness matrix and GUI updated with MN production status.
+
 ## v1.1 — 2026-05-21
 
 GA Tier 2 v2 chain landed; harvester hardened against settling-check timeouts; per-state pipeline parity files added.
