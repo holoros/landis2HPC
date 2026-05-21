@@ -1,18 +1,20 @@
 # PERSEUS multi-state readiness matrix
 
-**Date:** 2026-05-20 (updated after Great Lakes expansion)
+**Date:** 2026-05-21 (GA T2 v2 landed; MN/WI/MI at iter1)
 **Purpose:** definitive accounting of which states can enter the PERSEUS calibration framework, what each has, and what each still needs.
 
-## Current live status (2026-05-20)
+## Current live status (2026-05-21)
 
-Four Tier 2 CMA-ES chains running on Cardinal, harvested by `perseus/tools/harvest_t2_chains.py --all`:
+GA T2 v2 has **completed** (8 iterations, 112 candidates) and is harvested. MN/WI/MI are mid-iter1 and still running. All four are harvested by `perseus/tools/harvest_t2_chains.py --all`:
 
 | State | Chain | Job | Status |
 |---|---|---|---|
-| GA | ga_t2_v2 | 10021254 | finishing (iter7); best so far iter5_cand10 LL=−367 |
-| MN | mn_t2_v1 | 10124727 | running; iter0 LL=−2756 over n=4130 paired obs |
-| WI | wi_t2_v1 | 10126909 | running (335 plots, eco 47/50/51/52) |
-| MI | mi_t2_v1 | 10126910 | running (200 plots, eco 50/51) |
+| GA | ga_t2_v2 | 10021254 | **LANDED** — production iter5_cand8, per-plot LL −0.8871 over n=1255 (chain plateaued at iter5) |
+| MN | mn_t2_v1 | 10124727 | running (iter1); provisional best per-plot LL −0.96 over n=2867 |
+| WI | wi_t2_v1 | 10126909 | running (iter1); provisional best per-plot LL −0.66 over n=935 |
+| MI | mi_t2_v1 | 10126910 | running (iter1); provisional best per-plot LL −0.17 over n=528 |
+
+GA selection note: the raw CMA-ES min negLL (iter5_cand10, −367) was a **settling-check timeout artifact** — that candidate ran on only 240/779 plots (n=398). The defensible production vector is iter5_cand8 (n=1255, ~92% of max), chosen by per-plot LL among near-full-n candidates. The GA Tier 2 per-plot LL is not directly comparable to the v1.0 GA Tier 1 figure (different paired sets); a matched-n T1-vs-T2 evaluation is pending before declaring GA's production tier.
 
 When all land, PERSEUS spans **6 states (ME, GA, WA, MN, WI, MI)**. The EPA L3 ecoregion shapefile (`/users/PUOM0008/crsfaaron/Disturbance/us_eco_l3.shp`) unlocked MI/WI; they calibrate on ecoregions shared with MN (46–52), reusing MN species/climate/SppEcoregionData with zero new literature parameterization.
 
@@ -22,7 +24,7 @@ When all land, PERSEUS spans **6 states (ME, GA, WA, MN, WI, MI)**. The EPA L3 e
 cd /fs/scratch/PUOM0008/crsfaaron/landis2/tools
 python3 harvest_t2_chains.py --all      # writes theta_best_production.csv per chain
 ```
-The harvester selects each chain's production vector by **highest per-plot LL among candidates with n_pairs ≥ 300** (the v1.0 selection lesson), with a cma_history.csv fallback for the GA inline-LL runner. This avoids the sample-size-degeneracy artifact that the raw CMA-ES xbest can be.
+The harvester (v1.1, n-aware) parses the true paired-observation count and signed LL from each candidate's `launch.log` (`n=NNN ... LL=...`), requires **n ≥ max(300, 0.85 × max_n)** (near-full settling), and selects the **highest per-plot LL** among those. This supersedes the earlier cma_history.csv fallback, which trusted the settling check to guarantee comparable n and so could mis-select a settling-timeout artifact (the GA iter5_cand10 case). It defends the sample-size degeneracy mode against re-entry through a timed-out settling check.
 
 ## Two independent prerequisites
 
@@ -36,9 +38,9 @@ A state needs BOTH of the following before it can be calibrated:
 | State | (A) LANDIS inputs | (B) FIA tables | Calibration status | Gap to calibrate |
 |---|---|---|---|---|
 | **ME** | yes | (from earlier pipeline) | **T2 production (v1.0)** | none — done |
-| **GA** | yes | yes | **T2 v2 chain finishing (10021254)** | harvest when done |
+| **GA** | yes | yes | **T2 v2 LANDED (v1.1; iter5_cand8)** | matched-n T1-vs-T2 eval to set production tier |
 | **WA** | yes | yes | **T2 production (v1.0)** | none — done |
-| **MN** | yes | yes | **T2 chain running (10124727)** | harvest when done |
+| **MN** | yes | yes | **T2 chain running iter1 (10124727)** | harvest when done |
 | **WI** | reuses MN (shared eco) | yes | **T2 chain running (10126909)** | harvest when done; southern eco 53/54 deferred |
 | **MI** | reuses MN (shared eco) | yes | **T2 chain running (10126910)** | harvest when done; southern eco 55/56/57 deferred |
 | **IN** | yes (no IC raster) | **no** | not started | build IC raster + download IN FIA (state 18) |
@@ -69,10 +71,10 @@ IN and OH already have LANDIS inputs (species, ecoregion raster, climate, SppEco
 
 ## Recommended priority order
 
-1. **MN** — running now (job 10124727). First non-original-three calibration.
-2. **GA T2 v2** — landing now (job 10021254). Upgrades GA from T1 to T2 in v1.x.
+1. **GA T2 v2** — LANDED (v1.1, job 10021254). Production vector archived; matched-n T1-vs-T2 evaluation pending to set GA's production tier.
+2. **MN, WI, MI** — running at iter1 (jobs 10124727, 10126909, 10126910). Harvest with the n-aware `harvest_t2_chains.py --all` on completion (~12-15h ETA), then build the six-state production table + heatmap.
 3. **IN, OH** — download their FIA tables (states 18, 39) to the FIA folder; build IC rasters; then run the MN pipeline. Ecoregion dependency already solved.
-4. **MI, WI** — source the EPA L3 ecoregion vector, generate LANDIS inputs (reusing MN species params for shared ecoregions), then run the MN pipeline.
+4. **MI, WI southern ecoregions (53-57)** — need state-specific literature parameters beyond the MN-shared 46-52 set.
 
 A 5–6 state PERSEUS framework (ME, GA, WA, MN + IN/OH) is achievable with only FIA downloads. An 8-state framework adding MI/WI requires the ecoregion-raster generation step.
 

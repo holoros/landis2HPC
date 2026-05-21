@@ -2,6 +2,31 @@
 
 All notable changes to the multi-state LANDIS-II calibration framework are documented in this file. The framework follows a tag-based release model on `github.com/holoros/landis2HPC`.
 
+## v1.1 — 2026-05-21
+
+GA Tier 2 v2 chain landed; harvester hardened against settling-check timeouts; per-state pipeline parity files added.
+
+### Production calibrations
+The GA Tier 2 v2 chain (job 10021254) completed 8 CMA-ES iterations (112 candidates). Best production vector by near-full-n per-plot LL:
+
+| State | Tier | Total LL | n_pairs | Per-plot LL |
+|---|---|---|---|---|
+| Georgia | T2 per-species v2 (iter5_cand8) | −1113.3 | 1255 | −0.8871 |
+
+Tier-comparison caveat: the v1.0 GA production was Tier 1 uniform θ = 0.30 at LL +5.26 over n = 218 (per-plot +0.024). That value is NOT directly comparable to the T2 per-plot LL above, because the two were scored on different paired sets (n = 218 vs n = 1255). A matched-n evaluation of the T1 θ = 0.30 vector against the full n = 1255 set is required before declaring GA Tier 2 superior. GA's production tier therefore remains provisionally Tier 1; the Tier 2 vector is archived as the best per-species candidate pending that comparison.
+
+### Fixed
+- `perseus/tools/harvest_t2_chains.py`: n-aware production-vector selection. The prior cma_history fallback trusted the active settling check to guarantee a comparable plot count across candidates, then picked the lowest total negLL. But the settling check can time out under node contention: GA iter5_cand10 ran on only 240/779 plots (n = 398 paired obs), giving a spuriously low total negLL = 367 that is actually a mediocre per-plot fit (−0.9227). The harvester now parses the true paired-observation count and signed LL from each candidate's `launch.log` (`n=NNN ... LL=...`, a format shared by the GA inline-LL and MN/WI/MI runners), requires n ≥ max(MIN_N_PAIRS, 0.85 × max_n) (near-full settling), and selects the highest per-plot LL among those. This is a fourth safeguard over the three-mode degeneracy taxonomy: it defends the sample-size mode from re-entering through a settling-check timeout. Across GA's 112 candidates ~7 had settling shortfalls (n between 300 and 700) that the old fallback could have mis-selected.
+
+### Added (per-state pipeline parity)
+- GA/WA initial-community builders (`build_plot_ics_GA.py`, `build_plot_ics_WA.py`), GA multi-cycle plot list (`build_ga_plot_list.py`), GA biomass aggregator (`aggregate_GA_csv.py`).
+- CMA-ES objective + likelihood scripts (`likelihood.py`, `likelihood_GA.py`).
+- Tier 1 / Tier 1.5 theta application (`apply_theta.py`, `apply_theta_eco.py`).
+- Tier-ladder runners and submitters (`run_param_set_GA_t0/t1/t1_v2.sh`, `run_param_set_eco.sh`, `run_param_set_eco_t2.sh`, `run_param_set_t2.sh`, `submit_GA_t0.sh`, `submit_cma_es_tier2.sh`, `submit_cma_es_tier2_resume.sh`, `submit_eco_v3.sh`, `submit_refit.sh`).
+
+### In progress
+- MN, WI, MI Tier 2 chains (jobs 10124727, 10126909, 10126910) running at iter1 as of this tag. Provisional per-plot LL snapshots (MN −0.96, WI −0.66, MI −0.17) will be finalized on chain completion.
+
 ## v1.0.2 — 2026-05-17
 
 Defense-in-depth patches to both state-specific runners. Validated in production by the GA T2 v2 relaunch.
@@ -100,10 +125,11 @@ Foundational work culminating in the v1.0-rc1 milestone.
 
 ## Next planned releases
 
-### v1.x — pending GA T2 v2 chain completion (~12-15h ETA, started 2026-05-17 23:35 EDT)
-- GA Tier 2 per-species vector (if chain produces n ≥ 300 paired plots for the best candidate) — replaces GA Tier 1 in the production calibration table.
-- Methods Section 3.3 refresh with GA Tier 2 numbers if landed.
-- v1.x species heatmap with all three states at Tier 2.
+### v1.2 — pending MN / WI / MI Tier 2 chain completion (running at iter1; ~12-15h ETA from 2026-05-21)
+- Harvest MN / WI / MI Tier 2 production vectors via the n-aware `harvest_t2_chains.py --all`.
+- Six-state production calibration table + species heatmap.
+- Matched-n GA Tier 1 (θ = 0.30) vs Tier 2 evaluation to set GA's production tier.
+- Methods Section 3.3 refresh with multi-state Tier 2 numbers.
 
 ### v2.0 — methods paper acceptance + Zenodo DOI
 - Mint Zenodo DOI via GitHub-to-Zenodo webhook.
