@@ -160,6 +160,7 @@
       <h3>Statewide median trajectory</h3>
       <div class="sub" id="gc-sub">Climate scenarios under selected harvest</div>
       <div class="chartbox"><canvas id="stateChart" role="img" aria-label="Statewide biomass trajectory"></canvas></div>
+      <div class="sub" id="cmp-delta" style="color:var(--warn);display:none;margin-top:6px"></div>
     </div>
     <div class="card">
       <h3 id="plot-title">Selected plot</h3>
@@ -177,7 +178,7 @@
       </div>
       <div id="cal-mult" style="margin-top:10px"></div>
       <div id="cal-ladder-wrap" style="margin-top:10px;display:none">
-        <div style="font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Tier 1 ladder · LL vs θ</div>
+        <div id="cal-ladder-title" style="font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Tier 1 ladder · LL vs θ</div>
         <div style="position:relative;height:96px"><canvas id="ladderChart" role="img" aria-label="Calibration log-likelihood versus theta multiplier"></canvas></div>
       </div>
       <div id="cal-t15-wrap" style="margin-top:10px;display:none">
@@ -306,6 +307,9 @@ function drawStateChart(){
   const selKey=el("climate").value,fSel=CLIM[selKey]*harv*dm;
   curLine=ys.map((y,i)=>({x:y,y:baseT1[i]*fSel}));curLabel=`${stSel.value} ${selKey}/${el("harvest").value}`;
   if(pinned)ds.push({label:"Pinned: "+pinnedLabel,data:pinned,borderColor:"#e0a23a",borderWidth:2,borderDash:[2,2],pointRadius:0,tension:.25});
+  const cd=el("cmp-delta");
+  if(pinned){const d=curLine[curLine.length-1].y-pinned[pinned.length-1].y;cd.style.display="block";cd.textContent=`Current vs pinned (${pinnedLabel}): ${d>=0?"+":""}${Math.round(d)} Mg/ha at year 100`;}
+  else cd.style.display="none";
   if(stateChart)stateChart.destroy();
   stateChart=new Chart(el("stateChart"),{type:"line",data:{datasets:ds},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"nearest"},
@@ -362,10 +366,13 @@ function drawLadder(){
   const lad=LADDER[stSel.value];const wrap=el("cal-ladder-wrap");
   if(!lad){wrap.style.display="none";if(ladderChart){ladderChart.destroy();ladderChart=null;}return;}
   wrap.style.display="block";const cfg=STATES[stSel.value];
+  const opt=lad.reduce((a,b)=>b[1]>a[1]?b:a);
+  el("cal-ladder-title").textContent=`Tier 1 ladder · optimum θ=${opt[0]}`;
   if(ladderChart)ladderChart.destroy();
   ladderChart=new Chart(el("ladderChart"),{type:"line",data:{datasets:[{
       data:lad.map(r=>({x:r[0],y:r[1]})),borderColor:cfg.color,borderWidth:2,
-      pointRadius:2,pointBackgroundColor:cfg.color,tension:.2}]},
+      pointRadius:2,pointBackgroundColor:cfg.color,tension:.2},
+    {data:[{x:opt[0],y:opt[1]}],borderColor:"#e0a23a",backgroundColor:"#e0a23a",pointRadius:5,pointHoverRadius:6,showLine:false}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
       scales:{x:{type:"linear",reverse:true,title:{display:true,text:"θ (literature multiplier)",color:"#6f857a",font:{size:9}},ticks:{color:"#6f857a",font:{size:9}},grid:{color:"#26352e"}},
               y:{title:{display:true,text:"LL / cell",color:"#6f857a",font:{size:9}},ticks:{color:"#6f857a",font:{size:9}},grid:{color:"#26352e"}}}}});
