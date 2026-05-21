@@ -134,6 +134,11 @@
     </div>
 
     <a class="runbtn" id="runbtn">Apply scenario</a>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <a class="runbtn" id="pinbtn" style="background:transparent;border:1px solid var(--line);color:var(--ink2);margin-top:0;flex:1">Pin for comparison</a>
+      <a class="runbtn" id="clearpinbtn" style="background:transparent;border:1px solid var(--line);color:var(--ink3);margin-top:0;flex:0 0 auto;display:none">Clear</a>
+    </div>
+    <div id="pinlabel" class="note" style="margin-top:6px;color:var(--warn);display:none"></div>
     <div class="note">Climate and harvest responses are illustrative envelopes pending the
       27-cell factorial sweep. Calibration metrics and plot coordinates are real.</div>
   </aside>
@@ -227,6 +232,7 @@ let map=L.map("map",{zoomControl:true}).setView(STATES.ME.center,STATES.ME.zoom)
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
   {attribution:"© OpenStreetMap, © CARTO",maxZoom:12,subdomains:"abcd"}).addTo(map);
 let plotLayer=null,stateChart=null,plotChart=null,ladderChart=null,selPlot=null;
+let pinned=null,pinnedLabel="",curLine=null,curLabel="";
 
 function scenMult(){return CLIM[el("climate").value]*HARV[el("harvest").value]*(el("dist").value==="on"?0.9:1.0)}
 function cr(B0,Asym,year,k){k=k||0.035;return B0+(Asym-B0)*(1-Math.exp(-k*year))}
@@ -292,6 +298,9 @@ function drawStateChart(){
   });
   ds.push({label:"Tier 0 (literature)",data:ys.map((y,i)=>({x:y,y:baseT0[i]})),
     borderColor:"#6f857a",borderWidth:1.4,borderDash:[3,3],pointRadius:0,tension:.25});
+  const selKey=el("climate").value,fSel=CLIM[selKey]*harv*dm;
+  curLine=ys.map((y,i)=>({x:y,y:baseT1[i]*fSel}));curLabel=`${stSel.value} ${selKey}/${el("harvest").value}`;
+  if(pinned)ds.push({label:"Pinned: "+pinnedLabel,data:pinned,borderColor:"#e0a23a",borderWidth:2,borderDash:[2,2],pointRadius:0,tension:.25});
   if(stateChart)stateChart.destroy();
   stateChart=new Chart(el("stateChart"),{type:"line",data:{datasets:ds},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"nearest"},
@@ -359,6 +368,8 @@ el("state").addEventListener("change",()=>{selPlot=null;refresh();});
 el("layer").addEventListener("change",refresh);
 el("year").addEventListener("change",()=>{drawMap();});
 el("runbtn").addEventListener("click",refresh);
+el("pinbtn").addEventListener("click",()=>{if(!curLine)return;pinned=curLine.map(p=>({x:p.x,y:p.y}));pinnedLabel=curLabel;el("pinlabel").style.display="block";el("pinlabel").textContent="Pinned: "+pinnedLabel;el("clearpinbtn").style.display="block";drawStateChart();});
+el("clearpinbtn").addEventListener("click",()=>{pinned=null;el("pinlabel").style.display="none";el("clearpinbtn").style.display="none";drawStateChart();});
 el("layer").value="proj";applyPreset();
 el("yearv").textContent="50 yr";el("yearlbl").textContent="50 yr";
 refresh();
