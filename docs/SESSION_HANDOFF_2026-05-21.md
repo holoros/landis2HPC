@@ -1,58 +1,67 @@
-# PERSEUS session handoff
+# PERSEUS session handoff (v2)
 
 **Date:** 2026-05-21
 **Repo:** github.com/holoros/landis2HPC, branch main, in sync with origin
-**Latest commit at handoff:** b04e02f (plus a pending GUI-defaults commit described below)
+**Supersedes:** the earlier 2026-05-21 handoff. Adds the GUI build, the phase 3 backend, the GA/ME export tooling, and the Cardinal cleanup.
 
 ## One paragraph summary
 
-GA Tier 2 v2 finished and was harvested correctly after catching a settling-check timeout artifact; the harvester was hardened and the fix plus per-state parity files shipped as v1.1. A Forest Intelligence GUI (scenario builder, calibration view, statewide growth-curve projections, CTrees-style) was built, previewed, documented with a five-phase roadmap, and committed. MN, WI, and MI calibration chains are still running on Cardinal. The GUI now defaults to Maine with a curated set of scenario presets.
+GA Tier 2 v2 landed and was harvested after fixing a settling-timeout artifact in the harvester. A Forest Intelligence GUI was built, given sensible defaults, and wired to real Washington trajectories with an indicative statewide carbon readout. A phase 3 FastAPI backend that submits a scenario to Cardinal as a SLURM job was authored and its submission path was proven with a canary job. The GA and ME trajectory export has its merge tool ready; the heavy LANDIS runs are deferred to the post-chain window so they do not starve the running MN, WI, and MI calibration chains. Finished-chain SLURM logs were cleaned off scratch.
+
+## Commits this session (newest last)
+
+1. 972ed9e v1.1: GA T2 v2 landed, n-aware harvester, 19 per-state parity scripts.
+2. b04e02f Forest Intelligence GUI v1 plus architecture doc.
+3. d0a4d61 GUI defaults (Maine, scenario presets, projected layer) plus first handoff.
+4. 232e391 GUI phase 2: real WA per-plot trajectories from atlas JSON.
+5. ff0a5db GUI: indicative statewide carbon KPI.
+6. f73f720 Phase 3 seed: FastAPI scenario backend.
+7. f6c483b aggregate_atlas_trajectories.py (GA/ME atlas merge tool).
 
 ## Cardinal calibration state
 
-| State | Job | Status | Production / provisional per-plot LL | n |
+| State | Job | Status | Per-plot LL | n |
 |---|---|---|---|---|
 | ME | (v1.0) | production | +0.056 | 612 |
-| WA | (v1.0) | production | −0.217 | 805 |
-| GA | 10021254 | landed + harvested | −0.8871 (iter5_cand8) | 1255 |
-| MN | 10124727 | running, iter1 | −0.96 provisional | 2867 |
-| WI | 10126909 | running, iter1 | −0.66 provisional | 935 |
-| MI | 10126910 | running, iter1 | −0.17 provisional | 528 |
+| WA | (v1.0) | production | -0.217 | 805 |
+| GA | 10021254 | landed + harvested | -0.8871 (iter5_cand8) | 1255 |
+| MN | 10124727 | running, iter1 | -0.96 provisional | 2867 |
+| WI | 10126909 | running, iter1 | -0.66 provisional | 935 |
+| MI | 10126910 | running, iter1 | -0.17 provisional | 528 |
 
-MN, WI, and MI should land roughly 12 to 15 hours from the start of this session. When they do, the queue clears and the deferred GA matched-n evaluation can run.
+The three Great Lakes chains were still running at handoff (queue around 188 jobs). They should land roughly 12 to 15 hours from the start of this work, at which point the queue clears for the deferred compute below.
 
 ## Access notes
 
-SSH key lives at the session path `outputs/.session_ssh/id_osc`. The broken sandbox SSH config means every call needs `ssh -F /dev/null -i <key> -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no crsfaaron@cardinal.osc.edu`, and each bash call is independent so the key must be copied and chmod 600 inside the same call. The git repo on Cardinal is at `/users/PUOM0008/crsfaaron/repos/landis2HPC`; the live working scripts run from `/fs/scratch/PUOM0008/crsfaaron/landis2/tools`. GitHub push from Cardinal works (holoros authenticated).
+SSH key at the session path `outputs/.session_ssh/id_osc`. Every call needs `ssh -F /dev/null -i <key> -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no crsfaaron@cardinal.osc.edu`, and each bash call is independent so copy and chmod the key inside the same call. Repo on Cardinal at `/users/PUOM0008/crsfaaron/repos/landis2HPC`; live scripts at `/fs/scratch/PUOM0008/crsfaaron/landis2/tools`. GitHub push from Cardinal works (holoros authenticated).
 
-## What shipped this session
+## GUI status
 
-1. Fixed `perseus/tools/harvest_t2_chains.py` to be n-aware. It parses the true paired-observation count and signed LL from each candidate's `launch.log`, requires n at least max(300, 0.85 times the chain max), then selects the best per-plot LL. This stops a timed-out settling check from re-introducing the sample-size degeneracy. GA iter5_cand10 (240 of 779 plots, n=398) was the artifact it now rejects.
-2. Harvested GA correctly to `theta_best_production.csv` (iter5_cand8).
-3. Committed v1.1 (972ed9e): the harvester fix, 19 PERSEUS parity scripts pulled from the live tools tree, a CHANGELOG v1.1 entry, and the readiness matrix update. Pushed.
-4. Built and committed the Forest Intelligence GUI v1 (b04e02f): `perseus/dashboard/perseus_forest_intelligence_v1.html` and `docs/GUI_v1_architecture.md`. Pushed.
-5. Set GUI defaults (pending commit): default state Maine, a scenario preset selector, and projected biomass as the default map layer.
+The app is `perseus/dashboard/perseus_forest_intelligence_v1.html`, a self-contained single page tool. It opens on Maine with a scenario preset selector (no management reference, working forest, moderate climate, high climate plus disturbance, custom) and a projected biomass map layer at year 50. Washington uses its real per-plot Tier 0 and Tier 1 trajectories; the other states use the Chapman-Richards model anchored on observed biomass and the calibrated asymptote, marked with a measured or modeled label. There is an indicative statewide carbon headline (mean aboveground biomass times forest area times 0.47). Architecture and the five-phase roadmap are in `docs/GUI_v1_architecture.md`.
 
-## Key scientific decisions and open questions
+## Phase 3 backend status
 
-The GA Tier 2 per-plot LL (−0.8871 over n=1255) is not directly comparable to the v1.0 GA Tier 1 figure (+0.024 over n=218) because the two were scored on different paired sets. GA's production tier stays Tier 1 until a matched-n evaluation runs. The defensible production-vector rule is now per-plot LL among near-full-n candidates, not raw minimum negLL.
+`perseus/backend/` holds a runnable FastAPI seed: `config.py` (state registry, scenario to pipeline mapping, env-driven host and SSH settings), `cardinal_jobs.py` (build sbatch, submit over SSH, squeue status, read result.json), `app.py` (health, states, scenario run, status, result), plus requirements, launcher, and README. The single-plot scenario path runs `build_plot_scenario_{ST}.sh` plus LANDIS and extracts biomass at years 0, 25, 50, 75, 100. The SSH to sbatch to squeue to scancel path was smoke-tested with a canary job. It is a seed: before exposing it, add OSC-account authentication, a job database instead of the in-memory registry, and a results cache.
 
-## Next steps, in priority order
+## GA and ME trajectory export status
 
-1. When MN, WI, and MI land, run `harvest_t2_chains.py --all`, build the six-state production calibration table and species heatmap, refresh methods Section 3, and tag v1.2.
-2. Run the matched-n GA Tier 1 versus Tier 2 evaluation (task #118): build a uniform theta of 0.30 across all 54 GA parameters, run it through `run_param_set_GA_t2.sh` on `ga_t2_plotsubset.txt`, and compare its per-plot LL on n approximately 1255 to iter5_cand8's −0.8871. This sets GA's production tier. Run it after the chains clear the queue so it does not starve them.
-3. GUI phase 2: replace the illustrative climate and harvest envelopes with real per-plot trajectories read from `perseus/dashboard/atlas/{ST}.json`.
-4. GUI phase 3: stand up a minimal FastAPI service that submits one scenario to Cardinal and returns its trajectory, the seed for live runs.
-5. IN and OH: download FIA states 18 and 39, build their initial-communities rasters, then run the MN pipeline. Their ecoregion dependency is already solved.
+The merge tool `perseus/tools/aggregate_atlas_trajectories.py` is committed and self-tested. It reads the Tier 0 and calibrated per-plot biomass CSVs, converts g/m2 to Mg/ha, and writes t0 and t1 year-keyed dicts onto each atlas plot record in the WA schema. The LANDIS generation that produces those CSVs is deferred to the post-chain window so it does not compete with the calibration chains. Plan: run a Tier 0 pass and a calibrated pass over the GA and ME plot sets (ME via `run_t2_best_100yr.sh`; GA via a uniform theta 0.30 analog), aggregate into `atlas/GA.json` and `atlas/ME.json`, re-sample into the GUI dataset, and re-wire so GA and ME show measured curves like WA.
 
-## GUI defaults locked
+## Cardinal cleanup
 
-Default state is Maine, chosen as the home state with a clean Tier 2 production calibration. Featured production states are ME, WA, GA; MN, WI, MI appear flagged as calibrating. Scenario presets are: no management reference (baseline climate, no harvest), working forest (baseline, moderate harvest), moderate climate (SSP2-4.5, light harvest), and high climate plus disturbance (SSP5-8.5, light harvest, disturbance on), plus a custom mode that exposes the raw controls. The default map layer is projected biomass at year 50.
+A background job removed the finished GA Tier 2 v2 chain's per-task SLURM logs (`c*_*.out`, `c*_*.err`), the `chunk*.slurm` scripts, any leftover `runs/` scratch, and the phase 3 canary directory. Production artifacts were preserved in every candidate dir: `launch.log`, `theta.csv`, `log_likelihood.txt`, and `theta_best_production.csv`. The MN, WI, and MI bayesian directories were left untouched because their chains are still writing to them. The freed-space report is in `/fs/scratch/PUOM0008/crsfaaron/landis2/cleanup_*.log`.
 
-## File map
+## Post-chain compute window checklist (run when MN/WI/MI land)
 
-GUI app at `perseus/dashboard/perseus_forest_intelligence_v1.html`. Architecture and roadmap at `docs/GUI_v1_architecture.md`. Harvester at `perseus/tools/harvest_t2_chains.py`. Readiness matrix at `docs/multistate_readiness_matrix.md`. Changelog at `CHANGELOG.md`. Per-state plot bundles at `perseus/data/untreated_plots_{ST}.csv`. Production theta vectors at `perseus/theta_best/`.
+1. `harvest_t2_chains.py --all`, then build the six-state production table and species heatmap, refresh methods Section 3, and tag v1.2.
+2. Matched-n GA Tier 1 versus Tier 2 evaluation (task #118): uniform theta 0.30 across the 54 GA params through `run_param_set_GA_t2.sh` on `ga_t2_plotsubset.txt`, compare per-plot LL to iter5_cand8's -0.8871, set GA's production tier.
+3. GA and ME trajectory generation, then `aggregate_atlas_trajectories.py`, then re-sample into the GUI.
+4. Optionally extend the same trajectory export to MN, WI, MI once their production vectors are set.
+
+## Other next steps
+
+GUI phase 4 is statewide raster tiles for true wall-to-wall carbon. Phase 3 hardening (auth, job DB, cache) turns the seed into a deployable service. IN and OH still need FIA states 18 and 39 downloaded plus initial-community rasters, then the MN pipeline applies.
 
 ## Open tasks
 
-Monitoring MN (#112) and WI/MI (#114). Matched-n GA Tier 1 versus Tier 2 evaluation (#118). GUI phase 2 and phase 3 are next to be created as tasks.
+Monitor MN (#112) and WI/MI (#114). Matched-n GA evaluation (#118). GA/ME trajectory generation (#126, aggregator done, compute deferred). Phase 3 backend hardening and phase 4 rasters to be created as tasks when prioritized.
