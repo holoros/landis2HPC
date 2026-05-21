@@ -57,18 +57,28 @@ console-patch/
 ## Layer 2: PERSEUS Multi-state calibration framework
 
 Multi-state inverse parameterization of LANDIS-II Biomass Succession against the
-USDA Forest Inventory and Analysis (FIA) multi-cycle hindcast. Calibrated parameter
-sets for Maine, Georgia, and Washington with full validation framework.
+USDA Forest Inventory and Analysis (FIA) multi-cycle hindcast. Production calibrations
+for Maine, Georgia, Washington, and Minnesota, with Wisconsin and Michigan finishing,
+plus a full validation framework, a browser-based Forest Intelligence GUI, and a
+scenario-submission backend.
 
 ### Headline findings
 
-- **Literature parameters systematically biased** (over-prediction in GA + WA, slight
-  under-prediction in ME)
-- **Four-tier calibration ladder** closes the gap with state-specific optima
-- **Calibration changes 100-year biomass asymptotes by 7–67%** — directly relevant
-  to state-scale forest carbon accounting
-- **Calibration degeneracy diagnostic** — novel methodological contribution; the
-  active-growth fraction is the recommended diagnostic for production calibration
+- **A regional sign-flip in literature bias** — calibration scales productivity up in
+  Maine (85% of species above 1.0, median x1.31) but down hard in Washington and Georgia
+  (theta optimum 0.20 to 0.30). The literature parameters are not uniformly off; they are
+  regionally biased. See `docs/crossstate_literature_bias_memo.md`.
+- **Four-tier calibration ladder** (Tier 0 literature, Tier 1 uniform, Tier 1.5 per
+  ecoregion, Tier 2 per species) closes the gap with state-specific optima.
+- **Calibration changes 100-year biomass asymptotes by 7 to 67%** — for Washington the
+  median year-100 biomass falls from 562 to 185 Mg/ha, a level correction rather than a
+  growth shutdown (53% of plots still accrue biomass). See `docs/WA_calibration_effect_memo.md`.
+- **Tier 2 recovers ecologically coherent per-species structure** — Maine balsam fir gets
+  ANPP x2.26 with a biomass ceiling x0.54, the fast-growing short-lived signature, from
+  data alone. See `docs/me_tier2_multiplier_structure_memo.md`.
+- **Calibration degeneracy diagnostics** — a three-mode pathology (active-growth,
+  empty-aggregator, sample-size) plus an n-aware production-vector selector that defends
+  against settling-check timeouts (`perseus/tools/harvest_t2_chains.py`).
 
 ### Quick start
 
@@ -76,8 +86,8 @@ sets for Maine, Georgia, and Washington with full validation framework.
 # Browse the integrated methods paper
 less docs/methods_paper_FINAL_ASSEMBLY.md
 
-# Open the interactive PERSEUS Carbon Atlas
-xdg-open perseus/dashboard/atlas/index.html
+# Open the Forest Intelligence GUI (scenario builder, growth curves, calibration)
+xdg-open perseus/dashboard/perseus_forest_intelligence_v1.html
 
 # Inspect calibrated parameter vectors
 cat perseus/theta_best/ME_tier2_theta_best.csv
@@ -115,12 +125,13 @@ landis2HPC/
 │
 ├── perseus/                             # Layer 2: PERSEUS framework
 │   ├── README.md                        # PERSEUS layer details
-│   ├── tools/                           # 22 calibration scripts
+│   ├── tools/                           # calibration + harvest + atlas scripts
 │   ├── disturbance_agents/              # 6 validated agent files
 │   ├── theta_best/                      # Per-state best calibrations
-│   ├── figures/                         # 16 publication-quality PNGs
+│   ├── figures/                         # publication-quality PNGs
 │   ├── data/                            # FIA plot lists + ecoregion lookups
-│   ├── dashboard/                       # PERSEUS Carbon Atlas v1 (static HTML)
+│   ├── dashboard/                       # Forest Intelligence GUI + Carbon Atlas (static HTML)
+│   ├── backend/                         # FastAPI scenario-to-Cardinal service (phase 3)
 │   └── tests/                           # Reproducibility scripts
 │
 └── docs/                                # All documentation
@@ -134,6 +145,12 @@ landis2HPC/
     ├── T2_pairing_fix_resolution.md     # T2 CMA-ES debug audit
     ├── disturbance_extensions.md        # v8 Apptainer extension validation
     ├── GUI_scope_memo.md                # Next-step product decisions
+    ├── GUI_v1_architecture.md           # Forest Intelligence GUI architecture + roadmap
+    ├── multistate_readiness_matrix.md   # Per-state calibration readiness
+    ├── WA_calibration_effect_memo.md    # WA year-100 calibration effect (real trajectories)
+    ├── crossstate_literature_bias_memo.md  # Regional sign-flip synthesis
+    ├── me_tier2_multiplier_structure_memo.md  # ME per-species correction structure
+    ├── SESSION_HANDOFF_2026-05-21.md    # Latest session handoff
     ├── deposit_plan.md                  # GitHub + Zenodo strategy
     └── references.bib                   # 40-entry bibliography
 ```
