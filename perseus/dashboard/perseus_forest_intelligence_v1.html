@@ -93,6 +93,14 @@
     <select id="state"></select>
 
     <div class="sect">Scenario builder</div>
+    <label class="fld" for="preset">Scenario preset</label>
+    <select id="preset">
+      <option value="reference">No management (reference)</option>
+      <option value="working">Working forest</option>
+      <option value="climate_mod">Moderate climate (SSP2-4.5)</option>
+      <option value="climate_high">High climate + disturbance</option>
+      <option value="custom">Custom</option>
+    </select>
     <label class="fld" for="climate">Climate</label>
     <select id="climate">
       <option value="baseline">Baseline (historical PRISM)</option>
@@ -195,11 +203,19 @@ const HARV={none:1.0,light:0.86,moderate:0.72,heavy:0.56};
 
 function el(id){return document.getElementById(id)}
 const stSel=el("state");
-Object.keys(STATES).forEach(k=>{const o=document.createElement("option");o.value=k;
+["ME","WA","GA","MN","WI","MI"].forEach(k=>{const o=document.createElement("option");o.value=k;
   o.textContent=STATES[k].name+(STATES[k].status==="calibrating"?" (calibrating)":"");stSel.appendChild(o)});
-stSel.value="WA";
+stSel.value="ME";
+const PRESETS={
+  reference:{climate:"baseline",harvest:"none",dist:"off"},
+  working:{climate:"baseline",harvest:"moderate",dist:"off"},
+  climate_mod:{climate:"ssp245",harvest:"light",dist:"off"},
+  climate_high:{climate:"ssp585",harvest:"light",dist:"on"}
+};
+function applyPreset(){const p=PRESETS[el("preset").value];if(!p)return;
+  el("climate").value=p.climate;el("harvest").value=p.harvest;el("dist").value=p.dist;}
 
-let map=L.map("map",{zoomControl:true}).setView(STATES.WA.center,STATES.WA.zoom);
+let map=L.map("map",{zoomControl:true}).setView(STATES.ME.center,STATES.ME.zoom);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
   {attribution:"© OpenStreetMap, © CARTO",maxZoom:12,subdomains:"abcd"}).addTo(map);
 let plotLayer=null,stateChart=null,plotChart=null,selPlot=null;
@@ -312,10 +328,13 @@ function refresh(){const cfg=STATES[stSel.value];map.flyTo(cfg.center,cfg.zoom);
   drawMap();drawStateChart();drawPlotChart();drawCalib();crumb();}
 
 el("year").addEventListener("input",()=>{el("yearv").textContent=el("year").value+" yr";el("yearlbl").textContent=el("year").value+" yr";});
-["state","climate","harvest","dist","layer"].forEach(id=>el(id).addEventListener("change",e=>{
-  if(id==="state")selPlot=null;refresh();}));
+el("preset").addEventListener("change",()=>{applyPreset();refresh();});
+["climate","harvest","dist"].forEach(id=>el(id).addEventListener("change",()=>{el("preset").value="custom";refresh();}));
+el("state").addEventListener("change",()=>{selPlot=null;refresh();});
+el("layer").addEventListener("change",refresh);
 el("year").addEventListener("change",()=>{drawMap();});
 el("runbtn").addEventListener("click",refresh);
+el("layer").value="proj";applyPreset();
 el("yearv").textContent="50 yr";el("yearlbl").textContent="50 yr";
 refresh();
 </script>
