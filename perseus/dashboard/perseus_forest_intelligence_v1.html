@@ -144,6 +144,7 @@
       <div class="fk"><div class="l">Mean AGB (yr T)</div><div class="v" id="fk-agb">—</div></div>
       <div class="fk"><div class="l">Carbon density</div><div class="v" id="fk-c">—</div></div>
       <div class="fk"><div class="l">Inventory plots</div><div class="v" id="fk-n">—</div></div>
+      <div class="fk"><div class="l">Statewide C (indic.)</div><div class="v" id="fk-tc">—</div></div>
     </div>
     <div class="legend" id="legend"></div>
   </div>
@@ -201,6 +202,7 @@ const STATES = {
 const CLIM={baseline:1.0,ssp245:1.06,ssp585:1.11};
 const HARV={none:1.0,light:0.86,moderate:0.72,heavy:0.56};
 STATES.WA.traj="measured";["ME","GA","MN","WI","MI"].forEach(k=>STATES[k].traj="modeled");
+const AREA={ME:7.6e6,WA:9.3e6,GA:9.8e6,MN:6.9e6,WI:6.5e6,MI:8.0e6};
 
 function el(id){return document.getElementById(id)}
 const stSel=el("state");
@@ -259,6 +261,7 @@ function drawMap(){
   el("fk-agb").textContent=meanAGB.toFixed(0)+" Mg/ha";
   el("fk-c").textContent=(meanAGB*0.47).toFixed(0)+" MgC/ha";
   el("fk-n").textContent=cfg.nplots?cfg.nplots.toLocaleString():"calibrating";
+  el("fk-tc").textContent=(meanAGB*(AREA[stSel.value]||0)*0.47/1e6).toFixed(0)+" Tg C";
   el("legend").innerHTML="<b>"+(layer==="growth"?"Net change":"Biomass (Mg/ha)")+"</b>"+
     (layer==="growth"
       ?'<span class="sw" style="background:rgb(80,170,100)"></span> gain<br><span class="sw" style="background:rgb(210,110,80)"></span> loss'
