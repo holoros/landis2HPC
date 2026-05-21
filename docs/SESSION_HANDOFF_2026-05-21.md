@@ -49,7 +49,7 @@ The merge tool `perseus/tools/aggregate_atlas_trajectories.py` is committed and 
 
 ## Cardinal cleanup
 
-A background job removed the finished GA Tier 2 v2 chain's per-task SLURM logs (`c*_*.out`, `c*_*.err`), the `chunk*.slurm` scripts, any leftover `runs/` scratch, and the phase 3 canary directory. Production artifacts were preserved in every candidate dir: `launch.log`, `theta.csv`, `log_likelihood.txt`, and `theta_best_production.csv`. The MN, WI, and MI bayesian directories were left untouched because their chains are still writing to them. The freed-space report is in `/fs/scratch/PUOM0008/crsfaaron/landis2/cleanup_*.log`.
+A cleanup pass confirmed the finished GA Tier 2 v2 chain was already tidy: the runner self-cleans its per-task SLURM logs and `runs/` scratch during execution, so the chain directory holds only about 7.5 MB across 112 candidates (`launch.log`, `theta.csv`, `log_likelihood.txt`, `SppEcoregionData_*.csv`, and `theta_best_production.csv`). The pass removed the phase 3 canary directory. The MN, WI, and MI bayesian directories were left untouched because their chains are still writing to them. The pass log is in `/fs/scratch/PUOM0008/crsfaaron/landis2/cleanup_*.log`.
 
 ## Post-chain compute window checklist (run when MN/WI/MI land)
 
