@@ -171,6 +171,10 @@
         <div class="kpi"><div class="l">Paired obs (n)</div><div class="v" id="cal-n">—</div></div>
       </div>
       <div id="cal-mult" style="margin-top:10px"></div>
+      <div id="cal-ladder-wrap" style="margin-top:10px;display:none">
+        <div style="font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Tier 1 ladder · LL vs θ</div>
+        <div style="position:relative;height:96px"><canvas id="ladderChart" role="img" aria-label="Calibration log-likelihood versus theta multiplier"></canvas></div>
+      </div>
       <div class="note" id="cal-note"></div>
     </div>
   </aside>
@@ -203,6 +207,7 @@ const CLIM={baseline:1.0,ssp245:1.06,ssp585:1.11};
 const HARV={none:1.0,light:0.86,moderate:0.72,heavy:0.56};
 STATES.WA.traj="measured";["ME","GA","MN","WI","MI"].forEach(k=>STATES[k].traj="modeled");
 const AREA={ME:7.6e6,WA:9.3e6,GA:9.8e6,MN:6.9e6,WI:6.5e6,MI:8.0e6};
+const LADDER={WA:[[1.0,-0.85],[0.85,-0.79],[0.75,-0.75],[0.65,-0.7],[0.5,-0.63],[0.45,-0.6],[0.4,-0.58],[0.3,-0.54],[0.25,-0.53],[0.2,-0.53],[0.15,-0.54],[0.1,-0.57]],GA:[[1.0,-14.07],[0.9,-13.1],[0.7,-11.24],[0.5,-9.62],[0.3,-8.81]]};
 
 function el(id){return document.getElementById(id)}
 const stSel=el("state");
@@ -221,7 +226,7 @@ function applyPreset(){const p=PRESETS[el("preset").value];if(!p)return;
 let map=L.map("map",{zoomControl:true}).setView(STATES.ME.center,STATES.ME.zoom);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
   {attribution:"© OpenStreetMap, © CARTO",maxZoom:12,subdomains:"abcd"}).addTo(map);
-let plotLayer=null,stateChart=null,plotChart=null,selPlot=null;
+let plotLayer=null,stateChart=null,plotChart=null,ladderChart=null,selPlot=null;
 
 function scenMult(){return CLIM[el("climate").value]*HARV[el("harvest").value]*(el("dist").value==="on"?0.9:1.0)}
 function cr(B0,Asym,year,k){k=k||0.035;return B0+(Asym-B0)*(1-Math.exp(-k*year))}
@@ -327,6 +332,19 @@ function drawCalib(){
     });
   }
   el("cal-note").textContent=cfg.note||"";
+  drawLadder();
+}
+function drawLadder(){
+  const lad=LADDER[stSel.value];const wrap=el("cal-ladder-wrap");
+  if(!lad){wrap.style.display="none";if(ladderChart){ladderChart.destroy();ladderChart=null;}return;}
+  wrap.style.display="block";const cfg=STATES[stSel.value];
+  if(ladderChart)ladderChart.destroy();
+  ladderChart=new Chart(el("ladderChart"),{type:"line",data:{datasets:[{
+      data:lad.map(r=>({x:r[0],y:r[1]})),borderColor:cfg.color,borderWidth:2,
+      pointRadius:2,pointBackgroundColor:cfg.color,tension:.2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{type:"linear",reverse:true,title:{display:true,text:"θ (literature multiplier)",color:"#6f857a",font:{size:9}},ticks:{color:"#6f857a",font:{size:9}},grid:{color:"#26352e"}},
+              y:{title:{display:true,text:"LL / cell",color:"#6f857a",font:{size:9}},ticks:{color:"#6f857a",font:{size:9}},grid:{color:"#26352e"}}}}});
 }
 function crumb(){el("crumb").textContent=
   `${STATES[stSel.value].name} · scenario: ${el("climate").value} / ${el("harvest").value}`+
