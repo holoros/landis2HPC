@@ -2,7 +2,9 @@
 
 **Date:** 2026-05-21
 **Data:** production theta vectors for ME, GA, WA, MN, WI, MI (`states/{ST}/perseus/bayesian/.../theta_best_production.csv`) and the ME atlas multipliers.
-**Figure:** `perseus/figures/sixstate_literature_bias_gradient.png`
+**Figures:** `perseus/figures/sixstate_literature_bias_gradient.png` (regional gradient),
+`perseus/figures/greatlakes_per_species_structure.png` (per-species ANPP vs ceiling: Maine up, Great Lakes moderate down),
+`perseus/figures/wa_statewide_carbon_trajectory.png` (Washington statewide carbon: literature overstates the year-100 stock 3x, 264 vs 87 Mg C/ha)
 
 ## Production calibration table
 
