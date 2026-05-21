@@ -1,7 +1,28 @@
 # PERSEUS multi-state readiness matrix
 
-**Date:** 2026-05-20
+**Date:** 2026-05-20 (updated after Great Lakes expansion)
 **Purpose:** definitive accounting of which states can enter the PERSEUS calibration framework, what each has, and what each still needs.
+
+## Current live status (2026-05-20)
+
+Four Tier 2 CMA-ES chains running on Cardinal, harvested by `perseus/tools/harvest_t2_chains.py --all`:
+
+| State | Chain | Job | Status |
+|---|---|---|---|
+| GA | ga_t2_v2 | 10021254 | finishing (iter7); best so far iter5_cand10 LL=−367 |
+| MN | mn_t2_v1 | 10124727 | running; iter0 LL=−2756 over n=4130 paired obs |
+| WI | wi_t2_v1 | 10126909 | running (335 plots, eco 47/50/51/52) |
+| MI | mi_t2_v1 | 10126910 | running (200 plots, eco 50/51) |
+
+When all land, PERSEUS spans **6 states (ME, GA, WA, MN, WI, MI)**. The EPA L3 ecoregion shapefile (`/users/PUOM0008/crsfaaron/Disturbance/us_eco_l3.shp`) unlocked MI/WI; they calibrate on ecoregions shared with MN (46–52), reusing MN species/climate/SppEcoregionData with zero new literature parameterization.
+
+### Landing workflow (when a chain completes)
+
+```bash
+cd /fs/scratch/PUOM0008/crsfaaron/landis2/tools
+python3 harvest_t2_chains.py --all      # writes theta_best_production.csv per chain
+```
+The harvester selects each chain's production vector by **highest per-plot LL among candidates with n_pairs ≥ 300** (the v1.0 selection lesson), with a cma_history.csv fallback for the GA inline-LL runner. This avoids the sample-size-degeneracy artifact that the raw CMA-ES xbest can be.
 
 ## Two independent prerequisites
 
@@ -15,17 +36,17 @@ A state needs BOTH of the following before it can be calibrated:
 | State | (A) LANDIS inputs | (B) FIA tables | Calibration status | Gap to calibrate |
 |---|---|---|---|---|
 | **ME** | yes | (from earlier pipeline) | **T2 production (v1.0)** | none — done |
-| **GA** | yes | yes | **T1 v1.0 / T2 v2 finishing** | T2 v2 chain landing now |
+| **GA** | yes | yes | **T2 v2 chain finishing (10021254)** | harvest when done |
 | **WA** | yes | yes | **T2 production (v1.0)** | none — done |
-| **MN** | yes | yes | **T2 chain launched (job 10124727)** | none — running now |
+| **MN** | yes | yes | **T2 chain running (10124727)** | harvest when done |
+| **WI** | reuses MN (shared eco) | yes | **T2 chain running (10126909)** | harvest when done; southern eco 53/54 deferred |
+| **MI** | reuses MN (shared eco) | yes | **T2 chain running (10126910)** | harvest when done; southern eco 55/56/57 deferred |
 | **IN** | yes (no IC raster) | **no** | not started | build IC raster + download IN FIA (state 18) |
 | **OH** | yes (no IC raster) | **no** | not started | build IC raster + download OH FIA (state 39) |
-| **MI** | **no** | yes | not started | generate full LANDIS inputs (ecoregion raster, species params, climate) |
-| **WI** | **no** | yes | not started | generate full LANDIS inputs (ecoregion raster, species params, climate) |
 
 FIA folder states present: AL, FL, GA, IA, ID, MI, MN, NC, OR, SC, TN, WA, WI.
-LANDIS state dirs present: GA, IN, ME, MN, OH, WA.
-**Only MN, GA, WA (and ME from the earlier pipeline) satisfy both prerequisites today.**
+LANDIS state dirs present: GA, IN, ME, MN, OH, WA (+ MI, WI now reuse MN inputs on shared ecoregions).
+**Six states (ME, GA, WA, MN, WI, MI) are now calibrating or done; IN/OH remain blocked on FIA downloads.**
 
 ## What MI + WI specifically need (the requested states)
 
