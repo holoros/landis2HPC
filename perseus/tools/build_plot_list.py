@@ -175,7 +175,8 @@ def main():
             valid.append({**rec, "biom_Mgha": bio})
         if len(valid) < args.min_cycles: continue
         first = valid[0]
-        out = {"PLOT": key[3], "FIRST_PLTCN": first["plt_cn"],
+        out = {"PLOT": None,  # sequential unique plot_id assigned after sort
+               "FIA_PLOT": key[3], "FIRST_PLTCN": first["plt_cn"],
                "FIRST_INVYR": first["invyr"], "PUB_LAT": first["lat"],
                "PUB_LONG": first["lon"], "COUNTYCD": first["countycd"],
                "N_CYCLES": len(valid)}
@@ -183,12 +184,17 @@ def main():
             out[f"BIOM_{rec['invyr']}_Mgha"] = round(rec["biom_Mgha"], 3)
         rows_out.append(out)
 
-    rows_out.sort(key=lambda r: (-r["N_CYCLES"], int(r["PLOT"])))
+    rows_out.sort(key=lambda r: (-r["N_CYCLES"], int(r["FIA_PLOT"])))
     if args.limit > 0: rows_out = rows_out[:args.limit]
+    # Assign sequential globally-unique plot_id (FIA PLOT number is NOT unique
+    # across counties/units; downstream IC + ecoregion + scenario builders key
+    # off this unique PLOT id).
+    for i, r in enumerate(rows_out, start=1):
+        r["PLOT"] = i
     print(f"Plots passing filters: {len(rows_out)}", file=sys.stderr)
 
     cycle_cols = sorted({k for r in rows_out for k in r if k.startswith("BIOM_")})
-    base_cols = ["PLOT", "FIRST_PLTCN", "FIRST_INVYR", "PUB_LAT", "PUB_LONG",
+    base_cols = ["PLOT", "FIA_PLOT", "FIRST_PLTCN", "FIRST_INVYR", "PUB_LAT", "PUB_LONG",
                  "COUNTYCD", "N_CYCLES"]
     with open(args.out, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=base_cols + cycle_cols)
