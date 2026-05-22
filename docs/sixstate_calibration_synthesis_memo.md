@@ -11,7 +11,7 @@
 | State | Region | Production vector | Per-plot LL | n |
 |---|---|---|---|---|
 | Maine | Northeast | T2 per-species (26 params) | +0.056 | 612 |
-| Georgia | Southeast | T1 uniform θ = 0.30 (T2 archived) | +0.024 | 218 |
+| Georgia | Southeast | T2 per-species (iter5_cand8) | −0.8871 | 1255 |
 | Washington | West | T2 per-species (50 params) | −0.217 | 805 |
 | Michigan | Great Lakes | T2 per-species (iter7_cand5) | −0.1292 | 562 |
 | Wisconsin | Great Lakes | T2 per-species (iter2_cand11) | −0.6470 | 916 |
@@ -31,7 +31,7 @@ A framework that pulled every state the same direction would be easy to dismiss 
 
 ## Caveats
 
-The Maine, Georgia, Minnesota, Wisconsin, and Michigan values are per-species ANPP multipliers; Washington is shown at its Tier 1 uniform optimum because its production vector is Tier 2 but its per-plot multiplier vector was not exported into the atlas in the same form. The robust claim is the three-regime ordering of the correction factor, not a precise per-state magnitude on a single common scale. Georgia's production tier remains provisionally Tier 1 pending the matched-n Tier 1 versus Tier 2 evaluation; the per-species median quoted here is from the archived Tier 2 vector and agrees with the Tier 1 optimum.
+The Maine, Georgia, Minnesota, Wisconsin, and Michigan values are per-species ANPP multipliers; Washington is shown at its Tier 1 uniform optimum because its production vector is Tier 2 but its per-plot multiplier vector was not exported into the atlas in the same form. The robust claim is the three-regime ordering of the correction factor, not a precise per-state magnitude on a single common scale. Georgia's production tier is now Tier 2: a matched-n evaluation gives Tier 2 per-plot LL −0.8871 versus the Tier 1 θ=0.30 vector at −0.9603 over n≈1280, so Tier 2 wins. All six states are Tier 2 production.
 
 ## Next
 

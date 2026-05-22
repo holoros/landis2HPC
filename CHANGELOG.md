@@ -17,6 +17,8 @@ The MN Tier 2 chain (job 10124727) completed 8 CMA-ES iterations (112 candidates
 
 PERSEUS now has **six production states** (ME, GA, WA, MN, WI, MI). The six-state synthesis is in `docs/sixstate_calibration_synthesis_memo.md`: literature productivity bias is a regional gradient, not a global offset. Maine scales up (median ANPP multiplier 1.31); the Great Lakes scale down moderately (MN 0.60, WI 0.65, MI 0.63); Washington and Georgia scale down hard (0.20, 0.31). Figures: `sixstate_literature_bias_gradient.png`, `greatlakes_per_species_structure.png`, and `wa_statewide_carbon_trajectory.png` (literature overstates the Washington year-100 carbon stock by 3x, 264 vs 87 Mg C/ha).
 
+Georgia upgraded from Tier 1 to Tier 2: a matched-n evaluation (uniform θ=0.30 through the GA Tier 2 runner on the same plot subset, n≈1280) gives Tier 1 per-plot LL −0.9603 versus Tier 2 −0.8871, so all six states are now Tier 2 production.
+
 ### Added (Forest Intelligence GUI)
 - `perseus/dashboard/perseus_forest_intelligence_v1.html`: self-contained CTrees-style app. Default Maine, scenario presets (no management, working forest, moderate climate, high climate plus disturbance, custom), dark-basemap map with real FIA plot coordinates colored by observed / projected / net change, statewide growth curves with climate-scenario overlays, scenario pin and compare with a year-100 delta readout, indicative statewide carbon KPI, Tier 1 calibration ladder with optimum highlight, and a WA Tier 1.5 per-ecoregion theta panel (wet-to-dry gradient). Washington uses real per-plot Tier 1 trajectories; other states use a Chapman-Richards model fallback labeled measured vs modeled.
 - `docs/GUI_v1_architecture.md`: vision, three surfaces, five-phase roadmap.

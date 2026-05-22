@@ -14,7 +14,7 @@ All six chains have **completed** (8 iterations, 112 candidates each) and are ha
 | WI | wi_t2_v1 | 10126909 | **LANDED** — production iter2_cand11, per-plot LL −0.6470 over n=916 |
 | MI | mi_t2_v1 | 10126910 | **LANDED** — production iter7_cand5, per-plot LL −0.1292 over n=562 |
 
-GA selection note: the raw CMA-ES min negLL (iter5_cand10, −367) was a **settling-check timeout artifact** — that candidate ran on only 240/779 plots (n=398). The defensible production vector is iter5_cand8 (n=1255, ~92% of max), chosen by per-plot LL among near-full-n candidates. The GA Tier 2 per-plot LL is not directly comparable to the v1.0 GA Tier 1 figure (different paired sets); a matched-n T1-vs-T2 evaluation is pending before declaring GA's production tier.
+GA selection note: the raw CMA-ES min negLL (iter5_cand10, −367) was a **settling-check timeout artifact** — that candidate ran on only 240/779 plots (n=398). The defensible production vector is iter5_cand8 (n=1255, ~92% of max), chosen by per-plot LL among near-full-n candidates. A matched-n evaluation now confirms Tier 2 (per-plot LL −0.8871) beats the Tier 1 θ=0.30 vector (−0.9603 over n≈1280), so GA's production tier is Tier 2. All six states are Tier 2 production.
 
 When all land, PERSEUS spans **6 states (ME, GA, WA, MN, WI, MI)**. The EPA L3 ecoregion shapefile (`/users/PUOM0008/crsfaaron/Disturbance/us_eco_l3.shp`) unlocked MI/WI; they calibrate on ecoregions shared with MN (46–52), reusing MN species/climate/SppEcoregionData with zero new literature parameterization.
 
@@ -38,7 +38,7 @@ A state needs BOTH of the following before it can be calibrated:
 | State | (A) LANDIS inputs | (B) FIA tables | Calibration status | Gap to calibrate |
 |---|---|---|---|---|
 | **ME** | yes | (from earlier pipeline) | **T2 production (v1.0)** | none — done |
-| **GA** | yes | yes | **T2 v2 LANDED (v1.1; iter5_cand8)** | matched-n T1-vs-T2 eval to set production tier |
+| **GA** | yes | yes | **T2 production (v1.2; iter5_cand8, per-plot LL −0.8871)** | none — T2 confirmed > T1 (matched-n: −0.8871 vs −0.9603) |
 | **WA** | yes | yes | **T2 production (v1.0)** | none — done |
 | **MN** | yes | yes | **T2 LANDED (v1.2; iter7_cand0, per-plot LL −0.9325, n=2741)** | none — harvested |
 | **WI** | reuses MN (shared eco) | yes | **T2 LANDED (v1.2; iter2_cand11, per-plot LL −0.6470, n=916)** | none — harvested; southern eco 53/54 deferred |
