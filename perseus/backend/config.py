@@ -19,6 +19,10 @@ SSH_OPTS = [
     "-o", "ConnectTimeout=20",
 ]
 
+# Optional API key. If set, action endpoints require a matching X-API-Key header.
+# Leave unset for local development (endpoints stay open).
+API_KEY = os.environ.get("PERSEUS_API_KEY", "")
+
 LANDIS_ROOT = os.environ.get("LANDIS_ROOT", "/fs/scratch/PUOM0008/crsfaaron/landis2")
 TOOLS = f"{LANDIS_ROOT}/tools"
 ACCOUNT = os.environ.get("OSC_ACCOUNT", "PUOM0008")

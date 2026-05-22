@@ -169,6 +169,7 @@
       <div style="margin-top:8px;border-top:1px solid var(--line);padding-top:8px">
         <div style="font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Live run on Cardinal (phase 3)</div>
         <input id="be-url" placeholder="backend URL e.g. http://localhost:8000" style="width:100%;margin-bottom:6px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;box-sizing:border-box">
+        <input id="be-key" placeholder="API key (if required)" style="width:100%;margin-bottom:6px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;box-sizing:border-box">
         <div style="display:flex;gap:6px;align-items:center">
           <input id="be-plot" placeholder="plot id" value="1" style="flex:1;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;box-sizing:border-box">
           <a class="runbtn" id="be-run" style="margin-top:0;flex:0 0 auto;padding:8px 14px">Run live</a>
@@ -392,7 +393,8 @@ async function runLive(){
   const body={state:stSel.value,plot_id:(el("be-plot").value.trim()||"1"),climate:el("climate").value,harvest:el("harvest").value,disturbance:el("dist").value==="on"};
   st.textContent="Submitting "+body.state+" plot "+body.plot_id+" ...";
   try{
-    const r=await fetch(url+"/scenario/run",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+    const hdr={"content-type":"application/json"};const k=el("be-key").value.trim();if(k)hdr["X-API-Key"]=k;
+    const r=await fetch(url+"/scenario/run",{method:"POST",headers:hdr,body:JSON.stringify(body)});
     if(!r.ok){st.textContent="Submit failed: HTTP "+r.status;return;}
     const j=await r.json();const tag=j.job_tag;st.textContent="Queued (SLURM job "+j.job_id+") ...";
     for(let i=0;i<180;i++){
