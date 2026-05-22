@@ -166,6 +166,15 @@
       <h3 id="plot-title">Selected plot</h3>
       <div class="sub">Click a plot on the map</div>
       <div class="chartbox"><canvas id="plotChart" role="img" aria-label="Selected plot trajectory"></canvas></div>
+      <div style="margin-top:8px;border-top:1px solid var(--line);padding-top:8px">
+        <div style="font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Live run on Cardinal (phase 3)</div>
+        <input id="be-url" placeholder="backend URL e.g. http://localhost:8000" style="width:100%;margin-bottom:6px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;box-sizing:border-box">
+        <div style="display:flex;gap:6px;align-items:center">
+          <input id="be-plot" placeholder="plot id" value="1" style="flex:1;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;box-sizing:border-box">
+          <a class="runbtn" id="be-run" style="margin-top:0;flex:0 0 auto;padding:8px 14px">Run live</a>
+        </div>
+        <div class="note" id="be-status" style="margin-top:6px"></div>
+      </div>
     </div>
 
     <div class="sect">Calibration</div>
@@ -377,6 +386,40 @@ function drawLadder(){
       scales:{x:{type:"linear",reverse:true,title:{display:true,text:"θ (literature multiplier)",color:"#6f857a",font:{size:9}},ticks:{color:"#6f857a",font:{size:9}},grid:{color:"#26352e"}},
               y:{title:{display:true,text:"LL / cell",color:"#6f857a",font:{size:9}},ticks:{color:"#6f857a",font:{size:9}},grid:{color:"#26352e"}}}}});
 }
+async function runLive(){
+  const url=el("be-url").value.trim().replace(/\/+$/,"");const st=el("be-status");
+  if(!url){st.textContent="Set a backend URL first. Start it with: uvicorn app:app --port 8000";return;}
+  const body={state:stSel.value,plot_id:(el("be-plot").value.trim()||"1"),climate:el("climate").value,harvest:el("harvest").value,disturbance:el("dist").value==="on"};
+  st.textContent="Submitting "+body.state+" plot "+body.plot_id+" ...";
+  try{
+    const r=await fetch(url+"/scenario/run",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+    if(!r.ok){st.textContent="Submit failed: HTTP "+r.status;return;}
+    const j=await r.json();const tag=j.job_tag;st.textContent="Queued (SLURM job "+j.job_id+") ...";
+    for(let i=0;i<180;i++){
+      await new Promise(res=>setTimeout(res,5000));
+      let s; try{s=await (await fetch(url+"/scenario/status/"+tag)).json();}catch(e){continue;}
+      st.textContent="Status: "+s.state+" (job "+j.job_id+", ~"+(i*5)+"s)";
+      if(s.state==="done"){
+        const rr=await fetch(url+"/scenario/result/"+tag);
+        if(rr.status===202){st.textContent="Job done; result still flushing ...";continue;}
+        overlayLive(await rr.json());st.textContent="Live run complete: "+body.state+" plot "+body.plot_id;return;
+      }
+    }
+    st.textContent="Timed out after 15 min waiting for the run.";
+  }catch(e){st.textContent="Error: "+e.message+". Is the backend running and reachable (CORS)?";}
+}
+function overlayLive(data){
+  const traj=(data&&data.trajectory)||{};
+  const pts=Object.keys(traj).map(y=>({x:+y,y:+traj[y]})).sort((a,b)=>a.x-b.x);
+  if(!pts.length){el("be-status").textContent="Run returned no trajectory.";return;}
+  const ds={label:"Live LANDIS run",data:pts,borderColor:"#e0a23a",borderWidth:2.6,pointRadius:3,pointBackgroundColor:"#e0a23a",tension:.2};
+  const opts={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:"#9fb4a8",boxWidth:10,font:{size:10}}}},
+    scales:{x:{type:"linear",title:{display:true,text:"year",color:"#6f857a"},ticks:{color:"#6f857a"},grid:{color:"#26352e"}},
+            y:{title:{display:true,text:"Mg/ha",color:"#6f857a"},ticks:{color:"#6f857a"},grid:{color:"#26352e"}}}};
+  if(plotChart){plotChart.data.datasets.push(ds);plotChart.update();}
+  else{plotChart=new Chart(el("plotChart"),{type:"line",data:{datasets:[ds]},options:opts});}
+  el("plot-title").textContent="Live run · "+stSel.value+" plot "+(el("be-plot").value||"");
+}
 function crumb(){el("crumb").textContent=
   `${STATES[stSel.value].name} · scenario: ${el("climate").value} / ${el("harvest").value}`+
   (el("dist").value==="on"?" / disturbance":"");}
@@ -392,6 +435,7 @@ el("year").addEventListener("change",()=>{drawMap();});
 el("runbtn").addEventListener("click",refresh);
 el("pinbtn").addEventListener("click",()=>{if(!curLine)return;pinned=curLine.map(p=>({x:p.x,y:p.y}));pinnedLabel=curLabel;el("pinlabel").style.display="block";el("pinlabel").textContent="Pinned: "+pinnedLabel;el("clearpinbtn").style.display="block";drawStateChart();});
 el("clearpinbtn").addEventListener("click",()=>{pinned=null;el("pinlabel").style.display="none";el("clearpinbtn").style.display="none";drawStateChart();});
+el("be-run").addEventListener("click",runLive);
 el("layer").value="proj";applyPreset();
 el("yearv").textContent="50 yr";el("yearlbl").textContent="50 yr";
 refresh();

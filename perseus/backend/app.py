@@ -16,12 +16,23 @@ import time
 import uuid
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 import config
 import cardinal_jobs
 
 app = FastAPI(title="PERSEUS scenario API", version="0.1")
+
+# CORS so the static Forest Intelligence GUI (opened from file:// or a static host) can
+# call this service from the browser. Open for the seed; restrict allow_origins to the
+# GUI's deployed origin before exposing the service publicly.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
 
 # In-memory job registry: job_tag -> {job_id, spec, submitted}. Replace with a DB later.
 JOBS = {}

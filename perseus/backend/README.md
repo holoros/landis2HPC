@@ -35,6 +35,17 @@ curl localhost:8000/scenario/result/WA_1_xxxx
 The GUI calls these endpoints instead of computing illustrative envelopes, so the growth
 curve for a clicked plot becomes the model output for the exact scenario the user chose.
 
+## Using it from the GUI
+
+The Forest Intelligence GUI (`perseus/dashboard/perseus_forest_intelligence_v1.html`) has a
+"Live run on Cardinal" panel in the selected-plot card. Start this service
+(`uvicorn app:app --port 8000`), open the GUI, paste the backend URL (for a local run,
+`http://localhost:8000`), enter a plot id, and click Run live. The GUI posts the current
+state, climate, and harvest with that plot id, polls the job every five seconds, and overlays
+the returned trajectory as a "Live LANDIS run" line on the plot chart. CORS is open in this
+seed so the static GUI can call the service from the browser; restrict `allow_origins` to the
+GUI's deployed origin before exposing it.
+
 ## Before this is production
 
 Add authentication tied to OSC accounts; this service can submit compute, so it must not
