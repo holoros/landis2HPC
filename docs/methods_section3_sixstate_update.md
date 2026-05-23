@@ -35,6 +35,8 @@ The per-species corrections are also internally coherent. Plotting each species 
 
 The level correction propagates directly to carbon accounting. For Washington, the calibration lowers the median year-100 aboveground biomass from a literature value of 562 to 185 Mg per hectare, a 67 percent reduction, which translates to roughly 264 versus 87 Mg of carbon per hectare at the century mark (Fig. wa_statewide_carbon_trajectory). An uncalibrated application of the literature parameters would therefore overstate the standing carbon stock at year 100 by about a factor of three. The reduction is a correction of the asymptote rather than a suppression of growth: 53 percent of Washington plots still accrue biomass over the century, 44 percent hold steady, and only 3 percent decline.
 
+Maine runs the other way. There the calibration lifts the median year-100 carbon from a literature 103 to 136 Mg per hectare, a 32 percent increase that matches the median ANPP multiplier of 1.31, because the literature underpredicts productivity in the Northeast. The two states bracket the regional gradient at the carbon-accounting level: uncalibrated literature parameters overstate the Western stock by roughly threefold and understate the Northeastern stock by about a third (Fig. statewide_carbon_WA_ME). Both trajectories come from real 100-year LANDIS runs over the state plot sets (Washington n=4429, Maine n=1220), not from the modeled envelope.
+
 ## Figures referenced
 
 `perseus/figures/sixstate_literature_bias_gradient.png`, `perseus/figures/greatlakes_per_species_structure.png`, `perseus/figures/me_tier2_multiplier_structure.png`, `perseus/figures/wa_calibration_effect_year100.png`, `perseus/figures/wa_statewide_carbon_trajectory.png`.
