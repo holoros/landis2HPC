@@ -95,13 +95,6 @@ cat perseus/theta_best/ME_tier2_theta_best.csv
 
 See [`perseus/README.md`](perseus/README.md) for full PERSEUS layer documentation.
 
-### Companion paper
-
-Weiskittel, A.R., Lucash, M.S., Scheller, R.M., et al. (2026). Multi-state inverse
-parameterization of LANDIS-II Biomass Succession against the FIA inventory cycle:
-a calibration ladder for Maine, Georgia, and Washington forests.
-*Environmental Modelling & Software*, submitted.
-
 ---
 
 ## Repo layout
