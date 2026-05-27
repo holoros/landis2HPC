@@ -91,8 +91,16 @@ find \$PD -mindepth 1 -name "output" -type d -exec rm -rf {} + 2>/dev/null
 find \$PD -mindepth 1 -name "Metadata" -type d -exec rm -rf {} + 2>/dev/null
 rm -f \$PD/*.tif 2>/dev/null
 SLURM
-  JID=$(sbatch --parsable $CK)
-  echo "  chunk $c -> job $JID" >> $LOG
+  # Serialize submission across concurrent drivers (avoids OSC QOSMaxSubmitJobPerUserLimit).
+  # The flock holds while any other driver is checking the queue gate and submitting,
+  # so multiple statewide drivers can run in parallel without colliding on the submit step.
+  ( flock -x 200
+    while [ "$(squeue --me -h -r | wc -l)" -gt 100 ]; do sleep 30; done
+    sbatch --parsable $CK > $BAY/last_jid.txt 2>$BAY/last_jid.err
+  ) 200>/tmp/perseus_statewide_submit.lock
+  JID=$(cat $BAY/last_jid.txt 2>/dev/null)
+  if [ -z "$JID" ]; then echo "  chunk $c SUBMIT FAILED: $(cat $BAY/last_jid.err 2>/dev/null)" >> $LOG; continue; fi
+  echo "  chunk $c -> job $JID (serialized submit)" >> $LOG
   sleep 60
   while squeue -j $JID -h -r 2>/dev/null | grep -q .; do sleep 30; done
   THR=$(( N * 85 / 100 ))
