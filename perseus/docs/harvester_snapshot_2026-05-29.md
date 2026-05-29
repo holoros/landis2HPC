@@ -1,16 +1,20 @@
-# T2 v2 harvester snapshot — 2026-05-29 (mid-chain)
+# T2 v2 harvester snapshot — 2026-05-29 (mid-chain, multiple polls)
 
-Snapshot of `harvest_t2_chains.py --all` run while both `wa_t2_v2` and `ga_t2_v2` chains are still RUNNING (both at iter8 partial). The harvester picks the candidate with the best per-plot LL among near-full-n candidates (`n >= max(300, 0.85*max_n)`).
+Snapshot of `harvest_t2_chains.py --all` run while both `wa_t2_v2` and `ga_t2_v2` chains are still RUNNING. Latest poll: WA at iter9 partial (3 cands), GA at iter8 partial (12 cands). The harvester picks the candidate with the best per-plot LL among near-full-n candidates (`n >= max(300, 0.85*max_n)`).
 
-## Harvester output
+## Harvester output (latest poll)
 
-| State | Selected | LL_total | n | per-plot LL | max_n | floor | Verdict |
-|---|---|---|---|---|---|---|---|
-| WA | `wa_t2_v2_iter7_cand8` | -943.6 | 1493 | **-0.6320** | 1552 | 1319 | NEW vector (different from v1.0) |
-| GA | `ga_t2_v2_pre_warmstart_iter5_cand8` | -1113.3 | 1255 | -0.8871 | 1367 | 1161 | NO change (same as v1.1 production) |
-| MN | `mn_t2_v1_iter7_cand0` | -2556.1 | 2741 | -0.9325 | 2867 | 2436 | NO change (v1.2 production) |
-| WI | `wi_t2_v1_iter2_cand11` | -592.6 | 916 | -0.6470 | 1012 | 860 | NO change (v1.2 production) |
-| MI | `mi_t2_v1_iter7_cand5` | -72.6 | 562 | -0.1292 | 562 | 477 | NO change (v1.2 production) |
+| State | Selected | LL_total | n | per-plot LL | max_n | Verdict |
+|---|---|---|---|---|---|---|
+| WA | `wa_t2_v2_iter7_cand8` | -943.6 | 1493 | **-0.6320** | 1552 | NEW vector (stable across 2 polls) |
+| GA | `ga_t2_v2_iter8_cand5` | -1099.4 | 1249 | **-0.8802** | 1367 | NEW vector (beats v1.1 by 0.007 per-plot) |
+| MN | `mn_t2_v1_iter7_cand0` | -2556.1 | 2741 | -0.9325 | 2867 | NO change (v1.2 production) |
+| WI | `wi_t2_v1_iter2_cand11` | -592.6 | 916 | -0.6470 | 1012 | NO change (v1.2 production) |
+| MI | `mi_t2_v1_iter7_cand5` | -72.6 | 562 | -0.1292 | 562 | NO change (v1.2 production) |
+
+## GA breakthrough at iter8 (update from earlier snapshot)
+
+Earlier in the day the harvester picked `ga_t2_v2_pre_warmstart_iter5_cand8` (the warmstart seed = v1.1 production candidate, per-plot -0.8871) because no v2 candidate had yet beaten v1.1 on per-plot. As of the later poll, **iter8 cand5 (LL=-1099.40, n=1249, per-plot -0.8802)** has overtaken the warmstart seed by 0.007 per-plot. v2 chain has now improved over v1.1. Once chain lands, GA T2 v2.0 ships and replaces v1.1.
 
 ## WA T2 v1.0 vs v2 candidate (iter7 cand8) comparison
 
@@ -26,9 +30,13 @@ Snapshot of `harvest_t2_chains.py --all` run while both `wa_t2_v2` and `ga_t2_v2
 
 Same overall regime (median ~0.5), reshuffled per-species magnitudes. Some species moved by ±30 percent. The headline "Washington cuts threefold" carbon result is in the same neighborhood; the v2.0 candidate likely gives a slightly lower year-100 carbon (median ANPP shifted down 0.035).
 
-## GA verdict detail
+## GA verdict detail (updated)
 
-The chain has not yet improved over v1.1 per the matched-n eval, even though iter7 cand0 has the lowest aggregate LL (-1138.67). On a per-plot basis with n=1239, iter7 cand0 is at -0.920, worse than the warmstart seed (v1.1 production candidate) at -0.887. The harvester correctly picks the warmstart seed.
+iter7 cand0 looked like the global aggregate-LL leader at -1138.67 but its per-plot was -0.920 — worse than v1.1. As iter8 cands landed, **iter8 cand5 (LL -1099.40, n=1249)** delivered per-plot -0.8802, finally beating v1.1's -0.8871. Modest but real improvement of 0.007 per-plot. Chain may yet improve further at iter9 or iter10.
+
+## PERSEUS expansion discovered
+
+Two new state chains discovered in the queue (2026-05-29): `in_t2_v1` (Indiana) and `oh_t2_v1` (Ohio), both at iter0 cand0 just launched. The readiness matrix had flagged IN/OH as the highest-leverage expansion (needed only FIA state downloads since the MN pipeline applies directly). These chains will land in roughly 5 to 7 days each. PERSEUS may soon be 8 states. Tracked as Task #7.
 
 ## Why this is mid-chain not final
 
