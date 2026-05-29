@@ -1,1 +1,89 @@
-{"title": "PERSEUS Multi-state LANDIS-II Calibration", "generated_at": "2026-05-17", "states": {"ME": {"name": "Maine", "n_plots": 3632, "best_tier": "Tier 2 per-species (26 params, n=612)", "ll_gain": 0.59, "color": "#2E7D32", "ll_per_plot": 0.056}, "GA": {"name": "Georgia", "n_plots": 5216, "best_tier": "Tier 1 theta=0.30 (n=218; T2 deferred to v1.x)", "ll_gain": 5.26, "color": "#C62828"}, "WA": {"name": "Washington", "n_plots": 4471, "best_tier": "Tier 2 per-species iter1_cand11 (50 params, n=805)", "ll_gain": 0.31, "color": "#1565C0", "ll_per_plot": -0.217}}, "methodology": {"framework": "Multi-cycle FIA hindcast", "validation_tests_passed": ["k-fold CV", "time-out-of-sample", "leave-one-ecoregion-out", "cross-state", "bootstrap CI", "IC perturbation"], "novel_finding": "Three-mode calibration degeneracy pathology (active-growth, empty-aggregator, sample-size)"}, "pathology_taxonomy": {"active_growth": "very low theta -> near-zero growth -> trivial IC fit; guard: active-growth fraction >= 0.50", "empty_aggregator": "per-plot pipeline failure -> empty per_plot.csv -> LL=0 default; guard: non-empty per_plot.csv", "sample_size": "few successful pairs -> trivially small LL magnitude -> CMA-ES misled; guard: MIN_N_PAIRS >= 300"}, "version": "v1.0 metadata (2026-05-17)"}
+{
+  "title": "PERSEUS Multi-state LANDIS-II Calibration",
+  "generated_at": "2026-05-29",
+  "version": "v1.3 metadata (2026-05-29); WA T2 v2 chain running, v1.0 still production",
+  "states": {
+    "ME": {
+      "name": "Maine",
+      "region": "Northeast",
+      "n_plots": 3632,
+      "best_tier": "Tier 2 per-species v1.0 final (26 params, n=612)",
+      "ll_per_plot": 0.056,
+      "ll_gain": 0.59,
+      "median_anpp_theta": 1.31,
+      "color": "#2E7D32"
+    },
+    "GA": {
+      "name": "Georgia",
+      "region": "Southeast",
+      "n_plots": 5216,
+      "best_tier": "Tier 2 per-species v1.1 (iter5_cand8, n=1255)",
+      "ll_per_plot": -0.8871,
+      "median_anpp_theta": 0.31,
+      "color": "#C62828"
+    },
+    "WA": {
+      "name": "Washington",
+      "region": "West",
+      "n_plots": 4471,
+      "best_tier": "Tier 2 per-species v1.0 (iter1_cand11, 50 params, n=805)",
+      "ll_per_plot": -0.217,
+      "ll_gain": 0.31,
+      "median_anpp_theta": 0.30,
+      "v2_chain_status": "running; iter7_cand8 currently leads matched-n harvester (per-plot -0.6320, n=1493); promotion gated on chain termination",
+      "color": "#1565C0"
+    },
+    "MN": {
+      "name": "Minnesota",
+      "region": "Great Lakes",
+      "n_plots": 6582,
+      "best_tier": "Tier 2 per-species v1.2 (iter7_cand0, n=2741)",
+      "ll_per_plot": -0.9325,
+      "median_anpp_theta": 0.60,
+      "color": "#0277BD"
+    },
+    "WI": {
+      "name": "Wisconsin",
+      "region": "Great Lakes",
+      "n_plots": 6457,
+      "best_tier": "Tier 2 per-species v1.2 (iter2_cand11, n=916)",
+      "ll_per_plot": -0.6470,
+      "median_anpp_theta": 0.65,
+      "color": "#00838F"
+    },
+    "MI": {
+      "name": "Michigan",
+      "region": "Great Lakes",
+      "n_plots": 7323,
+      "best_tier": "Tier 2 per-species v1.2 (iter7_cand5, n=562)",
+      "ll_per_plot": -0.1292,
+      "median_anpp_theta": 0.63,
+      "color": "#00695C"
+    }
+  },
+  "statewide_carbon_year100_Mg_C_per_ha": {
+    "WA": {"literature": 264, "calibrated": 87, "ratio": 0.33},
+    "MN": {"literature": 131, "calibrated": 78, "ratio": 0.60},
+    "WI": {"literature": 177, "calibrated": 118, "ratio": 0.67},
+    "MI": {"literature": 179, "calibrated": 105, "ratio": 0.59},
+    "ME": {"literature": 103, "calibrated": 136, "ratio": 1.32}
+  },
+  "regional_gradient_finding": "Across the five states with statewide LANDIS trajectories, the year-100 calibrated-over-literature carbon ratio matches each state median ANPP multiplier within 0.05; three regimes confirmed (West cuts about 3x, Great Lakes cut 1.5 to 1.7x, Northeast lifts 32 percent).",
+  "methodology": {
+    "framework": "Multi-cycle FIA hindcast",
+    "validation_tests_passed": [
+      "k-fold CV",
+      "time-out-of-sample",
+      "leave-one-ecoregion-out",
+      "cross-state",
+      "bootstrap CI",
+      "IC perturbation"
+    ],
+    "novel_finding": "Three-mode calibration degeneracy pathology (active-growth, empty-aggregator, sample-size)"
+  },
+  "pathology_taxonomy": {
+    "active_growth": "very low theta -> near-zero growth -> trivial IC fit; guard: active-growth fraction >= 0.50",
+    "empty_aggregator": "per-plot pipeline failure -> empty per_plot.csv -> LL=0 default; guard: non-empty per_plot.csv",
+    "sample_size": "few successful pairs -> trivially small LL magnitude -> CMA-ES misled; guard: MIN_N_PAIRS >= 300, harvester uses per-plot LL on near-full-n candidates"
+  }
+}
