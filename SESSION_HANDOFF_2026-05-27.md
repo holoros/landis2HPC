@@ -28,16 +28,15 @@ Real 100-year LANDIS trajectories for both literature and calibrated parameters,
 
 SSH key at the session path `outputs/.session_ssh/id_osc`. Each Cowork sandbox bash call is independent, so copy and chmod the key inside the same call. Repo on Cardinal at `/users/PUOM0008/crsfaaron/repos/landis2HPC`; live scripts at `/fs/scratch/PUOM0008/crsfaaron/landis2/tools`. GitHub push from Cardinal works (holoros authenticated). Statewide-carbon runs live under `states/{ST}/perseus/statewide/{tag}/`.
 
-## What is running (2026-05-28 update)
+## What is running (2026-05-29 update)
 
-Two Tier 2 v2 chains in flight on Cardinal, both at iter0 with 8 candidates per iter, ~7 more iters to go:
+Two Tier 2 v2 chains in flight on Cardinal. Each iter has 14 cands; chain has been running roughly 48h.
 
-* `wa_t2_v2`: iter0 best so far is `cand4 LL=-990.4244` (n≈1428, per-plot ≈ -0.69). cand7 still in queue.
-* `ga_t2_v2`: iter0 best so far is `cand5 LL=-1187.0431` (n≈1238, per-plot ≈ -0.96). cand0 failed (LL=0/n=0); cand7 still in queue.
+`wa_t2_v2`: reached iter8 (5 cands so far). Best-so-far is `iter6 cand11 LL=-899.33` (n=1415, per-plot=-0.636). iter7 (-943) and iter8 (-975) partial regressed, so CMA-ES is likely near convergence with widened sigma. Harvest gate: matched-n eval of iter6 vector against v1.0 production (per-plot LL=-0.217, n=805).
 
-Both chains use the per-species apply_theta path against the state SppEcoregionData baselines. The n-aware harvester (`harvest_t2_chains.py --all`) will update the production theta when either chain lands.
+`ga_t2_v2`: reached iter7 (7 cands so far). Best-so-far is `iter7 cand0 LL=-1138.67` (n=1239, per-plot=-0.920). Monotonic descent iter0 to iter7 (-1187 to -1138, no regression), so chain still actively improving. Harvest gate: matched-n eval against v1.1 production (per-plot LL=-0.887, n=1255). Current iter7 best slightly worse per-plot but the matched-n eval is the real test.
 
-Monitor: `bash perseus/tools/check_t2v2_chains.sh` (committed 16df0f6) gives a one-shot per-iter best-LL snapshot and a RUNNING/LANDED/STALLED verdict per chain.
+Both chains use per-species apply_theta against the state SppEcoregionData baselines. `harvest_t2_chains.py --state {ST}` runs the matched-n eval. Monitor: `bash perseus/tools/check_t2v2_chains.sh` (commit 16df0f6).
 
 ## Cleared since the 2026-05-21 handoff
 
