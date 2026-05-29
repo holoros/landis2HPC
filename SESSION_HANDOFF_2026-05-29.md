@@ -63,7 +63,14 @@ SSH key at the session path `outputs/.session_ssh/id_osc`. Each Cowork sandbox b
 
 ## What is gating
 
-Both v2 calibration chains. Neither has emitted a `production_theta_{chain}.csv` yet (chains still running). Run the harvester once each chain lands.
+Both v2 calibration chains. Mid-chain harvester run (2026-05-29 08:01) snapshotted in `perseus/docs/harvester_snapshot_2026-05-29.md`:
+
+* WA: harvester picked `wa_t2_v2_iter7_cand8` (per-plot LL -0.6320, n=1493). NEW vector compared to v1.0 iter1_cand11. v2 vs v1 ANPP comparison: median ratio 0.985, range [0.524, 1.579], median |delta| 0.111. Same regime, reshuffled per-species. theta_best_production.csv written to chain dir.
+* GA: harvester picked `ga_t2_v2_pre_warmstart_iter5_cand8` — the warmstart seed = current v1.1 production. v2 chain has not yet improved over v1.1. No promotion needed unless later iters improve.
+
+**Do not promote v2.0 until chains terminate** (currently iter8 partial; future iters could shift the harvester pick). When `check_t2v2_chains.sh` flips to LANDED, re-harvest and compare to the snapshot. If stable, ship v1.4 per the steps in the harvester snapshot doc.
+
+Also noted: `perseus/backend/config.py` STATES dict is out of date for GA (says Tier 1) and MN (says "calibrating"). Worth correcting in the v1.4 ship.
 
 ## Cleared since the 2026-05-27 handoff
 
