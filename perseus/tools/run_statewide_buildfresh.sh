@@ -1,11 +1,16 @@
 #!/bin/bash
 # run_statewide_buildfresh.sh — build-fresh 100yr statewide trajectory generator.
 #
-# For MN-family states (MN, WI, MI) that build per-plot scenarios fresh via
-# build_plot_scenario_{ST}.sh (no pre-built template dirs, unlike the ME runner).
-# Runs a stratified plot set (<=200 per ecoregion) under a theta, extracts TotalBiomass
-# at years 0/25/50/75/100, and aggregates to a state-median biomass trajectory. No
-# likelihood step. The MN-family shares the MN SppEcoregionData base and apply_theta_MN.
+# State-parameterized runner. Builds per-plot scenarios fresh via
+# build_plot_scenario_{ST}.sh, applies a theta vector to the state SppEcoregionData
+# baseline via apply_theta_{ST}_perspecies.py, runs a stratified plot set
+# (<=200 per ecoregion) for 100 years, extracts TotalBiomass at years 0/25/50/75/100,
+# and aggregates to a state-median biomass trajectory. No likelihood step.
+#
+# Supports any state with a build_plot_scenario_{ST}.sh AND apply_theta_{ST}_perspecies.py
+# AND a baseline states/{ST}/inputs/SppEcoregionData.csv. MN family (MN/WI/MI) shares the
+# MN baseline + apply_theta_MN, so for those states pass ST=MN with the appropriate theta.
+# Hardened with flock-based submit serialization to avoid OSC QOSMaxSubmitJobPerUserLimit.
 #
 # Usage:  bash run_statewide_buildfresh.sh <STATE> <THETA_CSV> <TAG>
 set -uo pipefail
@@ -15,7 +20,7 @@ ST=$1; THETA_CSV=$2; TAG=$3
 LANDIS=/fs/scratch/PUOM0008/crsfaaron/landis2
 TOOLS=$LANDIS/tools
 PERSEUS=$LANDIS/states/$ST/perseus
-MNIN=$LANDIS/states/MN/inputs
+STIN=$LANDIS/states/$ST/inputs
 BAY=$PERSEUS/statewide/$TAG
 mkdir -p $BAY/runs
 LOG=$BAY/launch.log
@@ -29,9 +34,9 @@ awk -F',' 'NR>1 && $3+0>0 {print $3,$1}' $TOOLS/plot_to_ecoregion_${ST}.csv | so
 N=$(wc -l < $PLOT_LIST)
 echo "stratified plot list: $N" >> $LOG
 
-# Apply theta to the shared MN SppEcoregionData base
+# Apply theta to the state SppEcoregionData baseline (state-specific apply_theta tool)
 SPP_MOD=$BAY/SppEcoregionData_${TAG}.csv
-python3 $TOOLS/apply_theta_MN_perspecies.py --theta-csv "$THETA_CSV" --baseline-spp "$MNIN/SppEcoregionData.csv" --out "$SPP_MOD" >> $LOG 2>&1
+python3 $TOOLS/apply_theta_${ST}_perspecies.py --theta-csv "$THETA_CSV" --baseline-spp "$STIN/SppEcoregionData.csv" --out "$SPP_MOD" >> $LOG 2>&1
 
 while [ "$(squeue --me -h -r | wc -l)" -gt 100 ]; do sleep 30; done
 
