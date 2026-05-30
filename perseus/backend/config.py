@@ -30,16 +30,16 @@ ACCOUNT = os.environ.get("OSC_ACCOUNT", "PUOM0008")
 WORK = os.environ.get("PERSEUS_API_WORK", f"{LANDIS_ROOT}/api_runs")
 
 # States that have a production calibration and a per-plot scenario builder.
-# Production tier reflects v1.3 (2026-05-29). All six states at Tier 2 per-species.
-# WA v1.0 remains production while v2 chain still running; v2 promotion gated on
-# chain termination + harvester re-confirmation (see perseus/docs/harvester_snapshot_2026-05-29.md).
-# GA is at v1.1 production (matched-n eval confirmed Tier 2 over Tier 1). MN/WI/MI all at v1.2.
+# Production tier reflects v1.4 (2026-05-29). All six states at Tier 2 per-species.
+# WA promoted to v2.0 (iter9_cand4, per-plot LL -0.6254 over n=1415) after chain landed.
+# GA promoted to v2.0 (iter8_cand5, per-plot LL -0.8802 over n=1249) after chain landed.
+# MN/WI/MI all at v1.2.
 STATES = {
     "ME": {"name": "Maine", "tier": "Tier 2 per-species v1.0 (26 params)",
            "builder": "build_plot_scenario_ME.sh"},
-    "WA": {"name": "Washington", "tier": "Tier 2 per-species v1.0 (50 params)",
+    "WA": {"name": "Washington", "tier": "Tier 2 per-species v2.0 (50 params)",
            "builder": "build_plot_scenario_WA.sh"},
-    "GA": {"name": "Georgia", "tier": "Tier 2 per-species v1.1",
+    "GA": {"name": "Georgia", "tier": "Tier 2 per-species v2.0",
            "builder": "build_plot_scenario_GA.sh"},
     "MN": {"name": "Minnesota", "tier": "Tier 2 per-species v1.2",
            "builder": "build_plot_scenario_MN.sh"},

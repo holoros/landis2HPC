@@ -1,7 +1,7 @@
 {
   "title": "PERSEUS Multi-state LANDIS-II Calibration",
   "generated_at": "2026-05-29",
-  "version": "v1.3 metadata (2026-05-29); WA T2 v2 chain running, v1.0 still production",
+  "version": "v1.4 metadata (2026-05-29); WA + GA promoted to T2 v2.0 after chain landings",
   "states": {
     "ME": {
       "name": "Maine",
@@ -17,8 +17,9 @@
       "name": "Georgia",
       "region": "Southeast",
       "n_plots": 5216,
-      "best_tier": "Tier 2 per-species v1.1 (iter5_cand8, n=1255)",
-      "ll_per_plot": -0.8871,
+      "best_tier": "Tier 2 per-species v2.0 (ga_t2_v2 iter8_cand5, n=1249)",
+      "ll_per_plot": -0.8802,
+      "previous_production": "v1.1 iter5_cand8 (per-plot -0.8871, n=1255); v2 beats by 0.007 per-plot on matched-n eval",
       "median_anpp_theta": 0.31,
       "color": "#C62828"
     },
@@ -26,11 +27,11 @@
       "name": "Washington",
       "region": "West",
       "n_plots": 4471,
-      "best_tier": "Tier 2 per-species v1.0 (iter1_cand11, 50 params, n=805)",
-      "ll_per_plot": -0.217,
-      "ll_gain": 0.31,
+      "best_tier": "Tier 2 per-species v2.0 (wa_t2_v2 iter9_cand4, 50 params, n=1415)",
+      "ll_per_plot": -0.6254,
+      "previous_production": "v1.0 iter1_cand11 (per-plot -0.217 over n=805 smaller subset); v2 evaluated on near-full n=1415 with harvester per-plot floor rule",
       "median_anpp_theta": 0.30,
-      "v2_chain_status": "running; iter7_cand8 currently leads matched-n harvester (per-plot -0.6320, n=1493); promotion gated on chain termination",
+      "v2_chain_status": "completed 2026-05-29 (1d 10h elapsed, 10 iters, 142 cands); statewide carbon rerun deferred to v1.4.1",
       "color": "#1565C0"
     },
     "MN": {

@@ -1,5 +1,42 @@
 # PERSEUS / landis2HPC changelog
 
+## v1.4 — 2026-05-29 — WA and GA promoted to Tier 2 v2.0
+
+Both `wa_t2_v2` and `ga_t2_v2` Tier 2 calibration chains landed on 2026-05-29 (1d 10h elapsed each, wall-time termination, ExitCode 0:0). The n-aware harvester (`harvest_t2_chains.py`) selected the best per-plot LL candidate among near-full-n evaluations and promoted both states.
+
+### Production calibration table (v1.4)
+
+| State | Region | Production vector | Per-plot LL | n | Note |
+|---|---|---|---|---|---|
+| ME | Northeast | Tier 2 v1.0 final | +0.056 | 612 | unchanged |
+| WA | West | Tier 2 v2.0 (iter9_cand4) | -0.6254 | 1415 | promoted from v1.0 iter1_cand11 |
+| GA | Southeast | Tier 2 v2.0 (iter8_cand5) | -0.8802 | 1249 | promoted from v1.1 iter5_cand8 (beats by 0.007 per-plot) |
+| MN | Great Lakes | Tier 2 v1.2 (iter7_cand0) | -0.9325 | 2741 | unchanged |
+| WI | Great Lakes | Tier 2 v1.2 (iter2_cand11) | -0.6470 | 916 | unchanged |
+| MI | Great Lakes | Tier 2 v1.2 (iter7_cand5) | -0.1292 | 562 | unchanged |
+
+### WA v1.0 vs v2.0 (25 ANPP per-species)
+
+The new WA vector reshuffles within the same overall regime: median ratio v2/v1 = 0.985, range [0.524, 1.579], median absolute delta 0.111. Median ANPP shifts down very slightly (0.517 to 0.482). The headline "Washington cuts threefold" carbon result is expected to stay in the same neighborhood but the precise year-100 number will move; statewide carbon rerun is the v1.4.1 follow-up.
+
+### Updated
+
+- `perseus/backend/config.py` STATES dict: WA tier label "Tier 2 per-species v2.0"; GA tier label "Tier 2 per-species v2.0"; comment header reflects v1.4 production state.
+- `perseus/dashboard/atlas/summary.json`: WA and GA entries updated with v2.0 best_tier, ll_per_plot, previous_production note, and chain status. Atlas version bumped to v1.4 metadata (2026-05-29).
+- `perseus/docs/harvester_snapshot_2026-05-29.md`: captured the multi-poll harvester progression that led to the v2.0 picks.
+
+### Discovered (not yet acted on)
+
+Indiana (`in_t2_v1`) and Ohio (`oh_t2_v1`) Tier 2 v1 calibration chains observed in the queue, both at iter0 partial. PERSEUS 8-state expansion appears to be in flight. Expect 5 to 7 days per chain at the standard 8-iter cadence. Will track and harvest in a future release.
+
+### Deferred to v1.4.1
+
+WA statewide carbon rerun under the new v2.0 vector (the 5-state figure still uses v1.0 values for WA). Build-fresh runner is in place (`perseus/tools/run_statewide_buildfresh.sh` with flock hardening from v1.3); needs WA-specific apply_theta_WA_perspecies.py call. Estimated 12 to 24 hours of compute.
+
+### In progress
+
+`in_t2_v1` and `oh_t2_v1` chains continuing. No code work pending.
+
 All notable changes to the multi-state LANDIS-II calibration framework are documented in this file. The framework follows a tag-based release model on `github.com/holoros/landis2HPC`.
 
 ## v1.3 — 2026-05-27
