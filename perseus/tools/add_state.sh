@@ -101,6 +101,7 @@ fi
 echo "[6/6] Submitting T2 v1 chain (warmstart from cluster $CLUSTER reference)..." | tee -a $LOG
 TAG=${ST,,}_t2_v1
 WARMSTART=$TEMPLATES/cluster_${CLUSTER}_reference_theta.csv
+mkdir -p "$PERSEUS/bayesian/$TAG"   # SLURM --output dir must exist before sbatch
 sbatch_id=$(sbatch --parsable \
   --job-name=${TAG} \
   --account=PUOM0008 --partition=batch \

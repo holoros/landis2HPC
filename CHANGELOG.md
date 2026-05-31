@@ -1,5 +1,50 @@
 # PERSEUS / landis2HPC changelog
 
+## v1.5 — 2026-05-31 — Hybrid warmstart committed + optimizer/monitor hardening
+
+Committed to the architecture-C hybrid warmstart path from `docs/CONUS_expansion_plan.md`
+and fixed the two defects behind the 2026-05-29 IN/OH chain death.
+
+### Optimizer timeout hardening (the IN/OH chain killer)
+The IN and OH Tier 2 chains died after one iteration because a hung `run_param_set_*.sh`
+hit the optimizer's 4 h `subprocess` timeout and the resulting `TimeoutExpired` was
+uncaught, crashing the whole CMA-ES driver. The runner subprocess call in every
+`cma_es_optimize_*.py` (GA, MN, MI, WI, WA in the repo; plus IN, OH live on scratch) is
+now wrapped (`PERSEUS_TIMEOUT_GUARD`): a timeout or any runner exception scores that
+candidate as the degeneracy penalty (1e6) and the chain continues. Applied via the
+idempotent `patch_optimizer_timeout.py`; all variants recompile.
+
+### Chain monitor fixes (`check_t2v2_chains.sh`)
+Rewritten and generalized. Two correctness fixes: (1) promotion is now detected at the
+path the harvester actually writes, `<chain>/theta_best_production.csv`, instead of the
+never-written `states/<ST>/perseus/production_theta_<chain>.csv` — so harvested WA/GA v2
+chains read **PROMOTED** instead of the old false **STALLED**; (2) **STALLED** is reserved
+for genuine early death (no jobs, no promotion, <=1 scored iter). It now scans every
+`states/*/perseus/bayesian/*` chain (no per-chain edits for the CONUS expansion) and no
+longer chokes on empty/legacy chain dirs. Verified live: WA/GA v2 -> PROMOTED, IN/OH ->
+STALLED.
+
+### Hybrid warmstart infrastructure
+- `perseus/tools/cma_es_optimize_cluster.py`: one generalized, warmstart-capable Tier 2
+  driver replacing the per-state copies. Reads the species list from the state's
+  `SpeciesData.csv`, seeds x0 from a cluster reference theta (missing species fall back to
+  0.60 cold), has the timeout guard built in. Per-cluster symlinks
+  `cma_es_optimize_{N1..P4}.py` -> it, so `add_state.sh` resolves.
+- `perseus/tools/state_templates/`: cluster reference thetas frozen from calibrated states
+  — N1=ME, N2=MN, S1=GA, P3=WA (verbatim production theta) — plus a provisional N3 (IN/OH
+  eastern hardwood) reference bootstrapped from MN via a 12-of-23-species crosswalk, with
+  the 11 unmapped species recorded in `cluster_N3_extension_species.csv`. Also state-agnostic
+  `apply_theta_template.py` and `build_plot_scenario_template.sh` (species block from
+  SpeciesData.csv, eco names from ecoregions.txt) that `add_state.sh` sed-renders.
+- `add_state.sh`: creates the SLURM `--output` bayesian dir before sbatch (latent crash fix).
+
+### Remaining IN/OH gate (deliberately not auto-run)
+`plot_ics_full/` is still empty for IN/OH. `build_plot_ics_MN.py` cannot fill it — its FIA
+SPCD->species map only covers MN's pool and would silently drop IN/OH oaks and hickories.
+The N3 cluster needs a curated `build_plot_ics_N3.py` SPCD->LANDIS map (domain-sensitive),
+which is the one step left for review rather than fabricated-and-launched. See
+`perseus/tools/state_templates/README.md`. No calibration compute was launched this session.
+
 ## v1.4 — 2026-05-29 — WA and GA promoted to Tier 2 v2.0
 
 Both `wa_t2_v2` and `ga_t2_v2` Tier 2 calibration chains landed on 2026-05-29 (1d 10h elapsed each, wall-time termination, ExitCode 0:0). The n-aware harvester (`harvest_t2_chains.py`) selected the best per-plot LL candidate among near-full-n evaluations and promoted both states.

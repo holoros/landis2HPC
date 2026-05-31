@@ -75,8 +75,15 @@ def evaluate(theta_log, tag, bay_dir, tools_dir):
     theta_csv = tag_dir / "theta.csv"
     write_theta_csv(theta_log, theta_csv)
     runner = tools_dir / "run_param_set_WA_t2.sh"
-    proc = subprocess.run(["bash", str(runner), str(theta_csv), tag],
+    try:  # PERSEUS_TIMEOUT_GUARD
+        proc = subprocess.run(["bash", str(runner), str(theta_csv), tag],
                           capture_output=True, text=True, timeout=4*3600)
+    except subprocess.TimeoutExpired:
+        sys.stderr.write(f"TIMEOUT {tag}: runner exceeded the subprocess timeout; penalized\n")
+        return 1e6
+    except Exception as _e:
+        sys.stderr.write(f"FAIL {tag}: runner raised {_e!r}; penalized\n")
+        return 1e6
     ll_file = tag_dir / "log_likelihood.txt"
     if not ll_file.exists():
         sys.stderr.write(f"FAIL {tag}: no log_likelihood.txt (stderr: {proc.stderr[-500:]})\n")
