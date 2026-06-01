@@ -1,5 +1,48 @@
 # PERSEUS / landis2HPC changelog
 
+## v1.6 — 2026-06-01 — Indiana promoted (8 states); OH chain launched
+
+First state added through the hybrid warmstart path. PERSEUS is now eight states.
+
+### Indiana promoted to Tier 2 production
+The densified-pairing chain `in_t2_v3` (warmstarted from `in_t2_v2`'s own optimum) landed
+all 8 iterations and the harvester promoted it: best `in_t2_v3_iter2_cand11`, **n=733**
+paired observations (floor 634, max_n 747), per-plot LL **−1.3146**. The densified LL
+pairing did its job — n rose from 201 (5-year-only) to 733, clearing the harvester's
+near-full-n floor that blocked `in_t2_v2`. `theta_best_production.csv` written; monitor
+reads PROMOTED.
+
+| State | Region | Production vector | Per-plot LL | n |
+|---|---|---|---|---|
+| ME | Northeast | Tier 2 v1.0 | +0.056 | 612 |
+| WA | West | Tier 2 v2.0 | −0.6254 | 1415 |
+| GA | Southeast | Tier 2 v2.0 | −0.8802 | 1249 |
+| MN | Great Lakes | Tier 2 v1.2 | −0.9325 | 2741 |
+| WI | Great Lakes | Tier 2 v1.2 | −0.6470 | 916 |
+| MI | Great Lakes | Tier 2 v1.2 | −0.1292 | 562 |
+| **IN** | **Eastern Hardwood (N3)** | **Tier 2 v3 (in_t2_v3_iter2_cand11)** | **−1.3146** | **733** |
+
+IN's per-plot LL is the weakest of the eight — Indiana mixed-hardwood dynamics are harder to
+fit, and this is a defensible v1 calibration, not a final answer. Flagged for a domain look.
+
+### N3 cluster reference re-frozen from calibrated IN
+`state_templates/cluster_N3_reference_theta.csv` now holds IN's production theta (real
+values: POST 0.60→0.34, SHO→0.44, etc.) instead of the MN bootstrap, so OH and future
+Eastern-Hardwood states warmstart from a calibrated neighbor.
+
+### Ohio builder CRLF fix + chain launched
+`build_plot_scenario_OH.sh` failed its smoke test: PRISM_OH_l3.csv is CRLF, so the last
+ecoregion column ("71") carried a trailing `\r` and failed the `grep -qx` header check (the
+smoke plot was eco 71). Both IN and OH builders now strip `\r` when reading the PRISM header
+and when extracting the climate column. OH smoke then passed (rc=0, full biomass output).
+`oh_t2_v2` launched (job 11169120) with the densified runner, warmstarted from the
+IN-calibrated N3 reference.
+
+### Known incomplete: WA v1.4.1 statewide-carbon rerun
+`wa_stwide_v2` (launched 2026-05-30) produced no trajectories — it built its 1354-plot list
+then died (wall-time at 1d12h or queue-gate stall). The five-state carbon figure still uses
+WA v1.0 values. Needs a re-run with a longer wall-time budget; not auto-relaunched.
+
 ## v1.5 — 2026-05-31 — Hybrid warmstart committed + optimizer/monitor hardening
 
 Committed to the architecture-C hybrid warmstart path from `docs/CONUS_expansion_plan.md`
