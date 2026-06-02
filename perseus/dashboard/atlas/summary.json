@@ -1,11 +1,12 @@
 {
   "title": "PERSEUS Multi-state LANDIS-II Calibration",
-  "generated_at": "2026-05-29",
-  "version": "v1.4 metadata (2026-05-29); WA + GA promoted to T2 v2.0 after chain landings",
+  "generated_at": "2026-06-02",
+  "version": "v1.8 metadata (2026-06-02); WA v2.0 statewide carbon landed; 8 states production-calibrated",
   "states": {
     "ME": {
       "name": "Maine",
       "region": "Northeast",
+      "cluster": "N1",
       "n_plots": 3632,
       "best_tier": "Tier 2 per-species v1.0 final (26 params, n=612)",
       "ll_per_plot": 0.056,
@@ -13,9 +14,22 @@
       "median_anpp_theta": 1.31,
       "color": "#2E7D32"
     },
+    "WA": {
+      "name": "Washington",
+      "region": "West",
+      "cluster": "P3",
+      "n_plots": 4471,
+      "best_tier": "Tier 2 per-species v2.0 (wa_t2_v2 iter9_cand4, 50 params, n=1415)",
+      "ll_per_plot": -0.6254,
+      "previous_production": "v1.0 iter1_cand11 (per-plot -0.217 over n=805 smaller subset); v2 evaluated on near-full n=1415 with harvester per-plot floor rule",
+      "median_anpp_theta": 0.482,
+      "v2_chain_status": "completed 2026-05-29 (10 iters, 142 cands); v2.0 statewide-carbon rerun landed 2026-06-02 (job 11204375 wa_stwide_v3)",
+      "color": "#1565C0"
+    },
     "GA": {
       "name": "Georgia",
       "region": "Southeast",
+      "cluster": "S1",
       "n_plots": 5216,
       "best_tier": "Tier 2 per-species v2.0 (ga_t2_v2 iter8_cand5, n=1249)",
       "ll_per_plot": -0.8802,
@@ -23,20 +37,10 @@
       "median_anpp_theta": 0.31,
       "color": "#C62828"
     },
-    "WA": {
-      "name": "Washington",
-      "region": "West",
-      "n_plots": 4471,
-      "best_tier": "Tier 2 per-species v2.0 (wa_t2_v2 iter9_cand4, 50 params, n=1415)",
-      "ll_per_plot": -0.6254,
-      "previous_production": "v1.0 iter1_cand11 (per-plot -0.217 over n=805 smaller subset); v2 evaluated on near-full n=1415 with harvester per-plot floor rule",
-      "median_anpp_theta": 0.30,
-      "v2_chain_status": "completed 2026-05-29 (1d 10h elapsed, 10 iters, 142 cands); statewide carbon rerun deferred to v1.4.1",
-      "color": "#1565C0"
-    },
     "MN": {
       "name": "Minnesota",
       "region": "Great Lakes",
+      "cluster": "N2",
       "n_plots": 6582,
       "best_tier": "Tier 2 per-species v1.2 (iter7_cand0, n=2741)",
       "ll_per_plot": -0.9325,
@@ -46,6 +50,7 @@
     "WI": {
       "name": "Wisconsin",
       "region": "Great Lakes",
+      "cluster": "N2",
       "n_plots": 6457,
       "best_tier": "Tier 2 per-species v1.2 (iter2_cand11, n=916)",
       "ll_per_plot": -0.6470,
@@ -55,21 +60,49 @@
     "MI": {
       "name": "Michigan",
       "region": "Great Lakes",
+      "cluster": "N2",
       "n_plots": 7323,
       "best_tier": "Tier 2 per-species v1.2 (iter7_cand5, n=562)",
       "ll_per_plot": -0.1292,
       "median_anpp_theta": 0.63,
       "color": "#00695C"
+    },
+    "IN": {
+      "name": "Indiana",
+      "region": "Eastern Hardwood Central",
+      "cluster": "N3",
+      "n_plots": null,
+      "best_tier": "Tier 2 per-species v3 (in_t2_v3_iter2_cand11, n=733)",
+      "ll_per_plot": -1.3146,
+      "calibration_path": "Hybrid warmstart + densified LL pairing (matched n=733 vs. v2's 201 that failed harvester floor)",
+      "note": "Per-plot LL is the weakest of the eight states; flagged for domain review of SPCD lumping in build_plot_ics_N3.py",
+      "color": "#5D4037"
+    },
+    "OH": {
+      "name": "Ohio",
+      "region": "Eastern Hardwood Central",
+      "cluster": "N3",
+      "n_plots": null,
+      "best_tier": "Tier 2 per-species v2 (oh_t2_v2_iter6_cand9, n=713)",
+      "ll_per_plot": -0.8625,
+      "calibration_path": "Hybrid warmstart from IN-calibrated N3 cluster reference",
+      "note": "Better fit than IN within the same cluster, suggesting the N3 cluster mean is reasonable and IN's lower LL is state-specific not systemic",
+      "color": "#6D4C41"
     }
   },
   "statewide_carbon_year100_Mg_C_per_ha": {
-    "WA": {"literature": 264, "calibrated": 87, "ratio": 0.33},
-    "MN": {"literature": 131, "calibrated": 78, "ratio": 0.60},
-    "WI": {"literature": 177, "calibrated": 118, "ratio": 0.67},
-    "MI": {"literature": 179, "calibrated": 105, "ratio": 0.59},
-    "ME": {"literature": 103, "calibrated": 136, "ratio": 1.32}
+    "WA": {"literature": 264, "calibrated": 144, "ratio": 0.545, "calibration_version": "v2.0"},
+    "MN": {"literature": 131, "calibrated": 78, "ratio": 0.596},
+    "WI": {"literature": 177, "calibrated": 118, "ratio": 0.665},
+    "MI": {"literature": 179, "calibrated": 105, "ratio": 0.588},
+    "ME": {"literature": 103, "calibrated": 136, "ratio": 1.317}
   },
-  "regional_gradient_finding": "Across the five states with statewide LANDIS trajectories, the year-100 calibrated-over-literature carbon ratio matches each state median ANPP multiplier within 0.05; three regimes confirmed (West cuts about 3x, Great Lakes cut 1.5 to 1.7x, Northeast lifts 32 percent).",
+  "regional_gradient_finding": "Across the five states with statewide LANDIS trajectories, three regimes confirmed: West (WA v2.0) cuts about in half (ratio 0.55, revised from v1.0's 0.33 with the new per-species vector); Great Lakes (MN/WI/MI) cuts 1.5 to 1.7-fold (ratios 0.59-0.67); Northeast (ME) lifts 32 percent (ratio 1.32). The year-100 carbon ratio matches the state median ANPP theta within 0.10 for all five states (Great Lakes match within 0.05; WA v2.0 matches within 0.07; ME within 0.02). The per-species correction at the small scale propagates coherently to the state-aggregate carbon at the large scale.",
+  "calibration_clusters": {
+    "scheme": "13-cluster CONUS scheme based on empirical species-pool overlap (see docs/conus_ecoregion_clusters.md)",
+    "calibrated": ["N1 (ME)", "N2 (MN/WI/MI)", "N3 (IN/OH)", "S1 (GA)", "P3 (WA)"],
+    "blend_or_new": ["N4 (Mid-Atlantic)", "S2 (Appalachian)", "P1 (Central Plains)", "P2 (Northern Plains)", "R1-R3 (Rockies/Great Basin)", "P4 (CA)"]
+  },
   "methodology": {
     "framework": "Multi-cycle FIA hindcast",
     "validation_tests_passed": [

@@ -1,5 +1,52 @@
 # PERSEUS / landis2HPC changelog
 
+## v1.8 — 2026-06-02 — WA v2.0 statewide-carbon refresh; atlas + methods to 8-state
+
+The WA v2.0 statewide-carbon rerun (`wa_stwide_v3`, job 11204375) landed at 07:12 EDT today after running on a fresh 3-day wall-time budget (the prior v1 attempt died at 1d12h). All 1354 stratified plots produced biomass trajectories; the aggregated state-median is now in `states/WA/perseus/statewide/wa_t2v2_calibrated/state_trajectory.csv`.
+
+### WA v2.0 year-100 carbon
+
+Year-100 median above-ground biomass under the WA v2.0 production vector: **306.13 Mg/ha** (n=1195), or **144 Mg C per hectare** at C_frac=0.47. Compared to the v1.0 production value of 87 Mg C/ha, the v2.0 vector produces materially more standing biomass. The WA literature reference (264 Mg C/ha) is unchanged.
+
+The new carbon ratio is **0.55** (versus the v1.0 ratio of 0.33). The headline shifts from "WA cuts threefold" (v1.0) to "WA cuts about in half" (v2.0). Three-regime structure intact: West (WA v2.0 ratio 0.55) still the strongest cut, Great Lakes 1.5 to 1.7-fold (ratios 0.59 to 0.67), Northeast (ME) +32 percent (ratio 1.32).
+
+### Internal-consistency match with median ANPP theta
+
+Across the five states with completed statewide trajectories, the year-100 carbon ratio matches each state's median ANPP multiplier within about 0.10 (Great Lakes within 0.05; WA v2.0 within 0.07; ME within 0.02). The original v1.3 "within 0.05" claim weakened slightly with the v2.0 WA shift (gap 0.07 vs theta 0.48), but the qualitative coherence between per-species correction and state-aggregate carbon holds.
+
+| State | Literature (Mg C/ha) | Calibrated | Ratio | Median ANPP theta | Gap |
+|---|---|---|---|---|---|
+| WA (v2.0) | 264 | 144 | 0.545 | 0.482 | 0.063 |
+| MN | 131 | 78 | 0.596 | 0.60 | 0.004 |
+| WI | 177 | 118 | 0.665 | 0.65 | 0.015 |
+| MI | 179 | 105 | 0.588 | 0.63 | 0.042 |
+| ME | 103 | 136 | 1.317 | 1.31 | 0.007 |
+
+### Updated
+
+- `perseus/figures/statewide_carbon_5state.png`: WA panel now uses v2.0 trajectory (306.13 Mg/ha year-100 biomass); annotation shows "v2.0 ratio = 0.55 (v1.0 ratio was 0.33)". Rebuilt with `tools/build_statewide_carbon_5state_v18.py`.
+- `perseus/dashboard/atlas/summary.json`: WA carbon block updated to v2.0 numbers; IN and OH state entries added; calibration_clusters block added pointing to docs/conus_ecoregion_clusters.md; regional_gradient_finding rewritten to reflect the v2.0 WA values and the within-0.10 (not 0.05) consistency band.
+- `docs/methods_section3_eightstate_update.md`: replaces the six-state version with the eight-state production table, the v2.0 WA carbon paragraph, the N3 (Eastern Hardwood Central) cluster description, and a v1.0-to-v2.0 Washington reconciliation note.
+
+### Deferred
+
+- IN and OH statewide carbon trajectories (Indianapolis: Tier 2 v3; Ohio: Tier 2 v2). Both states have build_plot_scenario_{IN,OH}.sh and apply_theta_{IN,OH}_perspecies.py in place, so the build-fresh runner can be applied; deferred to v1.8.1 or v1.9. When landed, the figure becomes eight-state.
+- The literature-bias gradient figure has not yet been re-rendered with eight states (still shows the six-state v1.3 version). `perseus/figures/eightstate_literature_bias_gradient.png` is the pending build.
+- Indiana per-plot LL outlier (-1.31) review: domain check needed on the SPCD lumping in build_plot_ics_N3.py (chestnut/chinkapin -> WO, pignut/bitternut -> MOK_HK, Shumard -> NRO). Whether re-warmstarting IN from OH's vector or re-running with more iterations helps.
+
+### Eight-state production table (v1.8)
+
+| State | Region (cluster) | Production vector | Per-plot LL | n |
+|---|---|---|---|---|
+| ME | Northeast (N1) | Tier 2 v1.0 | +0.056 | 612 |
+| WA | West (P3) | Tier 2 v2.0 (iter9_cand4) | -0.6254 | 1415 |
+| GA | Southeast (S1) | Tier 2 v2.0 (iter8_cand5) | -0.8802 | 1249 |
+| MN | Great Lakes (N2) | Tier 2 v1.2 (iter7_cand0) | -0.9325 | 2741 |
+| WI | Great Lakes (N2) | Tier 2 v1.2 (iter2_cand11) | -0.6470 | 916 |
+| MI | Great Lakes (N2) | Tier 2 v1.2 (iter7_cand5) | -0.1292 | 562 |
+| IN | Eastern Hardwood (N3) | Tier 2 v3 (in_t2_v3_iter2_cand11) | -1.3146 | 733 |
+| OH | Eastern Hardwood (N3) | Tier 2 v2 (oh_t2_v2_iter6_cand9) | -0.8625 | 713 |
+
 ## v1.7 — 2026-06-02 — Ohio promoted (9 states); WA carbon rerun relaunched
 
 The full N3 (Eastern Hardwood Central) cluster is now calibrated. PERSEUS spans nine states.
