@@ -1,5 +1,35 @@
 # PERSEUS / landis2HPC changelog
 
+## v1.7 — 2026-06-02 — Ohio promoted (9 states); WA carbon rerun relaunched
+
+The full N3 (Eastern Hardwood Central) cluster is now calibrated. PERSEUS spans nine states.
+
+### Ohio promoted to Tier 2 production
+`oh_t2_v2` (densified runner, warmstarted from the IN-calibrated N3 reference) landed all 8
+iterations; the harvester promoted `oh_t2_v2_iter6_cand9` at **n=713** (floor 606), per-plot
+LL **−0.8625** — a healthy fit, and notably better than IN's −1.3146 on the same cluster.
+That OH fits well while IN does not points to an IN-specific issue (data or warmstart), not a
+systemic N3 problem.
+
+### Nine-state production table
+
+| State | Region | Production vector | Per-plot LL | n |
+|---|---|---|---|---|
+| ME | Northeast | Tier 2 v1.0 | +0.056 | 612 |
+| WA | West | Tier 2 v2.0 | −0.6254 | 1415 |
+| GA | Southeast | Tier 2 v2.0 | −0.8802 | 1249 |
+| MN | Great Lakes | Tier 2 v1.2 | −0.9325 | 2741 |
+| WI | Great Lakes | Tier 2 v1.2 | −0.6470 | 916 |
+| MI | Great Lakes | Tier 2 v1.2 | −0.1292 | 562 |
+| IN | Eastern Hardwood (N3) | Tier 2 v3 | −1.3146 | 733 |
+| **OH** | **Eastern Hardwood (N3)** | **Tier 2 v2 (oh_t2_v2_iter6_cand9)** | **−0.8625** | **713** |
+
+### WA v1.4.1 statewide-carbon rerun relaunched
+The prior `wa_stwide_v2` was cancelled at its 1d12h time limit before producing any
+trajectories. Resubmitted as `wa_stwide_v3` (job 11204375) with a **3-day** wall-time, same
+WA v2.0 theta and `wa_t2v2_calibrated` output tag. When it lands, refresh
+`perseus/figures/statewide_carbon_5state.png` with WA's v2.0 year-100 carbon number.
+
 ## v1.6 — 2026-06-01 — Indiana promoted (8 states); OH chain launched
 
 First state added through the hybrid warmstart path. PERSEUS is now eight states.
