@@ -99,20 +99,33 @@ SLURM
   # Serialize submission across concurrent drivers (avoids OSC QOSMaxSubmitJobPerUserLimit).
   # The flock holds while any other driver is checking the queue gate and submitting,
   # so multiple statewide drivers can run in parallel without colliding on the submit step.
-  ( flock -x 200
-    while [ "$(squeue --me -h -r | wc -l)" -gt 100 ]; do sleep 30; done
-    sbatch --parsable $CK > $BAY/last_jid.txt 2>$BAY/last_jid.err
-  ) 200>/tmp/perseus_statewide_submit.lock
-  JID=$(cat $BAY/last_jid.txt 2>/dev/null)
-  if [ -z "$JID" ]; then echo "  chunk $c SUBMIT FAILED: $(cat $BAY/last_jid.err 2>/dev/null)" >> $LOG; continue; fi
-  echo "  chunk $c -> job $JID (serialized submit)" >> $LOG
+  # v18b hardening: retry sbatch with backoff if QOSMaxSubmitJobPerUserLimit
+  JID=""; retry=0
+  for retry in 1 2 3 4 5 6 7 8 9 10; do
+    ( flock -x 200
+      while [ "$(squeue --me -h -r | wc -l)" -gt 100 ]; do sleep 30; done
+      sbatch --parsable $CK > $BAY/last_jid.txt 2>$BAY/last_jid.err
+    ) 200>/tmp/perseus_statewide_submit.lock
+    JID=$(cat $BAY/last_jid.txt 2>/dev/null)
+    ERR=$(cat $BAY/last_jid.err 2>/dev/null)
+    if [ -n "$JID" ]; then break; fi
+    if echo "$ERR" | grep -q "QOSMaxSubmit"; then
+      WAIT=$(( retry * 300 ))
+      echo "  chunk $c QOSMaxSubmit attempt $retry; sleeping ${WAIT}s" >> $LOG
+      sleep $WAIT
+    else
+      echo "  chunk $c SUBMIT FAILED (non-retryable): $ERR" >> $LOG; break
+    fi
+  done
+  if [ -z "$JID" ]; then echo "  chunk $c SUBMIT FAILED after retries: $(cat $BAY/last_jid.err 2>/dev/null)" >> $LOG; continue; fi
+  echo "  chunk $c -> job $JID (serialized submit, attempt $retry)" >> $LOG
   sleep 60
   while squeue -j $JID -h -r 2>/dev/null | grep -q .; do sleep 30; done
   THR=$(( N * 85 / 100 ))
-  for a in $(seq 1 20); do
+  for a in $(seq 1 60); do
     CNT=$(find $BAY/runs -name biomass_trajectory.csv 2>/dev/null | wc -l)
     if [ $CNT -ge $THR ]; then echo "  settled $CNT/$N" >> $LOG; break; fi
-    echo "  settling $CNT/$N (attempt $a/20)" >> $LOG; sleep 30
+    echo "  settling $CNT/$N (attempt $a/60)" >> $LOG; sleep 30
   done
 done
 
