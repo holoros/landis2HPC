@@ -1,5 +1,54 @@
 # PERSEUS / landis2HPC changelog
 
+## v1.9 — 2026-06-04 — Eastern Hardwood Central (IN, OH) statewide carbon
+
+All four v1.9 statewide carbon jobs (IN literature, IN calibrated v3, OH literature, OH calibrated v2) completed on the v18b-hardened runner (commit 035b059). The 7-state carbon figure now spans every cluster with a per-state calibrated production theta: West (WA), Northeast (ME), Great Lakes (MN/WI/MI), and Eastern Hardwood Central (IN/OH).
+
+### Seven-state year-100 carbon (Mg C/ha)
+
+| State | Region (cluster) | Literature | Calibrated | Ratio | n |
+|---|---|---|---|---|---|
+| WA | West (P3) | 264 | 144 | 0.545 | 1195 |
+| MN | Great Lakes (N2) | 131 | 78 | 0.596 | 1035 |
+| WI | Great Lakes (N2) | 177 | 118 | 0.665 | 635 |
+| MI | Great Lakes (N2) | 179 | 105 | 0.588 | 400 |
+| ME | Northeast (N1) | 103 | 136 | 1.317 | 1220 |
+| **IN** | **Eastern Hardwood (N3)** | **309** | **190** | **0.614** | **193** |
+| **OH** | **Eastern Hardwood (N3)** | **290** | **172** | **0.592** | **173** |
+
+IN and OH ratios (0.61 and 0.59) sit between WA's strong cut (0.55) and Great Lakes' moderate cuts (0.59 to 0.67), consistent with the regional gradient hypothesis. The Eastern Hardwood Central cluster behaves like the moderate end of the strong-down regime.
+
+### Caveat: low n for IN and OH
+
+Both states landed only ~170-193 valid trajectories out of ~850 stratified plots (about 22 percent success rate). The Great Lakes states landed 400-1035 trajectories from comparable plot lists. The IN/OH shortfall is plot-level LANDIS failure, not orchestrator failure — most likely from the N3 cluster's bottomland species lumping (eastern cottonwood -> QA, silver maple -> RM, etc.) producing initial communities that LANDIS-II Biomass Succession cannot resolve at runtime. v1.10 will retest with the COTT + SIM species pool extension; expected to lift n substantially.
+
+### Runner v18b hardening (commit 035b059, deployed for these runs)
+
+The original 4 v1.9 jobs (11207175-78) failed because 3 of 4 hit OSC `QOSMaxSubmitJobPerUserLimit` during chunk submit, and IN_t0's settling loop expired (20 attempts x 30s = 10 min) before the chunk array completed its plots. Two fixes:
+
+1. **QOSMaxSubmit retry loop**: 10 retries with exponential backoff (5, 10, 15, ... 50 minutes). Detects the OSC quota error specifically and only retries that one; non-retryable errors still fail fast.
+2. **Settling loop extended**: 20 attempts -> 60 attempts (10 min -> 30 min). Lets the orchestrator wait longer for slow-to-land plot trajectories.
+
+Both fixes are in production. The 3 resubmits (jobs 11262262/63/64) used them and completed cleanly.
+
+### Updated
+
+- `perseus/figures/statewide_carbon_7state.png`: NEW; replaces statewide_carbon_5state.png as the v1.9 figure.
+- `perseus/tools/build_statewide_carbon_7state_v19.py`: NEW; reproducible figure-build script.
+- `perseus/dashboard/atlas/summary.json`: IN + OH carbon block entries added.
+- `docs/methods_section3_eightstate_update.md`: (still tracks the 8-state production table; will be renamed to sevenstate or eightstate later when GA statewide is added).
+- `CHANGELOG.md`: this section.
+
+### Pending after v1.9
+
+- v1.9 Zenodo new version: stage with new_version.py from zenodo-deposit skill (parent DOI 10.5281/zenodo.20526411). Needs a fresh Zenodo token from Aaron.
+- v1.10 (IN COTT+SIM): launcher is staged at `/users/PUOM0008/crsfaaron/launch_v110_in_v2.sh`. Expected to lift IN per-plot LL from -1.31 toward -0.5 to -0.9, and (if hypothesis holds) lift the IN/OH statewide n from ~190 to closer to the cluster's actual plot count.
+
+### Files added
+
+`perseus/tools/build_statewide_carbon_7state_v19.py` — figure builder
+`perseus/figures/statewide_carbon_7state.png` — v1.9 7-state carbon figure
+
 ## v1.8 — 2026-06-02 — WA v2.0 statewide-carbon refresh; atlas + methods to 8-state
 
 The WA v2.0 statewide-carbon rerun (`wa_stwide_v3`, job 11204375) landed at 07:12 EDT today after running on a fresh 3-day wall-time budget (the prior v1 attempt died at 1d12h). All 1354 stratified plots produced biomass trajectories; the aggregated state-median is now in `states/WA/perseus/statewide/wa_t2v2_calibrated/state_trajectory.csv`.

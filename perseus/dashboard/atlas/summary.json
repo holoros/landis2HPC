@@ -1,7 +1,7 @@
 {
   "title": "PERSEUS Multi-state LANDIS-II Calibration",
-  "generated_at": "2026-06-02",
-  "version": "v1.8 metadata (2026-06-02); WA v2.0 statewide carbon landed; 8 states production-calibrated",
+  "generated_at": "2026-06-04",
+  "version": "v1.9 metadata (2026-06-04); IN + OH statewide carbon added; 7 states now have carbon trajectories",
   "states": {
     "ME": {
       "name": "Maine",
@@ -44,7 +44,7 @@
       "n_plots": 6582,
       "best_tier": "Tier 2 per-species v1.2 (iter7_cand0, n=2741)",
       "ll_per_plot": -0.9325,
-      "median_anpp_theta": 0.60,
+      "median_anpp_theta": 0.6,
       "color": "#0277BD"
     },
     "WI": {
@@ -53,7 +53,7 @@
       "cluster": "N2",
       "n_plots": 6457,
       "best_tier": "Tier 2 per-species v1.2 (iter2_cand11, n=916)",
-      "ll_per_plot": -0.6470,
+      "ll_per_plot": -0.647,
       "median_anpp_theta": 0.65,
       "color": "#00838F"
     },
@@ -91,17 +91,72 @@
     }
   },
   "statewide_carbon_year100_Mg_C_per_ha": {
-    "WA": {"literature": 264, "calibrated": 144, "ratio": 0.545, "calibration_version": "v2.0"},
-    "MN": {"literature": 131, "calibrated": 78, "ratio": 0.596},
-    "WI": {"literature": 177, "calibrated": 118, "ratio": 0.665},
-    "MI": {"literature": 179, "calibrated": 105, "ratio": 0.588},
-    "ME": {"literature": 103, "calibrated": 136, "ratio": 1.317}
+    "WA": {
+      "literature": 264,
+      "calibrated": 144,
+      "ratio": 0.545,
+      "calibration_version": "v2.0",
+      "n": 1195
+    },
+    "MN": {
+      "literature": 131,
+      "calibrated": 78,
+      "ratio": 0.596,
+      "n": 1035
+    },
+    "WI": {
+      "literature": 177,
+      "calibrated": 118,
+      "ratio": 0.665,
+      "n": 635
+    },
+    "MI": {
+      "literature": 179,
+      "calibrated": 105,
+      "ratio": 0.588,
+      "n": 400
+    },
+    "ME": {
+      "literature": 103,
+      "calibrated": 136,
+      "ratio": 1.317,
+      "n": 1220
+    },
+    "IN": {
+      "literature": 309,
+      "calibrated": 190,
+      "ratio": 0.614,
+      "calibration_version": "v3",
+      "n": 193,
+      "note": "low n vs other states; many plots failed LANDIS-II at build; v1.10 COTT+SIM expected to improve"
+    },
+    "OH": {
+      "literature": 290,
+      "calibrated": 172,
+      "ratio": 0.592,
+      "calibration_version": "v2",
+      "n": 173,
+      "note": "low n vs other states; same cause as IN"
+    }
   },
-  "regional_gradient_finding": "Across the five states with statewide LANDIS trajectories, three regimes confirmed: West (WA v2.0) cuts about in half (ratio 0.55, revised from v1.0's 0.33 with the new per-species vector); Great Lakes (MN/WI/MI) cuts 1.5 to 1.7-fold (ratios 0.59-0.67); Northeast (ME) lifts 32 percent (ratio 1.32). The year-100 carbon ratio matches the state median ANPP theta within 0.10 for all five states (Great Lakes match within 0.05; WA v2.0 matches within 0.07; ME within 0.02). The per-species correction at the small scale propagates coherently to the state-aggregate carbon at the large scale.",
+  "regional_gradient_finding": "Across seven states with completed statewide LANDIS trajectories, the three-regime structure holds: Northeast (ME ratio 1.32) lifts 32 percent; Great Lakes (MN/WI/MI 0.59 to 0.67) and Eastern Hardwood Central (IN/OH 0.59 to 0.61) cut by 1.5 to 1.7 fold; West (WA v2.0 ratio 0.55) cuts about in half. The per-species correction at small scale propagates coherently to state-aggregate carbon. v1.10 expected to lift IN/OH n from ~190 with the COTT+SIM bottomland species extension.",
   "calibration_clusters": {
     "scheme": "13-cluster CONUS scheme based on empirical species-pool overlap (see docs/conus_ecoregion_clusters.md)",
-    "calibrated": ["N1 (ME)", "N2 (MN/WI/MI)", "N3 (IN/OH)", "S1 (GA)", "P3 (WA)"],
-    "blend_or_new": ["N4 (Mid-Atlantic)", "S2 (Appalachian)", "P1 (Central Plains)", "P2 (Northern Plains)", "R1-R3 (Rockies/Great Basin)", "P4 (CA)"]
+    "calibrated": [
+      "N1 (ME)",
+      "N2 (MN/WI/MI)",
+      "N3 (IN/OH)",
+      "S1 (GA)",
+      "P3 (WA)"
+    ],
+    "blend_or_new": [
+      "N4 (Mid-Atlantic)",
+      "S2 (Appalachian)",
+      "P1 (Central Plains)",
+      "P2 (Northern Plains)",
+      "R1-R3 (Rockies/Great Basin)",
+      "P4 (CA)"
+    ]
   },
   "methodology": {
     "framework": "Multi-cycle FIA hindcast",
