@@ -1,0 +1,29 @@
+state,scenario,LANDIS_total_2100_TgC,FVS_total_2100_TgC,ratio_L_over_F,landis_param_basis
+WA,reserve,1371.3,2271.7,0.6,native
+WA,conservation,1369.6,2269.0,0.6,native
+WA,BAU,1367.0,2265.2,0.6,native
+WA,intensive,1360.3,2255.0,0.6,native
+MN,reserve,837.9,387.2,2.16,native
+MN,conservation,805.9,368.4,2.19,native
+MN,BAU,762.0,342.9,2.22,native
+MN,intensive,662.6,286.1,2.32,native
+IN,reserve,583.2,313.0,1.86,native
+IN,conservation,574.5,307.4,1.87,native
+IN,BAU,561.7,299.2,1.88,native
+IN,intensive,531.3,279.7,1.9,native
+OH,reserve,783.8,510.6,1.54,native
+OH,conservation,774.7,503.7,1.54,native
+OH,BAU,760.1,492.7,1.54,native
+OH,intensive,728.7,468.8,1.55,native
+WI,reserve,1236.6,624.5,1.98,borrowed eco53/54... (MN-51)
+WI,conservation,880.6,414.0,2.13,borrowed eco53/54... (MN-51)
+WI,BAU,595.1,256.1,2.32,borrowed eco53/54... (MN-51)
+WI,intensive,347.7,137.5,2.53,borrowed eco53/54... (MN-51)
+MI,reserve,1160.7,716.6,1.62,borrowed eco55/56/57 (MN-51)
+MI,conservation,943.0,562.0,1.68,borrowed eco55/56/57 (MN-51)
+MI,BAU,717.5,406.1,1.77,borrowed eco55/56/57 (MN-51)
+MI,intensive,428.5,218.6,1.96,borrowed eco55/56/57 (MN-51)
+ME,reserve,1170.8,547.2,2.14,native
+ME,conservation,1164.2,542.9,2.14,native
+ME,BAU,1154.8,536.8,2.15,native
+ME,intensive,1130.6,521.0,2.17,native

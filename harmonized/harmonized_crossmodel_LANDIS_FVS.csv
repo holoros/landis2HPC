@@ -1,0 +1,17 @@
+state,scenario,LANDIS_total_2100_TgC,FVS_total_2100_TgC
+IN,reserve,564.8,313
+IN,conservation,556.3,307.4
+IN,BAU,543.9,299.2
+IN,intensive,514.3,279.7
+MN,reserve,837.9,387.2
+MN,conservation,805.9,368.4
+MN,BAU,762,342.9
+MN,intensive,662.6,286.1
+OH,reserve,768.4,510.6
+OH,conservation,759.4,503.7
+OH,BAU,745.2,492.7
+OH,intensive,714.2,468.8
+WA,reserve,1371.3,2271.7
+WA,conservation,1369.6,2269
+WA,BAU,1367,2265.2
+WA,intensive,1360.3,2255

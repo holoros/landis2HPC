@@ -1,0 +1,10 @@
+raw_eco,model_eco,eco_name,kind
+1,1,Coast Range,native
+2,2,Puget Lowland,native
+3,2,Willamette Valley (mapped to Puget Lowland),remap
+4,4,Cascades,native
+9,9,Eastern Cascades Slopes and Foothills,native
+10,10,Columbia Plateau,native
+11,11,Blue Mountains,native
+15,11,Northern Rockies (mapped to Blue Mountains),remap
+77,77,North Cascades,native

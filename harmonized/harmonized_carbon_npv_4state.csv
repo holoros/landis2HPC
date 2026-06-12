@@ -1,0 +1,17 @@
+state,scenario,forest_2100_TgC,hwp_2100_TgC,total_2100_TgC,npv_timber_perha_0.03,npv_timber_perha_0.05
+IN,reserve,564.8,0,564.8,0,0
+IN,conservation,553.8,2.5,556.3,60,35
+IN,BAU,537.7,6.2,543.9,148,87
+IN,intensive,499.5,14.8,514.3,361,215
+MN,reserve,837.9,0,837.9,0,0
+MN,conservation,796.5,9.4,805.9,64,38
+MN,BAU,740,22,762,153,92
+MN,intensive,613,49.6,662.6,362,222
+OH,reserve,768.4,0,768.4,0,0
+OH,conservation,756.8,2.7,759.4,38,23
+OH,BAU,738.2,6.9,745.2,100,59
+OH,intensive,698.2,16,714.2,234,139
+WA,reserve,1371.3,0,1371.3,0,0
+WA,conservation,1369.1,0.5,1369.6,3,2
+WA,BAU,1365.8,1.2,1367,7,5
+WA,intensive,1357.1,3.1,1360.3,18,12

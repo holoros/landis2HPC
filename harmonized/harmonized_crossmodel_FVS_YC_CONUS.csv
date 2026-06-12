@@ -1,0 +1,5 @@
+scenario,FVS_TgC_CONUS,YieldCurve_TgC_CONUS
+reserve,32206.9,22348.4
+conservation,30153.5,20191.1
+BAU,28066.0,18040.3
+intensive,25591.1,15613.3

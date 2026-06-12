@@ -1,0 +1,9 @@
+dist_mode,scenario,CBM,FVS_cal,YieldCurve,ensemble_median,ens_lo,ens_hi
+disturbed,reserve,23074,30217,21113,23074,21113,30217
+disturbed,conservation,18596,24974,16350,18596,16350,24974
+disturbed,BAU,14258,19779,11845,14258,11845,19779
+disturbed,intensive,9675,13871,7368,9675,7368,13871
+nodisturb,reserve,24294,32207,22348,24294,22348,32207
+nodisturb,conservation,19730,26836,17495,19730,17495,26836
+nodisturb,BAU,15293,21487,12883,15293,12883,21487
+nodisturb,intensive,10553,15318,8232,10553,8232,15318

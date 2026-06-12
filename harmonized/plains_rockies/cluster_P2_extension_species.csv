@@ -1,0 +1,11 @@
+cluster,spcd,common_name,ba_states,is_new_vs_parent,needs_literature,landis_source_hint,longevity,sexual_maturity,shade_tolerance,fire_tolerance,seed_disperse_effective_m,seed_disperse_max_m,veg_reprod_prob,post_fire_regen
+P2,122,ponderosa pine,SD:65%,yes,yes,Creutzburg; Loudermilk Sierra LANDIS,,,,,,,,
+P2,544,green ash,ND:22%;SD:6%,no,no,(in parent pool),,,,,,,,
+P2,823,bur oak,ND:20%;SD:6%,yes,yes,bur oak - eastern LANDIS lit,,,,,,,,
+P2,746,quaking aspen,ND:17%,no,no,(in parent pool),,,,,,,,
+P2,742,eastern cottonwood,ND:10%;SD:4%,yes,yes,cottonwood - riparian LANDIS lit,,,,,,,,
+P2,313,boxelder,ND:9%;SD:2%,no,no,(in parent pool),,,,,,,,
+P2,66,Rocky Mountain juniper,ND:6%;SD:3%,yes,yes,derive (juniper),,,,,,,,
+P2,972,American elm,ND:6%;SD:2%,no,no,(in parent pool),,,,,,,,
+P2,94,white spruce,SD:4%,no,no,(in parent pool),,,,,,,,
+P2,951,American basswood,ND:2%,no,no,(in parent pool),,,,,,,,
