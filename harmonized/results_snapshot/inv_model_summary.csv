@@ -1,0 +1,7 @@
+model,n_states,scenarios,med_2100,min_state,max_state
+CBM,48,4,507.8,17.3,1376.6
+FVS_cal,48,4,528.9,16,3733.4
+FVS_def,48,4,702.3,19.8,4345.4
+YieldCurve,48,4,431,8.2,1528
+CEM,36,4,120.4,8.8,508.8
+LANDIS,9,4,837.9,271.1,1371.3

@@ -1,0 +1,13 @@
+state,variable,step1_TgC,laststep_TgC,area_ha
+GA,AG_Biomass_C,21.3,34.7,537454
+GA,Total_Ecosystem_C,67.4,83.5,537454
+IN,AG_Biomass_C,125.1,133.1,2130317
+IN,Total_Ecosystem_C,442.8,451.1,2130317
+ME,AG_Biomass_C,442.7,457.6,6688374
+ME,Total_Ecosystem_C,2036.8,2050.4,6688374
+MN,AG_Biomass_C,254.8,267.8,5519296
+MN,Total_Ecosystem_C,1143.2,1154.8,5519296
+OR,AG_Biomass_C,859.2,876.5,10110040
+OR,Total_Ecosystem_C,2815.1,2830.2,10110040
+WA,AG_Biomass_C,626.3,639.2,7411251
+WA,Total_Ecosystem_C,2093.7,2103.2,7411251

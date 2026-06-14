@@ -38,17 +38,26 @@ CRSF-Cowork/repos/landis2HPC (harmonized/ scripts + docs/).
 |-------------|-----------|---------|-----------------------------|-------|
 | FVS         | 48 states | 2100    | Bayesian posterior (~3%)    | calibrated (gompit); DG adopted all variants; West over-projects (intrinsic, not a bug) |
 | Yield curve | 48 states | 2100    | rcp45/85 + sim CI (~8%)     | re-anchored to common harvest |
-| CBM         | 48 states | 2100    | OAT + GCBM engine gap        | libcbm engine; eastern entry-point corrected; engine gap +21-26% folded in |
-| CEM         | 26 -> 48  | 2100    | anchor SE (scenario band TBD)| 48-state native-2100 array RUNNING (job 11505310/11505312) |
+| CBM         | 48 states | 2100    | OAT + GCBM engine gap (measured) | cbm_states per-state pipeline; GCBM spatial 6/48 (GA IN ME MN OR WA); libcbm calibration FINALIZED to FIA-expansion (B1.3); measured engine gap integrated for the 6 |
+| CEM         | 37 (33 native-2100) | 2100 | anchor SE (scenario band TBD)| conus2100 array landed 33 native-2100 states; adapter now prefers conus2100 dirs; 4 still running. Native 2100 propagated through overlay+ensemble+CI 2026-06-13. Full overlap reaches 9 when the LANDIS states (MN WI MI ME VT + WA NH) finish in CEM. |
 | LANDIS-II   | 9 -> 33+  | 2100    | anchor SE (replicate TBD)    | per-PLOT runs (not spatial); waves 1-4 calibrating; Plains/Rockies need species lit |
 
-Full 5-model overlap today: IN, OH, NH. Three-model CONUS backbone (FVS/YC/CBM, 48 states x
-4 scenarios x 2 disturbance modes) is COMPLETE with ensemble + CIs.
+Full 5-model overlap today: IN, NH, OH, WA (4 states; coverage-driven, recomputed 2026-06-13;
+the prior "IN/OH/NH" was a hardcoded artifact). Limiters are LANDIS (9) and CEM (36). When the
+running CEM 48-state array lands it absorbs the 5 LANDIS states not yet in CEM (MN, WI, MI, ME,
+VT), so full overlap jumps to all 9 LANDIS states and grows with the LANDIS waves (toward 33).
+build_crossmodel_ci.R + the headline figure are now coverage-driven and auto-expand. Three-model
+CONUS backbone (FVS/YC/CBM, 48 states x 4 scenarios x 2 disturbance modes) is COMPLETE with
+ensemble + CIs.
 
 ## Headline numbers (current)
 
 CONUS reserve best estimate, disturbance-aware (harmonized_best_estimate.csv): 2025 15.3,
 2050 19.9, 2075 22.6, 2100 ~23 Pg C (reserve = no harvest, UNCHANGED by the harvest recalibration).
+Central-estimate choice (CONUS reserve 2100, FVS+YC+CBM): arithmetic mean 26.3 / geometric mean 25.4
+/ median 24.2 Pg C (harmonized_conus_geomean.csv). The geometric mean (ens_geom in best_estimate;
+harmonized_ensemble_geomean.csv) runs ~9-12% below the arithmetic mean by down-weighting the high FVS
+end-member and is the recommended robust central estimate for these strictly-positive stocks.
 All-scenarios CONUS 2100 ensemble median (Tg C, nodisturb), AFTER the 2026-06-12 harvest recalibration
 (now canonical): reserve 24,294 / conservation 20,188 / BAU 15,929 / intensive 11,056; disturbed
 ~5% lower per scenario. These supersede the pre-calibration values (BAU was 20,218, intensive 17,860);
@@ -112,7 +121,14 @@ comparison) so the headline numbers stay apples-to-apples.
   Total_Ecosystem_C, Age) into FIA/gcbm_rasters/ME. Dependency afterany:11505497.
 - 11511365 gcbm_stack — GCBM source-stack build wave (MN WA OR CA GA), next states for the
   full CONUS GCBM run.
-- 11511377 me_spatial_res — Maine landscape LANDIS reserve to 2100 (30m, biomass rasters).
+- me_spatial_res — Maine landscape LANDIS reserve to 2100 (30m, biomass rasters). First submit
+  (11511377) FAILED on a maine_ vs me_ prefix mismatch in the ecoregion path; fixed and resubmitted
+  as 11555051. extract_me_spatial_reserve.R produces landis_ME_spatial_vs_plot.csv when it lands.
+- gcbm_tile (11555044) — tiling the 5 GCBM source stacks (MN WA OR CA GA) with per-state PRISM MAT
+  (state_mat_prism.csv: MN 5.2, WA 8.5, OR 8.7, CA 14.6, GA 17.8 degC; NOT Maine 5.67). Next:
+  per-state GCBM run arrays -> retain -> measured engine gap (build_inputs_state.sh is the generalized tiler).
+- AUTOPILOT: scheduled task `harmonized-carbon-monitor` (daily 07:00) checks these jobs and runs the
+  integration steps as each lands (CEM re-adapt, spatial-LANDIS extract, GCBM run+gap, LANDIS integrate).
 - 11505310 + 11505312 cem2100 — CEM 48-state native-2100 (16-cycle) array (RUNNING, ~7h).
 - LANDIS waves 1-4 t2 chains (24 states calibrating). Monitor check_t2v2_chains.sh.
 - (v7_qrf / hg_v6 / hcb_v6 / cspi are unrelated raster ML jobs.)
@@ -174,3 +190,48 @@ build_plains_rockies_species.py). Outputs live on Cardinal FIA scratch (472 CSVs
 canonical ~25 are cataloged in DATA_INDEX.md). The local repo holds the scripts + docs +
 the plains_rockies scaffolds; large outputs and rasters stay on Cardinal scratch and are
 archived to Zenodo at publication.
+
+## ============================================================================
+## 2026-06-14 CONSOLIDATED UPDATE (read this first; supersedes older sections)
+## ============================================================================
+
+STATUS: the 3-model CONUS backbone (FVS, yield curves, CBM, 48 states x 4 scenarios x 2 disturbance
+modes) is complete with ensemble, CIs, geometric-mean + median central estimates, and external
+benchmark validation. A full stress test (model x state x scenario) passes with ZERO anomalies. Team
+report: Harmonized_Carbon_Team_Report_2026-06-14.docx.
+
+KEY FINDINGS: inventory/stress clean. Cross-model 2100 divergence median CV 46%, fold 3.9x,
+CONCENTRATED IN THE WEST (NV 8x, NM 11x, CA 9x, CO 8x) = real structural signal. See inv_*.csv,
+MODEL_INVENTORY_AND_PERSEUS_2026-06-14.md.
+
+CBM (clarified + finalized): CENTRAL = libcbm 76-yr stratum engine (cbm_reserve_anchored, 48 states
+2025-2100). GCBM (spatial) is the engine-gap REFERENCE (5-yr cbm_states runs), not the central
+member. libcbm calibration FINALIZED to FIA-expansion (B1.3 per-state vol-to-bio) - a refinement over
+the Boudewyn coefficients standard CBM/MSU use; the gap reads as GCBM vs FIA ground truth
+(LIBCBM_CALIBRATION_DECISION_2026-06-14.md). Engine band = early (yr5) density gap; a 75-yr growth-
+shape alternative was tried and RETRACTED (GCBM runs are only 5 yr; step-interval error;
+ENGINE_GAP_ASSESSMENT_2026-06-14.md). Measured gaps integrated (6 states): ME +40, MN 0, WA -17,
+IN -25, OR -27, GA -34 %. TWO HOUSEKEEPING FLAGS, assessed (CBM_FLAGS_RESOLVED_2026-06-14.md):
+(1) re-point build_cbm_reserve.R explicitly at the libcbm 76-yr reserve run; (2) archive/label that
+no-harvest run. Reserve confirmed no-harvest (+63% MN, not BAU +140%) so the overlay does not double-count.
+
+GCBM (cbm_states): per-state chain port_new_state.sh; 6/48 spatial done (GA IN ME MN OR WA) with
+mosaics + per-owner strata; libcbm reference for all 48. Finalization = run the remaining 42 (compute).
+GCBM_STATE_PIPELINE_STATUS_2026-06-14.md.
+
+PERSEUS: feed (1) state x scenario x model x year carbon+NPV matrix, plus (2) for spatial members the
+per-owner stratum tables GCBM already emits (gcbm_state_per_owner.csv), at 10-YEAR steps (reserve is
+near-linear; <0.1% reconstruction error), with stratum area. Native rasters archived for mapping.
+
+LANDIS: 9-state per-plot integrated. 270m spatial-vs-plot ME deck fully reconstructed + verified (all
+Biomass Succession 7.0 keywords, 101-240 ecoregion scheme, 80-ecoregion climate); ready to submit,
+blocked only by the QOS limit behind the CEM array.
+
+CEM: 37/48 native-2100; 15 relaunched (job 11555926, 48h wall). Re-adapt + overlap->9 when complete.
+
+MONITOR: daily harmonized-carbon-monitor submits LANDIS, launches the GCBM port_new_state wave
+(CA CO NM NV then OH NH), re-adapts CEM, refreshes ensemble/CI/inventory as QOS slots free.
+
+NEW DOCS (docs/): MODEL_INVENTORY_AND_PERSEUS, GCBM_STATE_PIPELINE_STATUS, CBM_ENGINE_GAP_MEASURED,
+LIBCBM_CALIBRATION_DECISION, ENGINE_GAP_ASSESSMENT, CBM_FLAGS_RESOLVED (all 2026-06-14) + team report.
+NEW SCRIPTS (harmonized/): inventory_stress.R, resolution_strata_gcbm.R, gen_team_report.js.
