@@ -65,6 +65,48 @@ Home hit its 500G hard quota and was likely stalling the CEM stragglers. Fixed:
   CRSF-Cowork/repos/landis2HPC; origin already has the content via the Cardinal push (801ddb9), so
   the local clone can simply be reset/pulled to origin/main next session if desired.
 
+## PENDING: rerun the calibrated FVS member (bug fix in fvs-modern), full CONUS
+Aaron found a bug in the calibrated FVS we used and is updating fvs-modern. The harmonized FVS member
+must be regenerated once that fix is committed. Scope is full CONUS (all 48 states / 25 variants). This
+is gated on the fix landing; do NOT rerun against the current sources.
+
+WHAT THE FVS MEMBER IS NOW. The calibrated reserve in the ensemble is fvs_reserve_calibrated_v4_anchored.csv
+(DG-adopted re-extraction, 2026-06-11). It is built by build_fvs_reserve_cfg.R --config gompit from the
+calibrated FVS projection density outputs in /fs/scratch/PUOM0008/crsfaaron/fvs_stress/out_gompit_v3/,
+anchored to FIA 2025 (Mg C/ha = AGB_TONS_AC * 2.2417 * 0.5; total(t) = FIA * perha(t)/perha(2025)).
+Driver: landis2/harmonized/run_fvs4.sh. Cardinal fvs-modern clone: /users/PUOM0008/crsfaaron/fvs-modern,
+branch conus-sf-integration-2026-05-21 (recent work is recruitment/ingrowth injection + per-variant
+BAIMULT). Calibrated parameters: fvs-modern/config/calibrated/<variant>{,_draws}.json.
+
+RERUN SEQUENCE WHEN THE FIX LANDS:
+1. On the Cardinal clone, git pull the updated branch. Confirm with Aaron which layer the bug is in,
+   because it sets the cost: (a) Fortran engine -> rebuild the .so libraries
+   (bash deployment/scripts/build_fvs_libraries.sh src-converted ./lib) AND rerun the full projection
+   (days); (b) calibration parameters / config/calibrated only -> regenerate params then rerun projection;
+   (c) extraction/adapter only -> just re-run step 3 (hours). Aaron flagged the bug as "something else",
+   so verify the layer before assuming a full engine rebuild.
+2. Rerun the full-CONUS calibrated (gompit) FVS projection to regenerate out_gompit_v3 across all states
+   (the original task #57 campaign; large SLURM array, respect the QOS submit cap).
+3. Re-extract the reserves: run_fvs4.sh -> build_fvs_reserve_cfg.R --config gompit ->
+   fvs_reserve_calibrated_anchored.csv; then the v4 DG-adopted extraction that feeds the ensemble
+   (fvs_reserve_calibrated_v4_anchored.csv) and the TreeMap variant (build_fvs_reserve_treemap.R) if used.
+   Refresh fvs_posterior_ci_all.csv.
+4. Re-integrate the harmonized chain: apply_disturbance_overlay.R, apply_harvest_scenarios.R,
+   build_master_scenarios.R, build_ensemble_estimate.R, build_crossmodel_ci.R, uncertainty_ensemble.R,
+   inventory_stress.R, stress_test_harmonized.py. Pull CSVs+figures to repo, organize_deliverables.sh,
+   commit+push.
+5. Validate: the calibrated-vs-default 2100 reserve sanity table in run_fvs4.sh (WA OR MN ME GA AL CA),
+   the external benchmark check, and a clean stress test (target 0 anomalies). Regenerate the team report.
+6. Zenodo: the published v2.0.0 (10.5281/zenodo.20693111) carries the buggy FVS member. If the corrected
+   FVS shifts results materially, deposit a corrected new version (v2.1.0 or v3.0.0) and note the fix.
+
+SEQUENCING. Coordinate with the CEM-48 gate (GA running as job 11711470). Prefer to let CEM reach 48 and
+the corrected FVS land, then do ONE clean final integration rather than integrating twice. Do not launch
+the full FVS projection array while GA or other jobs sit near the QOS submit cap.
+
+OPEN QUESTION for Aaron when the fix is ready: which layer is the bug in (engine vs params vs adapter),
+and how will I know the fix is committed (a tag, a branch, or you tell me). That determines cost and trigger.
+
 ## Key artifacts (all on GitHub + Cardinal)
 Docs (landis2HPC/docs/): Harmonized_Carbon_Team_Report_2026-06-14.docx, MODEL_INVENTORY_AND_PERSEUS,
 LIBCBM_CALIBRATION_DECISION, CBM_ENGINE_GAP_MEASURED, ENGINE_GAP_ASSESSMENT, CBM_FLAGS_RESOLVED,
