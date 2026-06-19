@@ -74,6 +74,35 @@ Once the Route A driver is in place, the rerun is mechanical: build engines, run
 (PYTHONNOUSERSITE=1, staged submits), extract the three reserves, onboard ACD (ready) and ADK (needs a
 county join), and do one final harmonized integration. The SDIMAX/WO-1 fix and the numpy env fix carry over.
 
+## UPDATE 2026-06-19 (afternoon): projection path works; Maine run live; CONUS setup begun
+The blocker was the wrong driver. The working path is the perseus_100yr_projection.py CLI (fvsAddTrees +
+fvs.summary readback), NOT the stale scratch run_conus_task_fvstreeinit.py. With the WO-1 SDIMAX fix and
+PYTHONNOUSERSITE=1, it runs clean.
+
+DONE:
+- Maine PERSEUS run launched and running: SLURM array 11787011 (37 tasks, ACD+NE x default+calibrated),
+  output /fs/scratch/PUOM0008/crsfaaron/fvs_stress/out_perseus_wo1. Watcher fvs-rerun-driver aggregates
+  and extracts on completion. These are the SDIMAX-corrected projections.
+- CONUS plot list built from the FIADB FVS table ENTIRE_FVS_STANDINIT_PLOT.csv: 19 per-variant lists
+  (1,861,183 plots) at fvs_stress/conus_plotlist/plotlist_<variant>.csv (PLOT, FIRST_PLTCN=STAND_CN,
+  STATECD, FIRST_INVYR, lat/long). Builder: fvs_stress/build_conus_plotlist.py.
+- CONUS runner wrapper: fvs_stress/run_conus_perseus.py wraps the working driver and loads FIA trees per
+  STATECD (each <ST>_TREE.csv). Validated for SN: per-state load works and matching plots project
+  correctly (AGB 0 -> 41.5 -> growing over cycles).
+
+REMAINING for the full harmonized CONUS FVS member:
+1. CN alignment: some StandInit STAND_CN do not match the current <ST>_TREE.csv PLT_CN (older cycles).
+   Per Aaron, use the FIADB FVS tables: pair ENTIRE_FVS_STANDINIT with the matched FVS TreeInit tables
+   (<ST>_FVS_TREEINIT_PLOT.csv) keyed by STAND_CN, instead of raw TREE.csv, so every stand has its trees.
+2. Third config arm, the CONUS-variant via fvs-conus: the perseus driver supports only default and
+   calibrated; the fvs-conus equations must be injected via set_tree_attr (stop at restart code 5,
+   overwrite dg/htg with fvs-conus predictions, resume). The mechanism (set_tree_attr) exists in fvs2py
+   _base.py; wiring fvs-conus coefficient predictions as a third config is the remaining dev step.
+3. Launch the per-variant CONUS array (19 variants, ~375 chunks of 5000) through run_conus_perseus.py
+   for default, calibrated, conus-variant, when QOS frees (Maine run + CEM GA currently hold slots).
+4. Map to TreeMap 2022: allocate the per-plot reserve to TreeMap 2022 pixels via treemap_paint.R for
+   spatial CONUS coverage, then anchor to FIA design totals and integrate as the corrected FVS member.
+
 ## Clone state left for Aaron (nothing lost)
 fvs-modern Cardinal clone is on conus-sf-integration-2026-05-21, config_loader.py reverted to pristine.
 stash@{0} ("WIP on feat/conus-sf-integration") holds uncommitted work that predated this session; restore
