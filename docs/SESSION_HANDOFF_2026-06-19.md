@@ -66,6 +66,36 @@ conus_wo1 array is queued, then monitors, concatenates, and builds the anchored 
 6. Do one final harmonized integration once CEM reaches 48 and the corrected FVS (all arms) is in, rather
    than integrating piecemeal.
 
+## FVS arm design (expanded per PI direction 2026-06-19)
+
+Four FVS arms, not two. The base CONUS run (arms 1 and 2) must complete first; arms 3 and 4 build on it.
+1. default: native FVS. Running via run_conus_task_wo1 (subprocess path).
+2. calibrated: per-species multipliers from config/calibrated (the fvs-conus species-dependent equations
+   applied as multipliers; net near zero at stand level per SESSION_FINDINGS). Running with arm 1.
+3. fvs-conus species-DEPENDENT, deeper, with uncertainty: basis is perseus_uncertainty_projection.py,
+   which runs FVS with N posterior draws per variant via the UncertaintyEngine (parametric). CONUS-adapt
+   it (same pattern as run_conus_task_wo1: working perseus import, per-state trees, subprocess path) and
+   ADD residual variance so intervals are predictive (point +/- residual SD), since parameter-only
+   intervals undercover (about 13 percent per SESSION_FINDINGS). Posterior draws live in
+   output/variants/<v>/{diameter_growth_samples,mortality_samples,...}.rds.
+4. fvs-conus species-FREE, deeper, with uncertainty: no standalone projector exists yet. Build one
+   adapting R/17_stand_projection_engine.R (annualized DG/HG/mortality forward projector that already
+   reads posterior draws) to consume the species-free fits (R/32_fit_dg_kuehne_speciesfree,
+   32_fit_hg_speciesfree_v5, 34_fit_mortality/survival_speciesfree, 35_fit_cr_speciesfree,
+   36_fit_htdbh_speciesfree). First extract the species-free coefficients + residuals via
+   R/50sf_extract_speciesfree_residuals.R (only output/sf_bench exists now, not saved coefficients).
+   Propagate parametric + residual uncertainty.
+
+Mechanism choice (PI): HYBRID. Arm 3 uses the FVS engine + posterior draws; arm 4 uses a standalone
+equation projector. The in-process FVS injection (set_tree_attr) stays blocked on the Route A fvs2py
+work and is NOT on the critical path for either arm. Uncertainty (PI): parametric + residual for both.
+
+Build sequence: (a) finish base CONUS default+calibrated run; (b) CONUS-adapt perseus_uncertainty_projection
++ residual term, validate one variant, run arm 3; (c) extract species-free coefficients, build the
+species-free projector from R/17, validate against sf_bench, run arm 4; (d) anchor all arms to FIA totals,
+map to TreeMap 2022, integrate as the FVS member family with bounds. Arm 4 is substantial new modeling in
+Aaron's fvs-conus domain; validate equation forms against his fits before generating final numbers.
+
 ## Automation in place
 
 harmonized-carbon-monitor (daily 7 AM): home hygiene, integrates campaigns as they land, submits LANDIS
