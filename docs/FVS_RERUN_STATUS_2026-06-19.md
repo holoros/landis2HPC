@@ -49,16 +49,35 @@ project" moved the projection harness (perseus_100yr_projection.py) out of fvs-m
 fvs-conus project, so the harness on feat is the pre-decouple copy. The branch topology is mid-refactor:
 the segfault fix and the decoupled harness are not co-located on a single branch I can simply build from.
 
+## Final diagnosis (the precise blocker)
+The Route A fvs2py fix (4266a47, on conus-sf-integration-2026-05-21) replaced the broken extree/treeinit
+tree-loading path with an in-memory fvsAddTrees path. But the production CONUS projection driver on
+scratch, /fs/scratch/PUOM0008/crsfaaron/fvs_stress/run_conus_task_fvstreeinit.py, still uses the OLD
+treeinit path (its name says so). So even with the Route A fix present in fvs2py and the engine loaded,
+the driver never calls the fixed code and segfaults on the first FVS call. Verified across four
+combinations: feat engine, 05-21 engine, GOMPIT on, GOMPIT off, and 05-21 fvs2py with the fvs-conus
+harness on PYTHONPATH. All segfault identically right after "Library loaded successfully".
+
+fvs-conus (/users/PUOM0008/crsfaaron/fvs-conus) is the decoupled calibration + manuscript project; its
+QUICKSTART covers fitting the Bayesian models, not the 100yr projection run, so the Route A projection
+entry point is not wired up there yet.
+
 ## What is needed from Aaron
-Identify the single runtime-stable combination, since it spans the mid-refactor state:
-1. Which branch or project state carries the Route A fvs2py segfault fix (4266a47 line) TOGETHER with the
-   projection harness (the decoupled fvs-conus project) and the WO-1 config_loader guard. That is the
-   state to build the engine from and run.
-2. Where the decoupled standalone fvs-conus project lives (separate repo or path), since the run harness
-   now imports from there rather than fvs-modern/calibration/python.
-Once pointed at that combination, the rerun is mechanical: build engine, run the gompit projection
-(PYTHONNOUSERSITE=1, the staged submit scripts), extract the corrected reserve, onboard ACD (ready), and
-integrate. The SDIMAX bug fix and the numpy env fix are already done and carry over.
+The projection driver must be the Route A version that calls the in-memory fvsAddTrees path, not the
+stale run_conus_task_fvstreeinit.py. This is the in-progress Route A work. Specifically:
+1. The Route A projection driver (the script that drives perseus_100yr_projection via fvsAddTrees), and
+   how it is invoked for a CONUS array task. Once that driver exists/is identified, the staged submit
+   scripts point at it instead of run_conus_task_fvstreeinit.py.
+2. Confirmation of the three intended FVS runs and their engines: default, calibrated (gompit), and the
+   new CONUS-variant via fvs-conus. Each runs through the same corrected driver, differing by config.
+Once the Route A driver is in place, the rerun is mechanical: build engines, run the three projections
+(PYTHONNOUSERSITE=1, staged submits), extract the three reserves, onboard ACD (ready) and ADK (needs a
+county join), and do one final harmonized integration. The SDIMAX/WO-1 fix and the numpy env fix carry over.
+
+## Clone state left for Aaron (nothing lost)
+fvs-modern Cardinal clone is on conus-sf-integration-2026-05-21, config_loader.py reverted to pristine.
+stash@{0} ("WIP on feat/conus-sf-integration") holds uncommitted work that predated this session; restore
+with git stash pop if it is yours. lib_0521 (SN, 05-21 engine) and lib_wo1 (all 25, feat engine) retained.
 
 ## State left in place (nothing destructive)
 - lib_wo1 (feat engine, all 25 variants), lib_0521 (05-21 engine, SN only) retained.
