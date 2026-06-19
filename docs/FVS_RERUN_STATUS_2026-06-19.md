@@ -35,13 +35,30 @@ The v4 run that worked (out_gompit_v4, last written 2026-06-11) used an older ha
 libraries are gone (fvs_gompit/lib is empty) and the commit live on 2026-06-11 is older than anything in
 the current reflog window, so that exact working combination is not recoverable by branch switching alone.
 
+## Root cause found (update)
+The segfault is the known "extree / growth-step segfault" in the fvs2py tree read/write path. Aaron's
+own fvs2py Route A work fixes it:
+- 4266a47 (2026-06-18) "Route A milestone: fvsAddTrees in-memory load eliminates the extree segfault"
+- c32d40c (2026-06-18) "Route A: rebuild fixes keyrdr EOF; in-process tree-attr verified; growth-step segfault isolated"
+- 60960d6 (2026-06-18) "Route A: fvs2py in-process per-tree read/write (fvsTreeAttr binding)"
+
+These commits are NEWER than feat/conus-sf-integration HEAD (21dfbae, 2026-06-16), which is what I built
+and ran from. So feat does not contain the segfault fix, which is why every task crashed on the first
+FVS call. Separately, commit b22be5d (2026-06-12) "Decouple calibration subtree into standalone fvs-conus
+project" moved the projection harness (perseus_100yr_projection.py) out of fvs-modern into a standalone
+fvs-conus project, so the harness on feat is the pre-decouple copy. The branch topology is mid-refactor:
+the segfault fix and the decoupled harness are not co-located on a single branch I can simply build from.
+
 ## What is needed from Aaron
-The decision is which harness + engine + fvs2py commit is runtime-stable for the CONUS projection. Options:
-1. Point to the commit or tag live on 2026-06-11 that produced the working v4 run; rebuild engine and run
-   the harness from that commit, then apply only the WO-1 config_loader guard on top.
-2. If feat/conus-sf-integration is meant to run, identify the fvs2py / perseus_100yr_projection fix that
-   resolves the segfault (debug build + backtrace can localize it, but it is an active WIP branch).
-3. Restore the 2026-06-11 working libraries if archived anywhere off the empty fvs_gompit/lib.
+Identify the single runtime-stable combination, since it spans the mid-refactor state:
+1. Which branch or project state carries the Route A fvs2py segfault fix (4266a47 line) TOGETHER with the
+   projection harness (the decoupled fvs-conus project) and the WO-1 config_loader guard. That is the
+   state to build the engine from and run.
+2. Where the decoupled standalone fvs-conus project lives (separate repo or path), since the run harness
+   now imports from there rather than fvs-modern/calibration/python.
+Once pointed at that combination, the rerun is mechanical: build engine, run the gompit projection
+(PYTHONNOUSERSITE=1, the staged submit scripts), extract the corrected reserve, onboard ACD (ready), and
+integrate. The SDIMAX bug fix and the numpy env fix are already done and carry over.
 
 ## State left in place (nothing destructive)
 - lib_wo1 (feat engine, all 25 variants), lib_0521 (05-21 engine, SN only) retained.
