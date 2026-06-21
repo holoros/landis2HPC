@@ -24,10 +24,14 @@ fvs_post <- tryCatch(fread(file.path(FIA,"fvs_posterior_ci_all.csv")), error=fun
 cbm_oat  <- tryCatch(fread(file.path(FIA,"cbm_oat_bands.csv")), error=function(e) NULL)
 cbm_gap  <- tryCatch(fread(file.path(FIA,"cbm_engine_gap.csv")), error=function(e) NULL)
 yc_b     <- tryCatch(fread(file.path(FIA,"yc_bands.csv")), error=function(e) NULL)
+# FVS family band (across arms + parametric/residual + anchor), carried as se in the
+# family disturbed file; this is the FVS member's within-model relative SD.
+fvs_fam  <- tryCatch(fread(file.path(FIA,"fvs_reserve_family_disturbed.csv"))[scenario=="reserve"], error=function(e) NULL)
+if(!is.null(fvs_fam)) fvs_fam[, dom:=sprintf("%02d",as.integer(dom))]
 
 relband <- function(model, st, yr){           # within-model relative SD
-  if (grepl("FVS",model) && !is.null(fvs_post)){ s<-fvs_post[ST==st]; if(nrow(s)>=2)
-    return((approx(s$year,s$rel_hi,yr,rule=2)$y-approx(s$year,s$rel_lo,yr,rule=2)$y)/2/1.96) }
+  if (grepl("FVS",model) && !is.null(fvs_fam)){ dm<-sprintf("%02d",FIPS[st]); s<-fvs_fam[dom==dm]; if(nrow(s)>=2)
+    return(approx(s$year, s$agc_TgC_anchored_se/pmax(s$agc_TgC_anchored,1e-9), yr, rule=2)$y); return(0) }
   if (model=="CBM"){ oat<-if(!is.null(cbm_oat)&&nrow(cbm_oat[state==st])) cbm_oat[state==st]$rel_halfrange[1]/1.645 else 0
     eg<-if(!is.null(cbm_gap)&&nrow(cbm_gap[state==st])) abs(cbm_gap[state==st]$gcbm_over_libcbm_pct[1])/100/1.645 else 0
     return(sqrt(oat^2+eg^2)) }
@@ -35,7 +39,7 @@ relband <- function(model, st, yr){           # within-model relative SD
     return(sqrt((x$rel_climate_band[1]/1.645)^2+(x$rel_sim_band[1]/1.96)^2)) }
   return(0)                                     # LANDIS/CEM: no extra param band (anchor cv only)
 }
-files <- c(FVS="fvs_reserve_calibrated_disturbed.csv", LANDIS="harmonized_landis_reserve_9state_disturbed.csv",
+files <- c(FVS="fvs_reserve_family_disturbed.csv", LANDIS="harmonized_landis_reserve_9state_disturbed.csv",
            CEM="cem_reserve_disturbed.csv", YieldCurve="yc_reserve_disturbed.csv", CBM="cbm_reserve_disturbed.csv")
 mods <- lapply(files, function(f){ d<-fread(file.path(FIA,f))[scenario=="reserve"]; d[,dom:=sprintf("%02d",as.integer(dom))]; d })
 interp <- function(m, dom, yr){ s<-mods[[m]][dom==dom][order(year)]; if(nrow(s)<2) return(NA_real_); approx(s$year,s$agc_TgC_anchored,yr,rule=2)$y }
@@ -50,9 +54,10 @@ ens <- rbindlist(lapply(names(FIPS), function(ab){ dom<-sprintf("%02d",FIPS[ab])
     cv <- anc[state==ab]$cv; cv <- if(length(cv)) cv else 10
     within <- sapply(keep, function(m) v[m]*relband(m, ab, yr))
     bsd <- sd(v); med <- median(v); anch <- median(v)*cv/100
+    geom <- exp(mean(log(v[v>0])))   # geometric mean: robust central estimate (down-weights the high FVS end-member)
     tsd <- sqrt(bsd^2 + mean(within)^2 + anch^2)
     data.table(state=ab, year=yr, n_models=length(v),
-               ens_equal=round(wm(w_eq),1), ens_benchmark=round(wm(w_bm),1), median=round(med,1),
+               ens_equal=round(wm(w_eq),1), ens_geom=round(geom,1), ens_benchmark=round(wm(w_bm),1), median=round(med,1),
                between_sd=round(bsd,1), within_sd=round(mean(within),1), anchor_se=round(anch,1),
                lo90=round(pmax(wm(w_eq)-1.645*tsd,0),1), hi90=round(wm(w_eq)+1.645*tsd,1),
                crI_rel_pct=round(100*1.645*tsd/wm(w_eq),1))

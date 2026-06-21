@@ -14,8 +14,11 @@
 # module load gcc/12.3.0 R/4.4.0
 suppressPackageStartupMessages(library(data.table))
 FIA <- "/fs/scratch/PUOM0008/crsfaaron/FIA"
-files <- c(LANDIS="harmonized_landis_reserve_9state.csv", FVS_cal="fvs_reserve_calibrated_anchored.csv",
-           FVS_def="fvs_reserve_default_anchored.csv", YieldCurve="yc_reserve_anchored.csv",
+# FVS enters as ONE member (the family), its arms (default/calibrated/species-dep/
+# species-free) define its structural band, carried in agc_TgC_anchored_se by
+# build_fvs_family.R. Distinct from the other modeling approaches.
+files <- c(LANDIS="harmonized_landis_reserve_9state.csv", FVS="fvs_reserve_family_anchored.csv",
+           YieldCurve="yc_reserve_anchored.csv",
            CEM="cem_reserve_anchored.csv", CBM="cbm_reserve_anchored.csv")
 fvs_post <- tryCatch(fread(file.path(FIA,"fvs_posterior_ci_all.csv")), error=function(e) NULL)
 fvs_relsd <- function(st, yr){
@@ -44,14 +47,26 @@ yc_relsd <- function(st){
   x <- yc_b[state==st]; if (!nrow(x)) return(NA_real_)
   sqrt((x$rel_climate_band[1]/1.645)^2 + (x$rel_sim_band[1]/1.96)^2)
 }
-FIPS <- c(IN=18, OH=39, NH=33)
+# Coverage-driven full-overlap state set: the intersection of every model's reserve
+# states. Auto-expands as CEM (48-state array) and the LANDIS waves land - no re-edit.
+FIPS_ALL <- c(AL=1,AZ=4,AR=5,CA=6,CO=8,CT=9,DE=10,FL=12,GA=13,ID=16,IL=17,IN=18,IA=19,KS=20,
+  KY=21,LA=22,ME=23,MD=24,MA=25,MI=26,MN=27,MS=28,MO=29,MT=30,NE=31,NV=32,NH=33,NJ=34,NM=35,
+  NY=36,NC=37,ND=38,OH=39,OK=40,OR=41,PA=42,RI=44,SC=45,SD=46,TN=47,TX=48,UT=49,VT=50,VA=51,
+  WA=53,WV=54,WI=55,WY=56)
+.mdoms <- lapply(files, function(f){ d <- fread(file.path(FIA,f))[scenario=="reserve"]
+  unique(sprintf("%02d", as.integer(d$dom))) })
+.full <- Reduce(intersect, .mdoms)
+.ab <- names(FIPS_ALL)[match(.full, sprintf("%02d", FIPS_ALL))]
+FIPS <- FIPS_ALL[.ab[!is.na(.ab)]]
+cat("full-overlap states (coverage-driven, n=", length(FIPS), "): ",
+    paste(sort(names(FIPS)), collapse=", "), "\n", sep="")
 rows <- rbindlist(lapply(names(files), function(m){
   d <- fread(file.path(FIA,files[m]))[scenario=="reserve"]; d[, dom:=sprintf("%02d",as.integer(dom))]
   rbindlist(lapply(names(FIPS), function(st){
     s <- d[dom==sprintf("%02d",FIPS[st])][order(year)]; if(!nrow(s)) return(NULL)
     i <- which.max(s$year); val <- s$agc_TgC_anchored[i]; ase <- s$agc_TgC_anchored_se[i]
     psd <- 0; src <- "anchor-only"
-    if (grepl("FVS", m)) { r <- fvs_relsd(st, s$year[i]); if (is.finite(r)) { psd <- val*r; src <- "anchor+posterior" } }
+    if (m=="FVS") { src <- "family-band (arms+anchor)" }  # band already in agc_TgC_anchored_se
     if (m=="CBM") { r <- cbm_relsd(st); if (is.finite(r)) { psd <- val*r; src <- "anchor+OAT" } }
     if (m=="YieldCurve") { r <- yc_relsd(st); if (is.finite(r)) { psd <- val*r; src <- "anchor+rcp+sim" } }
     tse <- sqrt(ase^2 + psd^2)
