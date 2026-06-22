@@ -56,12 +56,24 @@ fvs_conus_setup/ tooling + results_snapshot/). Zenodo v2.0.0 DOI 10.5281/zenodo.
 
 ## Next steps and suggested refinements
 
-Science:
-1. FVS base run completes -> anchor per-state reserve (fvs-rerun-driver) -> build arms 3 and 4 -> TreeMap
-   2022 allocation -> integrate the FVS member family with bounds.
-2. CEM reaches 48 -> one clean final harmonized integration (not piecemeal).
-3. Deposit a corrected Zenodo version once the corrected FVS shifts results; refresh the team report.
-4. Flag any state with a small FVS treeinit-matched sample; pool to variant/ecoregion if noisy.
+Science (status as of 2026-06-21 review):
+1. DONE: base CONUS FVS run complete (26.6M rows, all 19 variants); corrected reserve anchored
+   (fvs_reserve_{calibrated,default}_wo1_anchored.csv, 06-20) and folded into the crossmodel CI as the FVS
+   family band (arms+anchor). Corrected calibrated is at parity with default (calib/def ~0.99), confirming
+   the SDIMAX over-thinning artifact is gone. Old buggy reserves backed up .bak_pre_wo1.
+2. DONE: CEM reached 48 states (Georgia finished). BUT the harmonized CEM member is STALE: cem_reserve_anchored.csv
+   is still 06-13 (pre-48). IMMEDIATE NEXT STEP: rebuild build_cem_reserve.R from the 48 conus2100 dirs, then
+   re-run the integration chain (apply_disturbance_overlay, apply_harvest_scenarios, build_master_scenarios,
+   build_ensemble_estimate, build_crossmodel_ci, uncertainty_ensemble, inventory_stress, stress_test) so the
+   CEM member is current. This is the one clean final integration; the cem-48-catch-and-integrate watcher is
+   meant to do it on its 6h cadence (verify it fired; trigger if not).
+3. Then build the two deeper fvs-conus arms (#84 species-dependent, #85 species-free) with parametric+residual
+   uncertainty, TreeMap 2022 allocation for the FVS family, and re-integrate.
+4. Deposit a corrected Zenodo version once results are final; refresh the team report.
+5. Flag any state with a small FVS treeinit-matched sample (n_matched in the anchored reserve); pool to
+   variant/ecoregion if noisy.
+
+Infra: home recovered to 257G (LSOG jobs finished); keep LSOG output pointed at scratch to avoid refilling.
 
 Organization (to make handoffs easier; do the disruptive parts at a quiet milestone, not mid-run):
 5. Adopt conus_multimodel/<model>/ as the canonical output convention; point new runs there (or symlink on
