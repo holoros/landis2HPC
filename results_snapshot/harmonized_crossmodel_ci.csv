@@ -1,0 +1,46 @@
+state,model,year,value,anchor_se,param_sd,total_se,lo90,hi90,ci_source
+WA,LANDIS,2100,1371.3,13.8,0,13.8,1348.5,1394.1,anchor-only
+MN,LANDIS,2100,837.9,7.5,0,7.5,825.6,850.1,anchor-only
+IN,LANDIS,2100,583.2,13.4,0,13.4,561.2,605.3,anchor-only
+OH,LANDIS,2100,783.8,15.4,0,15.4,758.5,809.1,anchor-only
+WI,LANDIS,2100,1236.6,9.9,0,9.9,1220.3,1252.9,anchor-only
+MI,LANDIS,2100,1160.7,13,0,13,1139.3,1182.1,anchor-only
+ME,LANDIS,2100,1170.8,10.8,0,10.8,1153,1188.5,anchor-only
+NH,LANDIS,2100,271.1,4.5,0,4.5,263.7,278.5,anchor-only
+VT,LANDIS,2100,277,5,0,5,268.8,285.3,anchor-only
+WA,FVS,2100,3045.9,268.8,0,268.8,2603.7,3488.2,family-band (arms+anchor)
+MN,FVS,2100,593.6,52.1,0,52.1,507.8,679.4,family-band (arms+anchor)
+IN,FVS,2100,358.9,32.4,0,32.4,305.6,412.3,family-band (arms+anchor)
+OH,FVS,2100,604,54,0,54,515.1,692.9,family-band (arms+anchor)
+WI,FVS,2100,875.9,76.8,0,76.8,749.5,1002.2,family-band (arms+anchor)
+MI,FVS,2100,904.7,79.7,0,79.7,773.6,1035.8,family-band (arms+anchor)
+ME,FVS,2100,822,72.3,0,72.3,703.1,941,family-band (arms+anchor)
+NH,FVS,2100,408.3,36.3,0,36.3,348.6,468.1,family-band (arms+anchor)
+VT,FVS,2100,392.4,35,0,35,334.8,450,family-band (arms+anchor)
+WA,YieldCurve,2100,1178.1,11.9,51,52.4,1091.9,1264.3,anchor+rcp+sim
+MN,YieldCurve,2100,444,4,18.7,19.1,412.6,475.4,anchor+rcp+sim
+IN,YieldCurve,2100,230.7,5.3,9.4,10.8,212.9,248.5,anchor+rcp+sim
+OH,YieldCurve,2100,365.6,7.2,14.9,16.6,338.4,392.9,anchor+rcp+sim
+WI,YieldCurve,2100,581.3,4.7,24.2,24.6,540.8,621.8,anchor+rcp+sim
+MI,YieldCurve,2100,852.5,9.5,35.5,36.8,791.9,913,anchor+rcp+sim
+ME,YieldCurve,2100,608,5.6,25.8,26.4,564.6,651.4,anchor+rcp+sim
+NH,YieldCurve,2100,177.8,3,7.3,7.9,164.9,190.7,anchor+rcp+sim
+VT,YieldCurve,2100,180.9,3.3,7.4,8.1,167.6,194.1,anchor+rcp+sim
+WA,CEM,2100,514.6,30.2,0,30.2,464.9,564.4,anchor-only
+MN,CEM,2100,176.3,4.5,0,4.5,168.8,183.8,anchor-only
+IN,CEM,2100,125.8,8.8,0,8.8,111.4,140.2,anchor-only
+OH,CEM,2100,152.8,9.6,0,9.6,137,168.6,anchor-only
+WI,CEM,2100,233.5,6.5,0,6.5,222.9,244.1,anchor-only
+MI,CEM,2100,303.7,8.3,0,8.3,290.1,317.4,anchor-only
+ME,CEM,2100,195.2,4.4,0,4.4,187.9,202.5,anchor-only
+NH,CEM,2100,75.4,2.5,0,2.5,71.3,79.4,anchor-only
+VT,CEM,2100,75,2.2,0,2.2,71.4,78.7,anchor-only
+WA,CBM,2100,1022.8,10.3,105.2,105.7,848.8,1196.7,anchor+OAT
+MN,CBM,2100,501.9,4.5,11.2,12.1,482.1,521.8,anchor+OAT
+IN,CBM,2100,306.5,7.1,47.2,47.8,228,385.1,anchor+OAT
+OH,CBM,2100,409,8,30.9,31.9,356.5,461.4,anchor+OAT
+WI,CBM,2100,636.1,5.1,0,5.1,627.7,644.4,anchor-only
+MI,CBM,2100,742.2,8.3,0,8.3,728.6,755.9,anchor-only
+ME,CBM,2100,523.2,4.8,128.8,128.9,311.1,735.2,anchor+OAT
+NH,CBM,2100,214.7,3.6,29,29.2,166.6,262.8,anchor+OAT
+VT,CBM,2100,197.4,3.6,0,3.6,191.5,203.2,anchor-only

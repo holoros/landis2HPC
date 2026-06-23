@@ -30,7 +30,8 @@ FIPS <- c(AL=1,AZ=4,AR=5,CA=6,CO=8,CT=9,DE=10,FL=12,GA=13,ID=16,IL=17,IN=18,IA=1
 anc <- fread(file.path(FIA,"fia_agc_anchor_design_by_state.csv"))[, .(state, fia=agc_TgC_design, cv=cv_pct)]
 
 out <- rbindlist(lapply(names(FIPS), function(st) {
-  ds <- list.files(OUTDIR, pattern=sprintf("conus_harmonized_sdimax_%s$", st), full.names=TRUE)
+  ds <- list.files(OUTDIR, pattern=sprintf("conus2100_%s$", st), full.names=TRUE)
+  if (!length(ds)) ds <- list.files(OUTDIR, pattern=sprintf("conus_harmonized_sdimax_%s$", st), full.names=TRUE)
   if (!length(ds)) return(NULL)
   f <- file.path(sort(ds)[length(ds)], "ci_summaries.csv")   # newest
   if (!file.exists(f)) return(NULL)
