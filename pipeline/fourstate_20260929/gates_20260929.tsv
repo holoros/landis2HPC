@@ -257,3 +257,11 @@ time	state	stage	gate	result	value	threshold	provenance
 2026-09-30 00:51:30	MI	stage7	eco30:active_IC_outside_state_all_inactive	PASS	0.9994 of 193553 out-of-state active IC cells have no ecoregion	> 0.999	LANDIS simulates only cells with an active ecoregion
 2026-09-30 00:52:36	WI	stage7	eco30:active_IC_inside_state_without_ecoregion	PASS	0.00050 of 584629 sampled active in-state cells	<= 0.005	2 M cell sample, seed 20260930, census 1:20M polygon
 2026-09-30 00:52:36	WI	stage7	eco30:active_IC_outside_state_all_inactive	PASS	0.9993 of 280535 out-of-state active IC cells have no ecoregion	> 0.999	LANDIS simulates only cells with an active ecoregion
+2026-09-30 00:57:31	NH	stage2	TM_22:ids_in_VAT_2022	FAIL	4269 unique ids, 1 not in Value of the 2022 VAT	0 orphans	TreeMap2022_CONUS.tif.vat.dbf; the 29 Sep gate read the wrong table or column
+2026-09-30 00:57:44	VT	stage2	TM_22:ids_in_VAT_2022	FAIL	4462 unique ids, 1 not in Value of the 2022 VAT	0 orphans	TreeMap2022_CONUS.tif.vat.dbf; the 29 Sep gate read the wrong table or column
+2026-09-30 00:59:04	MI	stage2	TM_22:ids_in_VAT_2022	FAIL	8269 unique ids, 1 not in Value of the 2022 VAT	0 orphans	TreeMap2022_CONUS.tif.vat.dbf; the 29 Sep gate read the wrong table or column
+2026-09-30 00:59:52	WI	stage2	TM_22:ids_in_VAT_2022	FAIL	7224 unique ids, 1 not in Value of the 2022 VAT	0 orphans	TreeMap2022_CONUS.tif.vat.dbf; the 29 Sep gate read the wrong table or column
+2026-09-30 01:00:47	NH	stage2	TM_22:ids_in_VAT_2022	PASS	4269 unique ids, 0 not in Value of the 2022 VAT	0 orphans	TreeMap2022_CONUS.tif.vat.dbf Value column; the 29 Sep gate compared RAT labels with TM_ID
+2026-09-30 01:01:00	VT	stage2	TM_22:ids_in_VAT_2022	PASS	4462 unique ids, 0 not in Value of the 2022 VAT	0 orphans	TreeMap2022_CONUS.tif.vat.dbf Value column; the 29 Sep gate compared RAT labels with TM_ID
+2026-09-30 01:02:18	MI	stage2	TM_22:ids_in_VAT_2022	PASS	8269 unique ids, 0 not in Value of the 2022 VAT	0 orphans	TreeMap2022_CONUS.tif.vat.dbf Value column; the 29 Sep gate compared RAT labels with TM_ID
+2026-09-30 01:03:04	WI	stage2	TM_22:ids_in_VAT_2022	PASS	7224 unique ids, 0 not in Value of the 2022 VAT	0 orphans	TreeMap2022_CONUS.tif.vat.dbf Value column; the 29 Sep gate compared RAT labels with TM_ID
