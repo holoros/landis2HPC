@@ -1,0 +1,259 @@
+time	state	stage	gate	result	value	threshold	provenance
+2026-09-29 07:50:41	NH	stage1	eco270:crs	PASS	5070	EPSG:5070	LANDIS run CRS used by ME/MN templates and stage one (clip_state_ecoregions.R)
+2026-09-29 07:50:41	NH	stage1	eco270:res	FAIL	270.18306339131x269.990213321538	270 m	stage one run grid 270 m (CellLength 270 in ME run script)
+2026-09-29 07:50:42	NH	stage1	eco270:range	PASS	58 59	[58,59]	physical/code bounds for this layer
+2026-09-29 07:50:42	NH	stage1	eco270:frac_inside_state	PASS	1.0000	>= 0.980	set here: 270 m edge cells vs 1:20M cartographic polygon
+2026-09-29 07:50:42	NH	stage1	eco270:frac_state_reached	PASS	0.9972	>= 0.970	stage one report coverage 0.977 to 1.000
+2026-09-29 07:50:42	NH	stage1	eco270:square_cells	FAIL	270.183063 x 269.990213	xres == yres	LANDIS CellLength assumes square cells
+2026-09-29 07:50:42	NH	stage1	eco270:codes_expected	PASS	58 59	58 59	brief: stage one codes per state
+2026-09-29 07:50:42	NH	stage1	eco270:table_matches_raster	PASS	58 59	active MapCodes == raster codes	LANDIS Ecoregions table must list every raster code
+2026-09-29 07:50:42	NH	stage1	eco270:no_zero_codes	PASS	NAflag NaN zero cells 0	0 cells coded 0 (outside-state cells are NA)	nothing uncovered silently becomes a valid code
+2026-09-29 07:50:57	VT	stage1	eco270:crs	PASS	5070	EPSG:5070	LANDIS run CRS used by ME/MN templates and stage one (clip_state_ecoregions.R)
+2026-09-29 07:50:57	VT	stage1	eco270:res	FAIL	269.805093825905x270.121880353803	270 m	stage one run grid 270 m (CellLength 270 in ME run script)
+2026-09-29 07:50:57	VT	stage1	eco270:range	PASS	58 83	[58,83]	physical/code bounds for this layer
+2026-09-29 07:50:57	VT	stage1	eco270:frac_inside_state	PASS	1.0000	>= 0.980	set here: 270 m edge cells vs 1:20M cartographic polygon
+2026-09-29 07:50:58	VT	stage1	eco270:frac_state_reached	PASS	0.9999	>= 0.970	stage one report coverage 0.977 to 1.000
+2026-09-29 07:50:58	VT	stage1	eco270:square_cells	FAIL	269.805094 x 270.121880	xres == yres	LANDIS CellLength assumes square cells
+2026-09-29 07:50:58	VT	stage1	eco270:codes_expected	PASS	58 59 83	58 59 83	brief: stage one codes per state
+2026-09-29 07:50:58	VT	stage1	eco270:table_matches_raster	PASS	58 59 83	active MapCodes == raster codes	LANDIS Ecoregions table must list every raster code
+2026-09-29 07:50:58	VT	stage1	eco270:no_zero_codes	PASS	NAflag NaN zero cells 0	0 cells coded 0 (outside-state cells are NA)	nothing uncovered silently becomes a valid code
+2026-09-29 07:51:09	MI	stage1	eco270:crs	PASS	5070	EPSG:5070	LANDIS run CRS used by ME/MN templates and stage one (clip_state_ecoregions.R)
+2026-09-29 07:51:09	MI	stage1	eco270:res	FAIL	270.012864231381x270.046599359938	270 m	stage one run grid 270 m (CellLength 270 in ME run script)
+2026-09-29 07:51:09	MI	stage1	eco270:range	PASS	50 57	[50,57]	physical/code bounds for this layer
+2026-09-29 07:51:12	MI	stage1	eco270:frac_inside_state	PASS	1.0000	>= 0.980	set here: 270 m edge cells vs 1:20M cartographic polygon
+2026-09-29 07:51:15	MI	stage1	eco270:frac_state_reached	PASS	0.9772	>= 0.970	stage one report coverage 0.977 to 1.000
+2026-09-29 07:51:15	MI	stage1	eco270:square_cells	FAIL	270.012864 x 270.046599	xres == yres	LANDIS CellLength assumes square cells
+2026-09-29 07:51:15	MI	stage1	eco270:codes_expected	PASS	50 51 55 56 57	50 51 55 56 57	brief: stage one codes per state
+2026-09-29 07:51:15	MI	stage1	eco270:table_matches_raster	PASS	50 51 55 56 57	active MapCodes == raster codes	LANDIS Ecoregions table must list every raster code
+2026-09-29 07:51:16	MI	stage1	eco270:no_zero_codes	PASS	NAflag NaN zero cells 0	0 cells coded 0 (outside-state cells are NA)	nothing uncovered silently becomes a valid code
+2026-09-29 07:51:27	WI	stage1	eco270:crs	PASS	5070	EPSG:5070	LANDIS run CRS used by ME/MN templates and stage one (clip_state_ecoregions.R)
+2026-09-29 07:51:27	WI	stage1	eco270:res	FAIL	269.991877698415x269.978663496486	270 m	stage one run grid 270 m (CellLength 270 in ME run script)
+2026-09-29 07:51:27	WI	stage1	eco270:range	PASS	47 54	[47,54]	physical/code bounds for this layer
+2026-09-29 07:51:28	WI	stage1	eco270:frac_inside_state	PASS	1.0000	>= 0.980	set here: 270 m edge cells vs 1:20M cartographic polygon
+2026-09-29 07:51:29	WI	stage1	eco270:frac_state_reached	PASS	0.9970	>= 0.970	stage one report coverage 0.977 to 1.000
+2026-09-29 07:51:29	WI	stage1	eco270:square_cells	FAIL	269.991878 x 269.978663	xres == yres	LANDIS CellLength assumes square cells
+2026-09-29 07:51:29	WI	stage1	eco270:codes_expected	PASS	47 50 51 52 53 54	47 50 51 52 53 54	brief: stage one codes per state
+2026-09-29 07:51:29	WI	stage1	eco270:table_matches_raster	PASS	47 50 51 52 53 54	active MapCodes == raster codes	LANDIS Ecoregions table must list every raster code
+2026-09-29 07:51:29	WI	stage1	eco270:no_zero_codes	PASS	NAflag NaN zero cells 0	0 cells coded 0 (outside-state cells are NA)	nothing uncovered silently becomes a valid code
+2026-09-29 08:01:33	NH	stage4	species_txt_equals_param_set	PASS	15 vs 15	species.txt codes == SppEcoregionData species	NE template species.txt vs SppEcoregionData_fia.csv
+2026-09-29 08:01:33	NH	stage4	SpeciesData_equals_param_set	PASS	15 vs 15	SpeciesData codes == SppEcoregionData species	NE template SpeciesData.csv
+2026-09-29 08:01:33	NH	stage4	param_set_covers_stage1_ecoregions	PASS	58 59 82	contains 58 59	every stage one L3 code needs SppEcoregionData rows
+2026-09-29 08:01:33	NH	stage4	lookup_codes_in_param_set	PASS	""	no lookup target outside parameter set	crosswalk vs SppEcoregionData
+2026-09-29 08:01:33	NH	stage4	mapped_BA_share	PASS	0.9923	>= 0.95	set here: at most 5% of live BA may fall outside the parameter set; unmapped species listed in unmapped_species_20260929.csv
+2026-09-29 08:01:33	NH	stage4	lookup_sources_cleanly	PASS	59	SPECIES_LOOKUP rows	builder contract (SPCD, LANDIS)
+2026-09-29 08:01:36	VT	stage4	species_txt_equals_param_set	PASS	15 vs 15	species.txt codes == SppEcoregionData species	NE template species.txt vs SppEcoregionData.csv
+2026-09-29 08:01:36	VT	stage4	SpeciesData_equals_param_set	PASS	15 vs 15	SpeciesData codes == SppEcoregionData species	NE template SpeciesData.csv
+2026-09-29 08:01:36	VT	stage4	param_set_covers_stage1_ecoregions	PASS	58 59 82 83	contains 58 59 83	every stage one L3 code needs SppEcoregionData rows
+2026-09-29 08:01:36	VT	stage4	lookup_codes_in_param_set	PASS	""	no lookup target outside parameter set	crosswalk vs SppEcoregionData
+2026-09-29 08:01:36	VT	stage4	mapped_BA_share	PASS	0.9816	>= 0.95	set here: at most 5% of live BA may fall outside the parameter set; unmapped species listed in unmapped_species_20260929.csv
+2026-09-29 08:01:36	VT	stage4	lookup_sources_cleanly	PASS	59	SPECIES_LOOKUP rows	builder contract (SPCD, LANDIS)
+2026-09-29 08:01:51	MI	stage4	species_txt_equals_param_set	PASS	24 vs 24	species.txt codes == SppEcoregionData species	LS template species.txt vs SppEcoregionData.csv
+2026-09-29 08:01:51	MI	stage4	SpeciesData_equals_param_set	PASS	24 vs 24	SpeciesData codes == SppEcoregionData species	LS template SpeciesData.csv
+2026-09-29 08:01:51	MI	stage4	param_set_covers_stage1_ecoregions	PASS	50 51 55 56 57	contains 50 51 55 56 57	every stage one L3 code needs SppEcoregionData rows
+2026-09-29 08:01:51	MI	stage4	lookup_codes_in_param_set	PASS	""	no lookup target outside parameter set	crosswalk vs SppEcoregionData
+2026-09-29 08:01:51	MI	stage4	mapped_BA_share	PASS	0.9559	>= 0.95	set here: at most 5% of live BA may fall outside the parameter set; unmapped species listed in unmapped_species_20260929.csv
+2026-09-29 08:01:51	MI	stage4	lookup_sources_cleanly	PASS	50	SPECIES_LOOKUP rows	builder contract (SPCD, LANDIS)
+2026-09-29 08:02:03	WI	stage4	species_txt_equals_param_set	PASS	24 vs 24	species.txt codes == SppEcoregionData species	LS template species.txt vs SppEcoregionData.csv
+2026-09-29 08:02:03	WI	stage4	SpeciesData_equals_param_set	PASS	24 vs 24	SpeciesData codes == SppEcoregionData species	LS template SpeciesData.csv
+2026-09-29 08:02:03	WI	stage4	param_set_covers_stage1_ecoregions	PASS	47 50 51 52 53 54	contains 47 50 51 52 53 54	every stage one L3 code needs SppEcoregionData rows
+2026-09-29 08:02:03	WI	stage4	lookup_codes_in_param_set	PASS	""	no lookup target outside parameter set	crosswalk vs SppEcoregionData
+2026-09-29 08:02:03	WI	stage4	mapped_BA_share	FAIL	0.9448	>= 0.95	set here: at most 5% of live BA may fall outside the parameter set; unmapped species listed in unmapped_species_20260929.csv
+2026-09-29 08:02:03	WI	stage4	lookup_sources_cleanly	PASS	50	SPECIES_LOOKUP rows	builder contract (SPCD, LANDIS)
+2026-09-29 08:46:03	NH	stage5	daymet_points_fetched	PASS	30 of 30	all sample points	fetch completeness
+2026-09-29 08:46:06	NH	stage5	daymet_columns_equal_stage1_codes	PASS	58 59	58 59	stage one L3 codes
+2026-09-29 08:46:06	NH	stage5	daymet_complete	PASS	1080	1080 rows, no NA	1991-2020 x 12 months x 3 variables
+2026-09-29 08:46:06	NH	stage5	precip_range_mm_month	PASS	5.4..387.7	[0,600] mm/month	physical bound for the NE and Lake States
+2026-09-29 08:46:06	NH	stage5	tmin_range	PASS	-20.9..17.7	[-40,30] C	physical bound (monthly mean)
+2026-09-29 08:46:06	NH	stage5	tmax_range	PASS	-8.3..29.7	[-30,40] C	physical bound (monthly mean)
+2026-09-29 08:46:06	NH	stage5	tmin_lt_tmax	PASS	min(tmax-tmin)=7.03	tmin < tmax everywhere	physical
+2026-09-29 08:48:58	NH	stage2	TM_22:identical_to_TM2022_crop	PASS	geom=TRUE ndiff=0	0 differing cells	confirms the existing clip derives from TreeMap 2022 CONUS
+2026-09-29 08:48:58	NH	stage2	TM_22:covers_stage1_padded_extent	PASS	1877955,2027055,2426355,2736255	extent >= stage1 extent + 2 km pad (30 m tolerance)	clip_state_treemap.R recipe
+2026-09-29 08:50:12	NH	stage2	TM_22:crs	PASS	5070	EPSG:5070	LANDIS run CRS used by ME/MN templates and stage one (clip_state_ecoregions.R)
+2026-09-29 08:50:12	NH	stage2	TM_22:res	PASS	30x30	30 m	TreeMap native 30 m
+2026-09-29 08:50:12	NH	stage2	TM_22:range	PASS	1515 69437	[0,70035]	physical/code bounds for this layer
+2026-09-29 08:50:57	NH	stage5	ssp245:shape	PASS	3276 rows	3276 rows (2010-2100 x 12 x 3), same L3 columns, no NA	build_synthetic_cmip6 schema
+2026-09-29 08:51:02	NH	stage5	ssp245:endpoint_delta	PASS	max |dT err| 5.00e-05, max |dP err| 4.71e-07	2100 = baseline + 2.5 C, x 1.05 precip	IPCC AR6 CONUS endpoint deltas coded in build_synthetic_cmip6.*
+2026-09-29 08:51:02	NH	stage5	ssp585:shape	PASS	3276 rows	3276 rows (2010-2100 x 12 x 3), same L3 columns, no NA	build_synthetic_cmip6 schema
+2026-09-29 08:51:04	NH	stage5	ssp585:endpoint_delta	PASS	max |dT err| 5.00e-05, max |dP err| 4.51e-07	2100 = baseline + 4.5 C, x 1.10 precip	IPCC AR6 CONUS endpoint deltas coded in build_synthetic_cmip6.*
+2026-09-29 08:56:51	VT	stage5	daymet_points_fetched	PASS	45 of 45	all sample points	fetch completeness
+2026-09-29 08:56:53	VT	stage5	daymet_columns_equal_stage1_codes	PASS	58 59 83	58 59 83	stage one L3 codes
+2026-09-29 08:56:53	VT	stage5	daymet_complete	PASS	1080	1080 rows, no NA	1991-2020 x 12 months x 3 variables
+2026-09-29 08:56:53	VT	stage5	precip_range_mm_month	PASS	10.7..346.7	[0,600] mm/month	physical bound for the NE and Lake States
+2026-09-29 08:56:53	VT	stage5	tmin_range	PASS	-22.2..17.5	[-40,30] C	physical bound (monthly mean)
+2026-09-29 08:56:53	VT	stage5	tmax_range	PASS	-9.3..30.0	[-30,40] C	physical bound (monthly mean)
+2026-09-29 08:56:53	VT	stage5	tmin_lt_tmax	PASS	min(tmax-tmin)=6.22	tmin < tmax everywhere	physical
+2026-09-29 08:59:17	NH	stage2	TM_22:frac_inside_state	PASS	0.5485	>= 0.000	bbox clip by design (clip_state_treemap.R); informational only
+2026-09-29 08:59:20	NH	stage2	TM_22:frac_state_reached	PASS	1.0000	>= 0.999	state polygon must lie inside the TreeMap clip extent
+2026-09-29 08:59:38	VT	stage5	ssp245:shape	PASS	3276 rows	3276 rows (2010-2100 x 12 x 3), same L3 columns, no NA	build_synthetic_cmip6 schema
+2026-09-29 08:59:39	VT	stage5	ssp245:endpoint_delta	PASS	max |dT err| 5.00e-05, max |dP err| 7.06e-07	2100 = baseline + 2.5 C, x 1.05 precip	IPCC AR6 CONUS endpoint deltas coded in build_synthetic_cmip6.*
+2026-09-29 08:59:40	VT	stage5	ssp585:shape	PASS	3276 rows	3276 rows (2010-2100 x 12 x 3), same L3 columns, no NA	build_synthetic_cmip6 schema
+2026-09-29 08:59:40	VT	stage5	ssp585:endpoint_delta	PASS	max |dT err| 5.00e-05, max |dP err| 9.87e-07	2100 = baseline + 4.5 C, x 1.10 precip	IPCC AR6 CONUS endpoint deltas coded in build_synthetic_cmip6.*
+2026-09-29 09:00:54	NH	stage2	TM_22:ids_in_VAT	FAIL	4269 unique ids, 4269 orphans	0 orphans	TreeMap2022_CONUS.tif.vat.dbf
+2026-09-29 09:00:54	NH	stage2	TM_22:nodata_flag	PASS	NAflag NaN	reported	informational: cells outside the TreeMap forest mask are NA
+2026-09-29 09:00:56	NH	stage2	TM_22:covers_stage1_eco	PASS	1.0000	>= 1.000	every valid stage one 270 m ecoregion cell centre lies within the TreeMap clip
+2026-09-29 09:01:55	MI	stage5	daymet_points_fetched	PASS	75 of 75	all sample points	fetch completeness
+2026-09-29 09:01:57	MI	stage5	daymet_columns_equal_stage1_codes	PASS	50 51 55 56 57	50 51 55 56 57	stage one L3 codes
+2026-09-29 09:01:58	MI	stage5	daymet_complete	PASS	1080	1080 rows, no NA	1991-2020 x 12 months x 3 variables
+2026-09-29 09:01:58	MI	stage5	precip_range_mm_month	PASS	7.3..255.1	[0,600] mm/month	physical bound for the NE and Lake States
+2026-09-29 09:01:58	MI	stage5	tmin_range	PASS	-21.4..18.6	[-40,30] C	physical bound (monthly mean)
+2026-09-29 09:01:58	MI	stage5	tmax_range	PASS	-9.0..32.4	[-30,40] C	physical bound (monthly mean)
+2026-09-29 09:01:58	MI	stage5	tmin_lt_tmax	PASS	min(tmax-tmin)=4.31	tmin < tmax everywhere	physical
+2026-09-29 09:02:26	WI	stage2	TM_22:crs	PASS	5070	EPSG:5070	LANDIS run CRS used by ME/MN templates and stage one (clip_state_ecoregions.R)
+2026-09-29 09:02:26	WI	stage2	TM_22:res	PASS	30x30	30 m	TreeMap native 30 m
+2026-09-29 09:02:26	WI	stage2	TM_22:range	PASS	1529 69640	[0,70035]	physical/code bounds for this layer
+2026-09-29 09:02:54	NH	stage2	TM_22:forest_area_lt_state_area	PASS	18847 km2 vs state 24038 km2	forest < state area	sanity bound (brief)
+2026-09-29 09:02:56	NH	stage2	TM_22:forest_area_vs_FIA_order_of_magnitude	PASS	TM 18847 km2 / (FIA forest fraction 0.849 x state 24038 km2 = 20403 km2) = 0.92	(0.5, 2.0)	band set here; FIA forest fraction = unweighted CONDPROP_UNADJ share of status-1 conditions, latest INVYR >= 2010 per plot, status 1-4 denominator
+2026-09-29 09:03:12	MI	stage5	ssp245:shape	PASS	3276 rows	3276 rows (2010-2100 x 12 x 3), same L3 columns, no NA	build_synthetic_cmip6 schema
+2026-09-29 09:03:13	MI	stage5	ssp245:endpoint_delta	PASS	max |dT err| 5.00e-05, max |dP err| 7.61e-07	2100 = baseline + 2.5 C, x 1.05 precip	IPCC AR6 CONUS endpoint deltas coded in build_synthetic_cmip6.*
+2026-09-29 09:03:13	MI	stage5	ssp585:shape	PASS	3276 rows	3276 rows (2010-2100 x 12 x 3), same L3 columns, no NA	build_synthetic_cmip6 schema
+2026-09-29 09:03:14	MI	stage5	ssp585:endpoint_delta	PASS	max |dT err| 5.00e-05, max |dP err| 8.36e-07	2100 = baseline + 4.5 C, x 1.10 precip	IPCC AR6 CONUS endpoint deltas coded in build_synthetic_cmip6.*
+2026-09-29 09:04:00	WI	stage5	daymet_points_fetched	PASS	90 of 90	all sample points	fetch completeness
+2026-09-29 09:04:00	WI	stage5	daymet_columns_equal_stage1_codes	PASS	47 50 51 52 53 54	47 50 51 52 53 54	stage one L3 codes
+2026-09-29 09:04:00	WI	stage5	daymet_complete	PASS	1080	1080 rows, no NA	1991-2020 x 12 months x 3 variables
+2026-09-29 09:04:00	WI	stage5	precip_range_mm_month	PASS	1.1..330.8	[0,600] mm/month	physical bound for the NE and Lake States
+2026-09-29 09:04:00	WI	stage5	tmin_range	PASS	-23.9..20.7	[-40,30] C	physical bound (monthly mean)
+2026-09-29 09:04:00	WI	stage5	tmax_range	PASS	-11.8..32.1	[-30,40] C	physical bound (monthly mean)
+2026-09-29 09:04:00	WI	stage5	tmin_lt_tmax	PASS	min(tmax-tmin)=5.09	tmin < tmax everywhere	physical
+2026-09-29 09:04:29	WI	stage5	ssp245:shape	PASS	3276 rows	3276 rows (2010-2100 x 12 x 3), same L3 columns, no NA	build_synthetic_cmip6 schema
+2026-09-29 09:04:29	WI	stage5	ssp245:endpoint_delta	PASS	max |dT err| 5.00e-05, max |dP err| 1.02e-06	2100 = baseline + 2.5 C, x 1.05 precip	IPCC AR6 CONUS endpoint deltas coded in build_synthetic_cmip6.*
+2026-09-29 09:04:29	WI	stage5	ssp585:shape	PASS	3276 rows	3276 rows (2010-2100 x 12 x 3), same L3 columns, no NA	build_synthetic_cmip6 schema
+2026-09-29 09:04:29	WI	stage5	ssp585:endpoint_delta	PASS	max |dT err| 5.00e-05, max |dP err| 1.64e-06	2100 = baseline + 4.5 C, x 1.10 precip	IPCC AR6 CONUS endpoint deltas coded in build_synthetic_cmip6.*
+2026-09-29 09:06:51	VT	stage2	TM_22:crs	PASS	5070	EPSG:5070	LANDIS run CRS used by ME/MN templates and stage one (clip_state_ecoregions.R)
+2026-09-29 09:06:51	VT	stage2	TM_22:res	PASS	30x30	30 m	TreeMap native 30 m
+2026-09-29 09:06:51	VT	stage2	TM_22:range	PASS	1513 69437	[0,70035]	physical/code bounds for this layer
+2026-09-29 09:08:37	VT	stage2	TM_22:frac_inside_state	PASS	0.6175	>= 0.000	bbox clip by design (clip_state_treemap.R); informational only
+2026-09-29 09:08:39	VT	stage2	TM_22:frac_state_reached	PASS	1.0000	>= 0.999	state polygon must lie inside the TreeMap clip extent
+2026-09-29 09:08:58	VT	stage2	TM_22:ids_in_VAT	FAIL	4462 unique ids, 4462 orphans	0 orphans	TreeMap2022_CONUS.tif.vat.dbf
+2026-09-29 09:08:58	VT	stage2	TM_22:nodata_flag	PASS	NAflag NaN	reported	informational: cells outside the TreeMap forest mask are NA
+2026-09-29 09:09:01	VT	stage2	TM_22:covers_stage1_eco	PASS	1.0000	>= 1.000	every valid stage one 270 m ecoregion cell centre lies within the TreeMap clip
+2026-09-29 09:09:34	VT	stage2	TM_22:forest_area_lt_state_area	PASS	18231 km2 vs state 24935 km2	forest < state area	sanity bound (brief)
+2026-09-29 09:09:35	VT	stage2	TM_22:forest_area_vs_FIA_order_of_magnitude	PASS	TM 18231 km2 / (FIA forest fraction 0.757 x state 24935 km2 = 18885 km2) = 0.97	(0.5, 2.0)	band set here; FIA forest fraction = unweighted CONDPROP_UNADJ share of status-1 conditions, latest INVYR >= 2010 per plot, status 1-4 denominator
+2026-09-29 09:25:39	WI	stage2	TM_22:frac_inside_state	PASS	0.6767	>= 0.000	bbox clip by design (clip_state_treemap.R); informational only
+2026-09-29 09:25:40	WI	stage2	TM_22:frac_state_reached	PASS	1.0000	>= 0.999	state polygon must lie inside the TreeMap clip extent
+2026-09-29 09:26:35	WI	stage2	TM_22:ids_in_VAT	FAIL	7224 unique ids, 7224 orphans	0 orphans	TreeMap2022_CONUS.tif.vat.dbf
+2026-09-29 09:26:35	WI	stage2	TM_22:nodata_flag	PASS	NAflag NaN	reported	informational: cells outside the TreeMap forest mask are NA
+2026-09-29 09:26:40	NH	stage3	IC30:crs	PASS	5070	EPSG:5070	LANDIS run CRS used by ME/MN templates and stage one (clip_state_ecoregions.R)
+2026-09-29 09:26:41	NH	stage3	IC30:res	PASS	30x30	30 m	TreeMap native 30 m
+2026-09-29 09:26:41	NH	stage3	IC30:range	PASS	0 4138	[0,4138]	physical/code bounds for this layer
+2026-09-29 09:26:48	WI	stage2	TM_22:covers_stage1_eco	PASS	1.0000	>= 1.000	every valid stage one 270 m ecoregion cell centre lies within the TreeMap clip
+2026-09-29 09:30:05	NH	stage3	IC30:frac_inside_state	PASS	0.5485	>= 0.000	bbox IC by design (build_initial_communities_v3.R writes the whole TreeMap clip); informational
+2026-09-29 09:30:05	NH	stage3	IC30:frac_state_reached	PASS	1.0000	>= 0.999	state polygon inside IC extent
+2026-09-29 09:30:25	NH	stage3	IC30:codes_defined_in_txt	PASS	4138 raster codes, 0 undefined	0 undefined	every raster MapCode needs an Initial Communities entry
+2026-09-29 09:30:37	NH	stage3	IC30:same_grid_as_TM_22	PASS	compareGeom	identical grid	IC is a reclass of the TreeMap clip
+2026-09-29 09:32:54	NH	stage3	IC30:no_code_on_TM_nodata	PASS	0	0 cells	nothing uncovered silently becomes a valid code
+2026-09-29 09:35:16	NH	stage3	IC30:forest_cells_without_cohorts	PASS	3520 of 38179509 TM forest cells -> MapCode 0 (0.0001)	reported	informational: TM_IDs whose trees are all unmapped or absent
+2026-09-29 09:36:06	NH	stage3	stands:same_grid_as_IC	PASS	compareGeom	identical grid	LANDIS reads stands with IC
+2026-09-29 09:36:06	NH	stage6	MA_PLACEHOLDER:same_grid_as_IC	PASS	compareGeom	identical grid	LANDIS reads management areas with IC
+2026-09-29 09:36:06	NH	stage3	stands:range	PASS	1 38175989	[1, 38175989 ]	one stand per active cell
+2026-09-29 09:36:06	NH	stage6	MA_PLACEHOLDER:range	PASS	1 1	[1,1]	single statewide PLACEHOLDER area
+2026-09-29 09:36:17	NH	stage3	stands:active_equals_IC_active	PASS	stands 38175989, MA 38175989, IC>0 38175989	equal	active cells identical across IC, stands, MA
+2026-09-29 09:36:17	NH	stage3	IC30:same_grid_as_stage1_ecoregions	FAIL	IC 30 m origin 1877955.000,2736255.000 vs stage1 res 270.183x269.990	identical grid	LANDIS reads ecoregions with IC; stage one raster is 270 m non-square (see stage1 gates)
+2026-09-29 09:37:30	NH	stage6	placeholder_files_named	PASS	management-area_PLACEHOLDER.tif management-areas_PLACEHOLDER.txt landowner_shares_PLACEHOLDER.csv README_PLACEHOLDER.txt	PLACEHOLDER in every filename	brief
+2026-09-29 09:37:30	NH	stage6	placeholder_in_headers	PASS	first line of each text file	contains PLACEHOLDER	brief
+2026-09-29 09:40:24	WI	stage2	TM_22:forest_area_lt_state_area	PASS	71668 km2 vs state 145561 km2	forest < state area	sanity bound (brief)
+2026-09-29 09:40:27	WI	stage2	TM_22:forest_area_vs_FIA_order_of_magnitude	PASS	TM 71668 km2 / (FIA forest fraction 0.434 x state 145561 km2 = 63171 km2) = 1.13	(0.5, 2.0)	band set here; FIA forest fraction = unweighted CONDPROP_UNADJ share of status-1 conditions, latest INVYR >= 2010 per plot, status 1-4 denominator
+2026-09-29 09:45:26	VT	stage3	IC30:crs	PASS	5070	EPSG:5070	LANDIS run CRS used by ME/MN templates and stage one (clip_state_ecoregions.R)
+2026-09-29 09:45:26	VT	stage3	IC30:res	PASS	30x30	30 m	TreeMap native 30 m
+2026-09-29 09:45:26	VT	stage3	IC30:range	PASS	0 4248	[0,4248]	physical/code bounds for this layer
+2026-09-29 09:46:28	VT	stage3	IC30:frac_inside_state	PASS	0.6176	>= 0.000	bbox IC by design (build_initial_communities_v3.R writes the whole TreeMap clip); informational
+2026-09-29 09:46:28	VT	stage3	IC30:frac_state_reached	PASS	1.0000	>= 0.999	state polygon inside IC extent
+2026-09-29 09:46:44	VT	stage3	IC30:codes_defined_in_txt	PASS	4248 raster codes, 0 undefined	0 undefined	every raster MapCode needs an Initial Communities entry
+2026-09-29 09:46:50	VT	stage3	IC30:same_grid_as_TM_22	PASS	compareGeom	identical grid	IC is a reclass of the TreeMap clip
+2026-09-29 09:47:31	VT	stage3	IC30:no_code_on_TM_nodata	PASS	0	0 cells	nothing uncovered silently becomes a valid code
+2026-09-29 09:48:44	VT	stage3	IC30:forest_cells_without_cohorts	PASS	3686 of 32803557 TM forest cells -> MapCode 0 (0.0001)	reported	informational: TM_IDs whose trees are all unmapped or absent
+2026-09-29 09:49:44	VT	stage3	stands:same_grid_as_IC	PASS	compareGeom	identical grid	LANDIS reads stands with IC
+2026-09-29 09:49:44	VT	stage6	MA_PLACEHOLDER:same_grid_as_IC	PASS	compareGeom	identical grid	LANDIS reads management areas with IC
+2026-09-29 09:49:44	VT	stage3	stands:range	PASS	1 32799871	[1, 32799871 ]	one stand per active cell
+2026-09-29 09:49:44	VT	stage6	MA_PLACEHOLDER:range	PASS	1 1	[1,1]	single statewide PLACEHOLDER area
+2026-09-29 09:49:55	VT	stage3	stands:active_equals_IC_active	PASS	stands 32799871, MA 32799871, IC>0 32799871	equal	active cells identical across IC, stands, MA
+2026-09-29 09:49:55	VT	stage3	IC30:same_grid_as_stage1_ecoregions	FAIL	IC 30 m origin 1764945.000,2696445.000 vs stage1 res 269.805x270.122	identical grid	LANDIS reads ecoregions with IC; stage one raster is 270 m non-square (see stage1 gates)
+2026-09-29 09:50:57	VT	stage6	placeholder_files_named	PASS	management-area_PLACEHOLDER.tif management-areas_PLACEHOLDER.txt landowner_shares_PLACEHOLDER.csv README_PLACEHOLDER.txt	PLACEHOLDER in every filename	brief
+2026-09-29 09:50:57	VT	stage6	placeholder_in_headers	PASS	first line of each text file	contains PLACEHOLDER	brief
+2026-09-29 09:50:59	MI	stage2	TM_22:crs	PASS	5070	EPSG:5070	LANDIS run CRS used by ME/MN templates and stage one (clip_state_ecoregions.R)
+2026-09-29 09:50:59	MI	stage2	TM_22:res	PASS	30x30	30 m	TreeMap native 30 m
+2026-09-29 09:50:59	MI	stage2	TM_22:range	PASS	1529 69640	[0,70035]	physical/code bounds for this layer
+2026-09-29 10:21:51	MI	stage2	TM_22:frac_inside_state	PASS	0.6463	>= 0.000	bbox clip by design (clip_state_treemap.R); informational only
+2026-09-29 10:21:54	MI	stage2	TM_22:frac_state_reached	PASS	1.0000	>= 0.999	state polygon must lie inside the TreeMap clip extent
+2026-09-29 10:24:28	MI	stage2	TM_22:ids_in_VAT	FAIL	8269 unique ids, 8269 orphans	0 orphans	TreeMap2022_CONUS.tif.vat.dbf
+2026-09-29 10:24:28	MI	stage2	TM_22:nodata_flag	PASS	NAflag NaN	reported	informational: cells outside the TreeMap forest mask are NA
+2026-09-29 10:24:40	MI	stage2	TM_22:covers_stage1_eco	PASS	1.0000	>= 1.000	every valid stage one 270 m ecoregion cell centre lies within the TreeMap clip
+2026-09-29 10:35:20	MI	stage2	TM_22:forest_area_lt_state_area	PASS	83818 km2 vs state 153620 km2	forest < state area	sanity bound (brief)
+2026-09-29 10:35:21	MI	stage2	TM_22:forest_area_vs_FIA_order_of_magnitude	PASS	TM 83818 km2 / (FIA forest fraction 0.575 x state 153620 km2 = 88328 km2) = 0.95	(0.5, 2.0)	band set here; FIA forest fraction = unweighted CONDPROP_UNADJ share of status-1 conditions, latest INVYR >= 2010 per plot, status 1-4 denominator
+2026-09-29 10:41:35	WI	stage3	IC30:crs	PASS	5070	EPSG:5070	LANDIS run CRS used by ME/MN templates and stage one (clip_state_ecoregions.R)
+2026-09-29 10:41:35	WI	stage3	IC30:res	PASS	30x30	30 m	TreeMap native 30 m
+2026-09-29 10:41:35	WI	stage3	IC30:range	PASS	0 6779	[0,6779]	physical/code bounds for this layer
+2026-09-29 10:43:06	MI	stage3	IC30:crs	PASS	5070	EPSG:5070	LANDIS run CRS used by ME/MN templates and stage one (clip_state_ecoregions.R)
+2026-09-29 10:43:06	MI	stage3	IC30:res	PASS	30x30	30 m	TreeMap native 30 m
+2026-09-29 10:43:06	MI	stage3	IC30:range	PASS	0 7767	[0,7767]	physical/code bounds for this layer
+2026-09-29 10:47:03	WI	stage3	IC30:frac_inside_state	PASS	0.6765	>= 0.000	bbox IC by design (build_initial_communities_v3.R writes the whole TreeMap clip); informational
+2026-09-29 10:47:04	WI	stage3	IC30:frac_state_reached	PASS	1.0000	>= 0.999	state polygon inside IC extent
+2026-09-29 10:48:00	WI	stage3	IC30:codes_defined_in_txt	PASS	6779 raster codes, 0 undefined	0 undefined	every raster MapCode needs an Initial Communities entry
+2026-09-29 10:48:04	WI	stage3	IC30:same_grid_as_TM_22	PASS	compareGeom	identical grid	IC is a reclass of the TreeMap clip
+2026-09-29 10:52:18	WI	stage3	IC30:no_code_on_TM_nodata	PASS	0	0 cells	nothing uncovered silently becomes a valid code
+2026-09-29 10:54:33	MI	stage3	IC30:frac_inside_state	PASS	0.6459	>= 0.000	bbox IC by design (build_initial_communities_v3.R writes the whole TreeMap clip); informational
+2026-09-29 10:54:33	MI	stage3	IC30:frac_state_reached	PASS	1.0000	>= 0.999	state polygon inside IC extent
+2026-09-29 10:56:04	MI	stage3	IC30:codes_defined_in_txt	PASS	7767 raster codes, 0 undefined	0 undefined	every raster MapCode needs an Initial Communities entry
+2026-09-29 10:56:07	MI	stage3	IC30:same_grid_as_TM_22	PASS	compareGeom	identical grid	IC is a reclass of the TreeMap clip
+2026-09-29 10:58:04	WI	stage3	IC30:forest_cells_without_cohorts	PASS	87667 of 117676933 TM forest cells -> MapCode 0 (0.0007)	reported	informational: TM_IDs whose trees are all unmapped or absent
+2026-09-29 10:59:35	WI	stage3	stands:same_grid_as_IC	PASS	compareGeom	identical grid	LANDIS reads stands with IC
+2026-09-29 10:59:35	WI	stage6	MA_PLACEHOLDER:same_grid_as_IC	PASS	compareGeom	identical grid	LANDIS reads management areas with IC
+2026-09-29 10:59:35	WI	stage3	stands:range	PASS	1 117589266	[1, 117589266 ]	one stand per active cell
+2026-09-29 10:59:35	WI	stage6	MA_PLACEHOLDER:range	PASS	1 1	[1,1]	single statewide PLACEHOLDER area
+2026-09-29 10:59:46	WI	stage3	stands:active_equals_IC_active	PASS	stands 117589266, MA 117589266, IC>0 117589266	equal	active cells identical across IC, stands, MA
+2026-09-29 10:59:46	WI	stage3	IC30:same_grid_as_stage1_ecoregions	FAIL	IC 30 m origin 240675.000,2687235.000 vs stage1 res 269.992x269.979	identical grid	LANDIS reads ecoregions with IC; stage one raster is 270 m non-square (see stage1 gates)
+2026-09-29 11:00:03	WI	stage6	placeholder_files_named	PASS	management-area_PLACEHOLDER.tif management-areas_PLACEHOLDER.txt landowner_shares_PLACEHOLDER.csv README_PLACEHOLDER.txt	PLACEHOLDER in every filename	brief
+2026-09-29 11:00:03	WI	stage6	placeholder_in_headers	PASS	first line of each text file	contains PLACEHOLDER	brief
+2026-09-29 11:04:24	MI	stage3	IC30:no_code_on_TM_nodata	PASS	0	0 cells	nothing uncovered silently becomes a valid code
+2026-09-29 11:14:34	MI	stage3	IC30:forest_cells_without_cohorts	PASS	398000 of 144109335 TM forest cells -> MapCode 0 (0.0028)	reported	informational: TM_IDs whose trees are all unmapped or absent
+2026-09-29 11:16:40	MI	stage3	stands:same_grid_as_IC	PASS	compareGeom	identical grid	LANDIS reads stands with IC
+2026-09-29 11:16:40	MI	stage6	MA_PLACEHOLDER:same_grid_as_IC	PASS	compareGeom	identical grid	LANDIS reads management areas with IC
+2026-09-29 11:16:40	MI	stage3	stands:range	PASS	1 143711335	[1, 143711335 ]	one stand per active cell
+2026-09-29 11:16:40	MI	stage6	MA_PLACEHOLDER:range	PASS	1 1	[1,1]	single statewide PLACEHOLDER area
+2026-09-29 11:17:02	MI	stage3	stands:active_equals_IC_active	PASS	stands 143711335, MA 143711335, IC>0 143711335	equal	active cells identical across IC, stands, MA
+2026-09-29 11:17:02	MI	stage3	IC30:same_grid_as_stage1_ecoregions	FAIL	IC 30 m origin 427065.000,2823675.000 vs stage1 res 270.013x270.047	identical grid	LANDIS reads ecoregions with IC; stage one raster is 270 m non-square (see stage1 gates)
+2026-09-29 11:17:23	MI	stage6	placeholder_files_named	PASS	management-area_PLACEHOLDER.tif management-areas_PLACEHOLDER.txt landowner_shares_PLACEHOLDER.csv README_PLACEHOLDER.txt	PLACEHOLDER in every filename	brief
+2026-09-29 11:17:23	MI	stage6	placeholder_in_headers	PASS	first line of each text file	contains PLACEHOLDER	brief
+2026-09-30 00:43:01	NH	stage7	eco30:same_grid_as_IC	PASS	compareGeom	identical grid	terra::resample near onto initial-communities.tif
+2026-09-30 00:43:01	NH	stage7	eco30:codes_equal_stage1	PASS	58 59	58 59	stage one raster codes
+2026-09-30 00:43:01	NH	stage7	eco30:active_IC_without_ecoregion	FAIL	0.45156 of 1486795 sampled active cells	<= 0.005	2 M cell sample, seed 20260930
+2026-09-30 00:43:01	NH	stage7	eco30:txt_matches_raster	PASS	58 59	58 59	ecoregions_20260929.txt yes rows
+2026-09-30 00:43:47	VT	stage7	eco30:same_grid_as_IC	PASS	compareGeom	identical grid	terra::resample near onto initial-communities.tif
+2026-09-30 00:43:47	VT	stage7	eco30:codes_equal_stage1	PASS	58 59 83	58 59 83	stage one raster codes
+2026-09-30 00:43:47	VT	stage7	eco30:active_IC_without_ecoregion	FAIL	0.38312 of 1355880 sampled active cells	<= 0.005	2 M cell sample, seed 20260930
+2026-09-30 00:43:47	VT	stage7	eco30:txt_matches_raster	PASS	58 59 83	58 59 83	ecoregions_20260929.txt yes rows
+2026-09-30 00:46:15	MI	stage7	eco30:same_grid_as_IC	PASS	compareGeom	identical grid	terra::resample near onto initial-communities.tif
+2026-09-30 00:46:15	MI	stage7	eco30:codes_equal_stage1	PASS	50 51 55 56 57	50 51 55 56 57	stage one raster codes
+2026-09-30 00:46:15	MI	stage7	eco30:active_IC_without_ecoregion	FAIL	0.35636 of 544793 sampled active cells	<= 0.005	2 M cell sample, seed 20260930
+2026-09-30 00:46:15	MI	stage7	eco30:txt_matches_raster	PASS	50 51 55 56 57	50 51 55 56 57	ecoregions_20260929.txt yes rows
+2026-09-30 00:47:30	NH	stage7	eco30:active_IC_inside_state_without_ecoregion	PASS	0.00103 of 815683 sampled active in-state cells	<= 0.005	2 M cell sample, seed 20260930, census 1:20M polygon
+2026-09-30 00:47:30	NH	stage7	eco30:active_IC_outside_state_all_inactive	PASS	0.9992 of 671112 out-of-state active IC cells have no ecoregion	> 0.999	LANDIS simulates only cells with an active ecoregion
+2026-09-30 00:47:49	VT	stage7	eco30:active_IC_inside_state_without_ecoregion	PASS	0.00059 of 836406 sampled active in-state cells	<= 0.005	2 M cell sample, seed 20260930, census 1:20M polygon
+2026-09-30 00:47:49	VT	stage7	eco30:active_IC_outside_state_all_inactive	PASS	0.9990 of 519474 out-of-state active IC cells have no ecoregion	> 0.999	LANDIS simulates only cells with an active ecoregion
+2026-09-30 00:48:16	WI	stage7	eco30:same_grid_as_IC	PASS	compareGeom	identical grid	terra::resample near onto initial-communities.tif
+2026-09-30 00:48:16	WI	stage7	eco30:codes_equal_stage1	PASS	47 50 51 52 53 54	47 50 51 52 53 54	stage one raster codes
+2026-09-30 00:48:16	WI	stage7	eco30:active_IC_without_ecoregion	FAIL	0.32437 of 865164 sampled active cells	<= 0.005	2 M cell sample, seed 20260930
+2026-09-30 00:48:16	WI	stage7	eco30:txt_matches_raster	PASS	47 50 51 52 53 54	47 50 51 52 53 54	ecoregions_20260929.txt yes rows
+2026-09-30 00:50:33	NH	stage7	fia_table:rows_equal_dryad	PASS	45 vs 45	equal	Dryad SppEcoregionData.csv row count
+2026-09-30 00:50:33	NH	stage7	fia_table:species_set_equals_dryad	PASS	ASH BE BF BS CE HE HICK IH PINE RM RO RS SM WS YB	same set	Dryad SpeciesCode set
+2026-09-30 00:50:33	NH	stage7	fia_table:no_coordinate_or_cn_column	PASS	Year EcoregionName SpeciesCode ProbEstablish ProbMortality ANPPmax BiomassMax	none	FIA privacy
+2026-09-30 00:50:33	NH	stage7	fia_table:BiomassMax_bound	PASS	3638..23156	1000..60000 g m-2	session 29 bound
+2026-09-30 00:50:33	NH	stage7	fia_table:ecoregions_not_in_raster	FAIL	82	none	rows for ecoregion codes the state raster lacks are Dryad inheritance (Maine code 82) and are inert in LANDIS, which reads ecoregions.txt; flagged for Aaron
+2026-09-30 00:50:33	VT	stage7	fia_table:rows_equal_dryad	PASS	60 vs 60	equal	Dryad SppEcoregionData.csv row count
+2026-09-30 00:50:33	VT	stage7	fia_table:species_set_equals_dryad	PASS	ASH BE BF BS CE HE HICK IH PINE RM RO RS SM WS YB	same set	Dryad SpeciesCode set
+2026-09-30 00:50:33	VT	stage7	fia_table:no_coordinate_or_cn_column	PASS	Year EcoregionName SpeciesCode ProbEstablish ProbMortality ANPPmax BiomassMax	none	FIA privacy
+2026-09-30 00:50:33	VT	stage7	fia_table:BiomassMax_bound	PASS	1428..24319	1000..60000 g m-2	session 29 bound
+2026-09-30 00:50:33	VT	stage7	fia_table:ecoregions_not_in_raster	FAIL	82	none	rows for ecoregion codes the state raster lacks are Dryad inheritance (Maine code 82) and are inert in LANDIS, which reads ecoregions.txt; flagged for Aaron
+2026-09-30 00:50:33	MI	stage7	fia_table:rows_equal_dryad	PASS	120 vs 120	equal	Dryad SppEcoregionData.csv row count
+2026-09-30 00:50:33	MI	stage7	fia_table:species_set_equals_dryad	PASS	AE BA BAS BE BF BO BS BSW CE HE JP PB QA RM RO RP RS SM TAM WAS WO WP WS YB	same set	Dryad SpeciesCode set
+2026-09-30 00:50:33	MI	stage7	fia_table:no_coordinate_or_cn_column	PASS	Year EcoregionName SpeciesCode ProbEstablish ProbMortality ANPPmax BiomassMax	none	FIA privacy
+2026-09-30 00:50:33	MI	stage7	fia_table:BiomassMax_bound	PASS	1537..32639	1000..60000 g m-2	session 29 bound
+2026-09-30 00:50:33	MI	stage7	fia_table:ecoregions_not_in_raster	PASS	none	none	rows for ecoregion codes the state raster lacks are Dryad inheritance (Maine code 82) and are inert in LANDIS, which reads ecoregions.txt; flagged for Aaron
+2026-09-30 00:50:33	WI	stage7	fia_table:rows_equal_dryad	PASS	144 vs 144	equal	Dryad SppEcoregionData.csv row count
+2026-09-30 00:50:33	WI	stage7	fia_table:species_set_equals_dryad	PASS	AE BA BAS BE BF BO BS BSW CE HE JP PB QA RM RO RP RS SM TAM WAS WO WP WS YB	same set	Dryad SpeciesCode set
+2026-09-30 00:50:33	WI	stage7	fia_table:no_coordinate_or_cn_column	PASS	Year EcoregionName SpeciesCode ProbEstablish ProbMortality ANPPmax BiomassMax	none	FIA privacy
+2026-09-30 00:50:33	WI	stage7	fia_table:BiomassMax_bound	PASS	3047..16488	1000..60000 g m-2	session 29 bound
+2026-09-30 00:50:33	WI	stage7	fia_table:ecoregions_not_in_raster	PASS	none	none	rows for ecoregion codes the state raster lacks are Dryad inheritance (Maine code 82) and are inert in LANDIS, which reads ecoregions.txt; flagged for Aaron
+2026-09-30 00:51:30	MI	stage7	eco30:active_IC_inside_state_without_ecoregion	PASS	0.00198 of 351240 sampled active in-state cells	<= 0.005	2 M cell sample, seed 20260930, census 1:20M polygon
+2026-09-30 00:51:30	MI	stage7	eco30:active_IC_outside_state_all_inactive	PASS	0.9994 of 193553 out-of-state active IC cells have no ecoregion	> 0.999	LANDIS simulates only cells with an active ecoregion
+2026-09-30 00:52:36	WI	stage7	eco30:active_IC_inside_state_without_ecoregion	PASS	0.00050 of 584629 sampled active in-state cells	<= 0.005	2 M cell sample, seed 20260930, census 1:20M polygon
+2026-09-30 00:52:36	WI	stage7	eco30:active_IC_outside_state_all_inactive	PASS	0.9993 of 280535 out-of-state active IC cells have no ecoregion	> 0.999	LANDIS simulates only cells with an active ecoregion
