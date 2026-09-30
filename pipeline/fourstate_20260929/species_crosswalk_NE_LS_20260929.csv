@@ -1,0 +1,63 @@
+SPCD,NE_CODE,NE_SOURCE,LS_CODE,LS_SOURCE,NOTE
+12,BF,ME_template,BF,MN_template,
+71,BS,ME_template,TAM,MN_template,
+94,WS,ME_template,WS,MN_template,
+95,BS,ME_template,BS,MN_template,
+97,RS,ME_template,RS,MN_template,
+105,PINE,ME_template,JP,MN_template,
+125,PINE,ME_template,RP,MN_template,
+129,PINE,ME_template,WP,MN_template,
+241,CE,ME_template,CE,MN_template,
+261,HE,ME_template,HE,MN_template,
+315,RM,ME_template,RM,MN_template,
+316,RM,ME_template,RM,MN_template,
+317,RM,ME_template,RM,MN_template,
+318,SM,ME_template,SM,MN_template,
+319,RM,ME_template,RM,MN_template,
+371,YB,ME_template,YB,MN_template,
+375,IH,ME_template,PB,MN_template,
+379,IH,ME_template,PB,MN_template,
+531,BE,ME_template,BE,MN_template,
+541,ASH,ME_template,WAS,MN_template,
+543,ASH,ME_template,BAS,MN_template,
+544,ASH,ME_template,WAS,MN_template,
+660,IH,ME_template,QA,MN_template,template lump kept (apple spp.; MN comment mislabels 660 as black gum)
+701,,UNMAPPED,QA,MN_template,template lump kept in LS (hophornbeam to aspen); no NE analog
+741,IH,ME_template,QA,MN_template,
+743,IH,ME_template,BA,MN_template,
+746,IH,ME_template,QA,MN_template,
+802,RO,ADDED_20260929_REVIEW,WO,MN_template,NE: white-oak group lumped to RO (N1 oak pool per RO_HICK_provenance.md)
+806,RO,ADDED_20260929_REVIEW,BO,MN_template,
+813,RO,ADDED_20260929_REVIEW,RO,MN_template,
+822,RO,ADDED_20260929_REVIEW,RO,MN_template,
+833,RO,ADDED_20260929_REVIEW,RO,MN_template,NE: RO is in ME species.txt and SppEcoregionData but absent from ME species_lookup.R
+837,RO,ADDED_20260929_REVIEW,BO,MN_template,MN comment mislabels 837 as post oak; 837 is black oak
+901,,UNMAPPED,BSW,MN_template,template row kept (901 is black locust; MN comment calls it basswood)
+972,IH,ME_template,AE,MN_template,
+126,PINE,ADDED_20260929_REVIEW,,UNMAPPED,NE: pitch pine to PINE lump (ME lumping rule)
+130,PINE,ADDED_20260929_REVIEW,,UNMAPPED,NE: Scotch pine to PINE lump (ME lumping rule)
+313,RM,ADDED_20260929_REVIEW,RM,ADDED_20260929_REVIEW,boxelder: other maples to RM (both template lumping rules)
+314,SM,ADDED_20260929_REVIEW,SM,ADDED_20260929_REVIEW,black maple to SM
+320,RM,ADDED_20260929_REVIEW,RM,ADDED_20260929_REVIEW,Norway maple: other maples to RM
+372,YB,ADDED_20260929_REVIEW,YB,ADDED_20260929_REVIEW,sweet birch to YB (Betula analog)
+742,IH,ADDED_20260929_REVIEW,QA,ADDED_20260929_REVIEW,eastern cottonwood: Populus lump as in templates (741)
+760,IH,ADDED_20260929_REVIEW,,UNMAPPED,NE: Prunus to IH (ME rule: intolerant hardwoods)
+761,IH,ADDED_20260929_REVIEW,,UNMAPPED,NE: pin cherry to IH
+762,IH,ADDED_20260929_REVIEW,,UNMAPPED,NE: black cherry to IH; LS pool has no analog
+763,IH,ADDED_20260929_REVIEW,,UNMAPPED,NE: chokecherry to IH
+804,RO,ADDED_20260929_REVIEW,WO,ADDED_20260929_REVIEW,swamp white oak: NE RO lump; LS white-oak group
+809,RO,ADDED_20260929_REVIEW,BO,ADDED_20260929_REVIEW,northern pin oak: red-oak group; LS lumped with 837 black oak to BO
+823,RO,ADDED_20260929_REVIEW,WO,ADDED_20260929_REVIEW,bur oak: white-oak group
+826,RO,ADDED_20260929_REVIEW,WO,ADDED_20260929_REVIEW,chinkapin oak: white-oak group
+830,RO,ADDED_20260929_REVIEW,RO,ADDED_20260929_REVIEW,pin oak: red-oak group
+832,RO,ADDED_20260929_REVIEW,WO,ADDED_20260929_REVIEW,chestnut oak: white-oak group
+400,HICK,ADDED_20260929_REVIEW,,UNMAPPED,hickory spp.; LS pool has no hickory
+402,HICK,ADDED_20260929_REVIEW,,UNMAPPED,bitternut hickory
+403,HICK,ADDED_20260929_REVIEW,,UNMAPPED,pignut hickory
+405,HICK,ADDED_20260929_REVIEW,,UNMAPPED,shellbark hickory
+407,HICK,ADDED_20260929_REVIEW,,UNMAPPED,shagbark hickory
+409,HICK,ADDED_20260929_REVIEW,,UNMAPPED,mockernut hickory
+951,,UNMAPPED,BSW,ADDED_20260929_REVIEW,American basswood: correct FIA code for the template's BSW (basswood) intent
+970,IH,ADDED_20260929_REVIEW,AE,ADDED_20260929_REVIEW,elm spp.: Ulmus lump as in templates (972)
+975,IH,ADDED_20260929_REVIEW,AE,ADDED_20260929_REVIEW,slippery elm: Ulmus lump
+977,IH,ADDED_20260929_REVIEW,AE,ADDED_20260929_REVIEW,rock elm: Ulmus lump
