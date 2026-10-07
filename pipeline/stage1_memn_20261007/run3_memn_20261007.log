@@ -1,0 +1,15 @@
+ME raster 84201 km2, census polygon 87117 km2, ratio 0.967 
+ME L3 codes in raster: 58 59 82 
+ME L3 codes in Dryad SppEcoregionData: 58 59 82 
+ME codes in raster not in Dryad file:  
+ME Dryad codes absent from raster (inherited rows, unused):  
+ME gates: G1 location TRUE, G2 coverage FALSE, G3 values TRUE, G4 cross-layer TRUE 
+ME FAILED: gate failure; candidate kept, not promoted 
+MN raster 218444 km2, census polygon 218794 km2, ratio 0.998 
+MN L3 codes in raster: 46 47 48 49 50 51 52 
+MN L3 codes in Dryad SppEcoregionData:  
+MN codes in raster not in Dryad file: 46 47 48 49 50 51 52 
+MN Dryad codes absent from raster (inherited rows, unused):  
+MN gates: G1 location TRUE, G2 coverage TRUE, G3 values TRUE, G4 cross-layer FALSE 
+MN FAILED: gate failure; candidate kept, not promoted 
+done with 2 failures

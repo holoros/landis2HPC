@@ -1,0 +1,21 @@
+LandisData  "Output Biomass"
+Timestep   5
+MakeTable  yes
+Species  BF
+         SM
+         BE
+         RS
+         WS
+         BS
+         CE
+         YB
+         RM
+         IH
+         PINE
+         ASH
+         HE
+         RO
+         HICK
+MapNames   output/biomass/biomass-{species}-{timestep}.tif
+DeadPools  both
+MapNames   output/biomass/biomass-{pool}-{timestep}.tif

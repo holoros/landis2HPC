@@ -1,0 +1,11 @@
+item,check,value,state
+stands.tif,res_m,30x30,VT
+stands.tif,same_grid_as_eco30,TRUE,VT
+stands.tif,same_grid_as_run270,FALSE,VT
+stands.tif,n_distinct_values,32799871,VT
+management-area_PLACEHOLDER.tif,res_m,30x30,VT
+management-area_PLACEHOLDER.tif,same_grid_as_eco30,TRUE,VT
+management-area_PLACEHOLDER.tif,same_grid_as_run270,FALSE,VT
+management-area_PLACEHOLDER.tif,n_distinct_values,1,VT
+baseline_table,species_x_eco_coverage,1,VT
+baseline_table,rows,45,VT

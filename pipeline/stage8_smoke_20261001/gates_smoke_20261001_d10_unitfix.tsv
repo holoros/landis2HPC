@@ -1,0 +1,25 @@
+time	state	stage	gate	value	threshold	result	note
+2026-10-01 17:51:48	NH	stage8_smoke_20261001_d10_unitfix	G8.1 run_complete	TRUE	TRUE and no ERROR/Exception	PASS	""
+2026-10-01 17:51:48	NH	stage8_smoke_20261001_d10_unitfix	G8.2 active_cells	landis 259296 build 259296 share_of_eco 0.7840	landis == build	PASS	log line: 2026-10-01 17:44:18,249 - Sites: 259,296 active (40.8%), 375,548 inactive (59.2%)
+2026-10-01 17:51:48	NH	stage8_smoke_20261001_d10_unitfix	G8.3 year0_vs_fiadb	238.61 Tg vs 314.26 Tg ratio 0.759	0.80 to 1.25	FLAG	EVALID 332401
+2026-10-01 17:51:48	NH	stage8_smoke_20261001_d10_unitfix	diag year0_vs_ic	238.61 Tg vs IC 238.61 ratio 1.000	report	INFO	""
+2026-10-01 17:51:48	NH	stage8_smoke_20261001_d10_unitfix	diag year10_over_0	1.032	report	INFO	""
+2026-10-01 17:51:48	NH	stage8_smoke_20261001_d10_unitfix	diag mean_density	126.2 Mg ha-1 on 1890268 ha	report	INFO	""
+2026-10-01 17:51:48	VT	stage8_smoke_20261001_d10_unitfix	G8.1 run_complete	TRUE	TRUE and no ERROR/Exception	PASS	""
+2026-10-01 17:51:48	VT	stage8_smoke_20261001_d10_unitfix	G8.2 active_cells	landis 250409 build 250409 share_of_eco 0.7295	landis == build	PASS	log line: 2026-10-01 17:44:18,244 - Sites: 250,409 active (41.8%), 348,179 inactive (58.2%)
+2026-10-01 17:51:48	VT	stage8_smoke_20261001_d10_unitfix	G8.3 year0_vs_fiadb	233.04 Tg vs 294.27 Tg ratio 0.792	0.80 to 1.25	FLAG	EVALID 502401
+2026-10-01 17:51:48	VT	stage8_smoke_20261001_d10_unitfix	diag year0_vs_ic	233.04 Tg vs IC 233.04 ratio 1.000	report	INFO	""
+2026-10-01 17:51:48	VT	stage8_smoke_20261001_d10_unitfix	diag year10_over_0	1.036	report	INFO	""
+2026-10-01 17:51:48	VT	stage8_smoke_20261001_d10_unitfix	diag mean_density	127.7 Mg ha-1 on 1825482 ha	report	INFO	""
+2026-10-01 17:51:48	MI	stage8_smoke_20261001_d10_unitfix	G8.1 run_complete	TRUE	TRUE and no ERROR/Exception	PASS	""
+2026-10-01 17:51:48	MI	stage8_smoke_20261001_d10_unitfix	G8.2 active_cells	landis 1146731 build 1146731 share_of_eco 0.5539	landis == build	PASS	log line: 2026-10-01 17:44:18,461 - Sites: 1,146,731 active (17.6%), 5,359,761 inactive (82.4%)
+2026-10-01 17:51:48	MI	stage8_smoke_20261001_d10_unitfix	G8.3 year0_vs_fiadb	703.29 Tg vs 1050.96 Tg ratio 0.669	0.80 to 1.25	FLAG	EVALID 262401
+2026-10-01 17:51:48	MI	stage8_smoke_20261001_d10_unitfix	diag year0_vs_ic	703.29 Tg vs IC 703.29 ratio 1.000	report	INFO	""
+2026-10-01 17:51:48	MI	stage8_smoke_20261001_d10_unitfix	diag year10_over_0	1.462	report	INFO	""
+2026-10-01 17:51:48	MI	stage8_smoke_20261001_d10_unitfix	diag mean_density	84.1 Mg ha-1 on 8359669 ha	report	INFO	""
+2026-10-01 17:51:48	WI	stage8_smoke_20261001_d10_unitfix	G8.1 run_complete	TRUE	TRUE and no ERROR/Exception	PASS	""
+2026-10-01 17:51:48	WI	stage8_smoke_20261001_d10_unitfix	G8.2 active_cells	landis 984090 build 984090 share_of_eco 0.4930	landis == build	PASS	log line: 2026-10-01 17:44:18,338 - Sites: 984,090 active (29.4%), 2,367,332 inactive (70.6%)
+2026-10-01 17:51:48	WI	stage8_smoke_20261001_d10_unitfix	G8.3 year0_vs_fiadb	624.69 Tg vs 814.17 Tg ratio 0.767	0.80 to 1.25	FLAG	EVALID 552401
+2026-10-01 17:51:48	WI	stage8_smoke_20261001_d10_unitfix	diag year0_vs_ic	624.69 Tg vs IC 624.69 ratio 1.000	report	INFO	""
+2026-10-01 17:51:48	WI	stage8_smoke_20261001_d10_unitfix	diag year10_over_0	1.154	report	INFO	""
+2026-10-01 17:51:48	WI	stage8_smoke_20261001_d10_unitfix	diag mean_density	87.1 Mg ha-1 on 7174016 ha	report	INFO	""

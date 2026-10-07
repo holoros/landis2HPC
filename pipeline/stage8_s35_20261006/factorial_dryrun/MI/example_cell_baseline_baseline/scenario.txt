@@ -1,0 +1,11 @@
+LandisData  Scenario
+Duration  100
+Species   ./species.txt
+Ecoregions      ./ecoregions.txt
+EcoregionsMap   ./ecoregions.tif
+CellLength  270
+"Biomass Succession"  biomass_succession.txt
+"Biomass Harvest"      biomass-harvest.txt
+"Original Wind"       base-wind.txt
+"Output Biomass"      output_biomass.txt
+RandomNumberSeed   42

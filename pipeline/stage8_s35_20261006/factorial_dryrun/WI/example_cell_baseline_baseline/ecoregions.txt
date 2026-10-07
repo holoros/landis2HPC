@@ -1,0 +1,10 @@
+LandisData	"Ecoregions"
+
+>>Active	MapCode	Name	Description
+no	0	nodata	"non-forest"
+yes	47	47	"Western Corn Belt Plains"
+yes	50	50	"Northern Lakes and Forests"
+yes	51	51	"North Central Hardwood Forests"
+yes	52	52	"Driftless Area"
+yes	53	53	"Southeastern Wisconsin Till Plains"
+yes	54	54	"Central Corn Belt Plains"

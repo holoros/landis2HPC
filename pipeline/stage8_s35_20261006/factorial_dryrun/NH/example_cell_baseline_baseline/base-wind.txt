@@ -1,0 +1,13 @@
+LandisData "Original Wind"
+Timestep    5
+EventSizeMean    50
+EventSizeMin     1
+EventSizeMax     500
+RotationPeriod   1000
+WindSeverities
+>>  Cohort age proportion         Severity
+    20%                            5
+    50%                            4
+    85%                            3
+    100%                           2
+WindReductionParameters

@@ -1,0 +1,9 @@
+LandisData  Scenario
+Duration  10
+Species   ./species.txt
+Ecoregions      ./ecoregions.txt
+EcoregionsMap   ./ecoregions.tif
+CellLength  270
+"Biomass Succession"  biomass_succession.txt
+"Output Biomass"      output_biomass.txt
+RandomNumberSeed   1234

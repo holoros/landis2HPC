@@ -1,0 +1,32 @@
+LandisData "Biomass Succession"
+Timestep 5
+SeedingAlgorithm WardSeedDispersal
+InitialCommunities       initial-communities.csv
+InitialCommunitiesMap    initial-communities.tif
+ClimateConfigFile        climate-generator.txt
+MinRelativeBiomass
+        58 59 83 
+    1  20% 20% 20% 
+    2  40% 40% 40% 
+    3  60% 60% 60% 
+    4  80% 80% 80% 
+    5  100% 100% 100% 
+SufficientLight
+    1   1.0  0.5  0.0  0.0  0.0  0.0
+    2   1.0  1.0  0.5  0.0  0.0  0.0
+    3   1.0  1.0  1.0  0.5  0.0  0.0
+    4   1.0  1.0  1.0  1.0  0.5  0.0
+    5   1.0  1.0  1.0  1.0  1.0  0.5
+SpeciesDataFile        SpeciesData.csv
+EcoregionParameters
+>>  AET (mm)
+58   600
+59   600
+83   600
+SpeciesEcoregionDataFile  SppEcoregionData_fia.csv
+FireReductionParameters
+    1        0.0        0.5
+    2        0.0        0.75
+    3        0.5        1.0
+HarvestReductionParameters
+    PerseusBA50 0.5 0.15 0.5 0.0
