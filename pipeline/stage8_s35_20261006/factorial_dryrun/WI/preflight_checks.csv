@@ -1,0 +1,17 @@
+item,check,value,state
+stands.tif,res_m,30x30,WI
+stands.tif,same_grid_as_eco30,TRUE,WI
+stands.tif,same_grid_as_run270,FALSE,WI
+stands.tif,n_distinct_values,117589266,WI
+management-area_PLACEHOLDER.tif,res_m,30x30,WI
+management-area_PLACEHOLDER.tif,same_grid_as_eco30,TRUE,WI
+management-area_PLACEHOLDER.tif,same_grid_as_run270,FALSE,WI
+management-area_PLACEHOLDER.tif,n_distinct_values,1,WI
+baseline_table,species_x_eco_coverage,1,WI
+baseline_table,rows,144,WI
+tier2_calibrated,path,/fs/scratch/PUOM0008/crsfaaron/landis2/states/WI/perseus/statewide/wi_t2_calibrated/SppEcoregionData_wi_t2_calibrated.csv,WI
+tier2_calibrated,species_x_eco_coverage,1,WI
+tier2_calibrated,matched_rows,144,WI
+tier2_calibrated,median_anpp_ratio,1.717,WI
+tier2_calibrated,median_bmx_ratio,1.655,WI
+tier2_calibrated,species_in_cal_not_in_run,"",WI

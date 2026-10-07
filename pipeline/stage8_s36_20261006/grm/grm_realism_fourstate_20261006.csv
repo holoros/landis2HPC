@@ -1,0 +1,5 @@
+state,stock_Tg,fia_gross_growth,fia_mortality,fia_net_growth,fia_ng_lo,fia_ng_hi,fia_removals,fia_net_change,fia_ng_pct_stock,landis_anch_Tg_yr,anch_pct_stock,ratio_anch_to_netgrowth,ratio_anch_lo,ratio_anch_hi,landis_unitfix_Tg_yr,ratio_unitfix_to_netgrowth
+MI,1050.96,31.774,13.045,18.729,17.859,19.599,9.941,8.788,1.78,19.058,1.81,1.018,0.972,1.067,32.47,1.734
+NH,314.26,8.253,2.782,5.47,5.113,5.828,2.364,3.107,1.74,0.13,0.04,0.024,0.022,0.025,0.771,0.141
+VT,294.27,7.609,2.986,4.623,4.276,4.971,1.812,2.812,1.57,0.288,0.1,0.062,0.058,0.067,0.836,0.181
+WI,814.17,29.041,10.126,18.914,18.363,19.466,8.578,10.336,2.32,4.632,0.57,0.245,0.238,0.252,9.61,0.508

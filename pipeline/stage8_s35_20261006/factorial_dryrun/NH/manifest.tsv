@@ -1,0 +1,156 @@
+cell	component	source	status	note
+NH_clim_baseline_harv_none	species.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/species_20260929.txt	READY	
+NH_clim_baseline_harv_none	SpeciesData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SpeciesData_20260929.csv	READY	
+NH_clim_baseline_harv_none	ecoregions.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/ecoregions_20260929.txt	READY	
+NH_clim_baseline_harv_none	ecoregions.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/ecoregions.tif	READY	270 m, gated 1 Oct
+NH_clim_baseline_harv_none	initial-communities.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/initial-communities.tif	READY	MapCode set identical under raw, unit fix and anchoring (anchor keeps every row, pmax 1)
+NH_clim_baseline_harv_none	initial-communities.csv	cohort_biomass_by_mapcode[_fiadb].csv	PENDING	decisions 1 and 2
+NH_clim_baseline_harv_none	SppEcoregionData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SppEcoregionData_fia_20260929.csv (active ecoregions)	READY	
+NH_clim_baseline_harv_none	climate.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/Daymet_NH_l3.csv	READY	Daymet 1991 to 2020 means
+NH_clim_baseline_harv_none	AET	placeholder 600 mm, all ecoregions	READY	inherited from scenario_factorial.sh and the smoke; not ecoregion specific
+NH_clim_baseline_harv_none	base-wind.txt	Lorimer and White 2003 regime, as scenario_factorial.sh	READY	Original Wind never run on these trees; untested
+NH_clim_baseline_harv_baseline	species.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/species_20260929.txt	READY	
+NH_clim_baseline_harv_baseline	SpeciesData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SpeciesData_20260929.csv	READY	
+NH_clim_baseline_harv_baseline	ecoregions.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/ecoregions_20260929.txt	READY	
+NH_clim_baseline_harv_baseline	ecoregions.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/ecoregions.tif	READY	270 m, gated 1 Oct
+NH_clim_baseline_harv_baseline	initial-communities.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/initial-communities.tif	READY	MapCode set identical under raw, unit fix and anchoring (anchor keeps every row, pmax 1)
+NH_clim_baseline_harv_baseline	initial-communities.csv	cohort_biomass_by_mapcode[_fiadb].csv	PENDING	decisions 1 and 2
+NH_clim_baseline_harv_baseline	SppEcoregionData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SppEcoregionData_fia_20260929.csv (active ecoregions)	READY	
+NH_clim_baseline_harv_baseline	climate.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/Daymet_NH_l3.csv	READY	Daymet 1991 to 2020 means
+NH_clim_baseline_harv_baseline	AET	placeholder 600 mm, all ecoregions	READY	inherited from scenario_factorial.sh and the smoke; not ecoregion specific
+NH_clim_baseline_harv_baseline	management-area.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/management-area_PLACEHOLDER.tif	BLOCKED	PLACEHOLDER pending Solarik MA definitions; 30 m, needs the 270 m run grid
+NH_clim_baseline_harv_baseline	stands.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/stands.tif	BLOCKED	30 m, needs the 270 m run grid
+NH_clim_baseline_harv_baseline	harvest_rate	0.022 PartialHarvest	READY	S-L 2025 study mean 0.022; increased +60 pct
+NH_clim_baseline_harv_baseline	base-wind.txt	Lorimer and White 2003 regime, as scenario_factorial.sh	READY	Original Wind never run on these trees; untested
+NH_clim_baseline_harv_increased	species.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/species_20260929.txt	READY	
+NH_clim_baseline_harv_increased	SpeciesData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SpeciesData_20260929.csv	READY	
+NH_clim_baseline_harv_increased	ecoregions.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/ecoregions_20260929.txt	READY	
+NH_clim_baseline_harv_increased	ecoregions.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/ecoregions.tif	READY	270 m, gated 1 Oct
+NH_clim_baseline_harv_increased	initial-communities.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/initial-communities.tif	READY	MapCode set identical under raw, unit fix and anchoring (anchor keeps every row, pmax 1)
+NH_clim_baseline_harv_increased	initial-communities.csv	cohort_biomass_by_mapcode[_fiadb].csv	PENDING	decisions 1 and 2
+NH_clim_baseline_harv_increased	SppEcoregionData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SppEcoregionData_fia_20260929.csv (active ecoregions)	READY	
+NH_clim_baseline_harv_increased	climate.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/Daymet_NH_l3.csv	READY	Daymet 1991 to 2020 means
+NH_clim_baseline_harv_increased	AET	placeholder 600 mm, all ecoregions	READY	inherited from scenario_factorial.sh and the smoke; not ecoregion specific
+NH_clim_baseline_harv_increased	management-area.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/management-area_PLACEHOLDER.tif	BLOCKED	PLACEHOLDER pending Solarik MA definitions; 30 m, needs the 270 m run grid
+NH_clim_baseline_harv_increased	stands.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/stands.tif	BLOCKED	30 m, needs the 270 m run grid
+NH_clim_baseline_harv_increased	harvest_rate	0.035 PartialHarvest	READY	S-L 2025 study mean 0.022; increased +60 pct
+NH_clim_baseline_harv_increased	base-wind.txt	Lorimer and White 2003 regime, as scenario_factorial.sh	READY	Original Wind never run on these trees; untested
+NH_clim_baseline_harv_perseus	species.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/species_20260929.txt	READY	
+NH_clim_baseline_harv_perseus	SpeciesData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SpeciesData_20260929.csv	READY	
+NH_clim_baseline_harv_perseus	ecoregions.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/ecoregions_20260929.txt	READY	
+NH_clim_baseline_harv_perseus	ecoregions.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/ecoregions.tif	READY	270 m, gated 1 Oct
+NH_clim_baseline_harv_perseus	initial-communities.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/initial-communities.tif	READY	MapCode set identical under raw, unit fix and anchoring (anchor keeps every row, pmax 1)
+NH_clim_baseline_harv_perseus	initial-communities.csv	cohort_biomass_by_mapcode[_fiadb].csv	PENDING	decisions 1 and 2
+NH_clim_baseline_harv_perseus	SppEcoregionData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SppEcoregionData_fia_20260929.csv (active ecoregions)	READY	
+NH_clim_baseline_harv_perseus	climate.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/Daymet_NH_l3.csv	READY	Daymet 1991 to 2020 means
+NH_clim_baseline_harv_perseus	AET	placeholder 600 mm, all ecoregions	READY	inherited from scenario_factorial.sh and the smoke; not ecoregion specific
+NH_clim_baseline_harv_perseus	management-area.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/management-area_PLACEHOLDER.tif	BLOCKED	PLACEHOLDER pending Solarik MA definitions; 30 m, needs the 270 m run grid
+NH_clim_baseline_harv_perseus	stands.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/stands.tif	BLOCKED	30 m, needs the 270 m run grid
+NH_clim_baseline_harv_perseus	harvest_rate	0.022 PerseusBA50	READY	S-L 2025 study mean 0.022; increased +60 pct
+NH_clim_baseline_harv_perseus	base-wind.txt	Lorimer and White 2003 regime, as scenario_factorial.sh	READY	Original Wind never run on these trees; untested
+NH_clim_ssp245_harv_none	species.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/species_20260929.txt	READY	
+NH_clim_ssp245_harv_none	SpeciesData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SpeciesData_20260929.csv	READY	
+NH_clim_ssp245_harv_none	ecoregions.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/ecoregions_20260929.txt	READY	
+NH_clim_ssp245_harv_none	ecoregions.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/ecoregions.tif	READY	270 m, gated 1 Oct
+NH_clim_ssp245_harv_none	initial-communities.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/initial-communities.tif	READY	MapCode set identical under raw, unit fix and anchoring (anchor keeps every row, pmax 1)
+NH_clim_ssp245_harv_none	initial-communities.csv	cohort_biomass_by_mapcode[_fiadb].csv	PENDING	decisions 1 and 2
+NH_clim_ssp245_harv_none	SppEcoregionData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SppEcoregionData_fia_20260929.csv (active ecoregions)	READY	
+NH_clim_ssp245_harv_none	climate.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/HadGEM3_ssp245_NH_l3.csv	READY	synthetic delta table (stage five)
+NH_clim_ssp245_harv_none	SppEcoregionData_climate	/fs/scratch/PUOM0008/crsfaaron/landis2/states/NH/pnet2/HadGEM3-GC31-LL_ssp245/SppEcoregionData_NH_HadGEM3-GC31-LL_ssp245.csv	BLOCKED	no PnET-II tables; with Monthly_AverageAllYears and static parameters this cell equals its baseline twin
+NH_clim_ssp245_harv_none	AET	placeholder 600 mm, all ecoregions	READY	inherited from scenario_factorial.sh and the smoke; not ecoregion specific
+NH_clim_ssp245_harv_none	base-wind.txt	Lorimer and White 2003 regime, as scenario_factorial.sh	READY	Original Wind never run on these trees; untested
+NH_clim_ssp245_harv_baseline	species.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/species_20260929.txt	READY	
+NH_clim_ssp245_harv_baseline	SpeciesData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SpeciesData_20260929.csv	READY	
+NH_clim_ssp245_harv_baseline	ecoregions.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/ecoregions_20260929.txt	READY	
+NH_clim_ssp245_harv_baseline	ecoregions.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/ecoregions.tif	READY	270 m, gated 1 Oct
+NH_clim_ssp245_harv_baseline	initial-communities.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/initial-communities.tif	READY	MapCode set identical under raw, unit fix and anchoring (anchor keeps every row, pmax 1)
+NH_clim_ssp245_harv_baseline	initial-communities.csv	cohort_biomass_by_mapcode[_fiadb].csv	PENDING	decisions 1 and 2
+NH_clim_ssp245_harv_baseline	SppEcoregionData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SppEcoregionData_fia_20260929.csv (active ecoregions)	READY	
+NH_clim_ssp245_harv_baseline	climate.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/HadGEM3_ssp245_NH_l3.csv	READY	synthetic delta table (stage five)
+NH_clim_ssp245_harv_baseline	SppEcoregionData_climate	/fs/scratch/PUOM0008/crsfaaron/landis2/states/NH/pnet2/HadGEM3-GC31-LL_ssp245/SppEcoregionData_NH_HadGEM3-GC31-LL_ssp245.csv	BLOCKED	no PnET-II tables; with Monthly_AverageAllYears and static parameters this cell equals its baseline twin
+NH_clim_ssp245_harv_baseline	AET	placeholder 600 mm, all ecoregions	READY	inherited from scenario_factorial.sh and the smoke; not ecoregion specific
+NH_clim_ssp245_harv_baseline	management-area.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/management-area_PLACEHOLDER.tif	BLOCKED	PLACEHOLDER pending Solarik MA definitions; 30 m, needs the 270 m run grid
+NH_clim_ssp245_harv_baseline	stands.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/stands.tif	BLOCKED	30 m, needs the 270 m run grid
+NH_clim_ssp245_harv_baseline	harvest_rate	0.022 PartialHarvest	READY	S-L 2025 study mean 0.022; increased +60 pct
+NH_clim_ssp245_harv_baseline	base-wind.txt	Lorimer and White 2003 regime, as scenario_factorial.sh	READY	Original Wind never run on these trees; untested
+NH_clim_ssp245_harv_increased	species.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/species_20260929.txt	READY	
+NH_clim_ssp245_harv_increased	SpeciesData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SpeciesData_20260929.csv	READY	
+NH_clim_ssp245_harv_increased	ecoregions.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/ecoregions_20260929.txt	READY	
+NH_clim_ssp245_harv_increased	ecoregions.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/ecoregions.tif	READY	270 m, gated 1 Oct
+NH_clim_ssp245_harv_increased	initial-communities.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/initial-communities.tif	READY	MapCode set identical under raw, unit fix and anchoring (anchor keeps every row, pmax 1)
+NH_clim_ssp245_harv_increased	initial-communities.csv	cohort_biomass_by_mapcode[_fiadb].csv	PENDING	decisions 1 and 2
+NH_clim_ssp245_harv_increased	SppEcoregionData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SppEcoregionData_fia_20260929.csv (active ecoregions)	READY	
+NH_clim_ssp245_harv_increased	climate.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/HadGEM3_ssp245_NH_l3.csv	READY	synthetic delta table (stage five)
+NH_clim_ssp245_harv_increased	SppEcoregionData_climate	/fs/scratch/PUOM0008/crsfaaron/landis2/states/NH/pnet2/HadGEM3-GC31-LL_ssp245/SppEcoregionData_NH_HadGEM3-GC31-LL_ssp245.csv	BLOCKED	no PnET-II tables; with Monthly_AverageAllYears and static parameters this cell equals its baseline twin
+NH_clim_ssp245_harv_increased	AET	placeholder 600 mm, all ecoregions	READY	inherited from scenario_factorial.sh and the smoke; not ecoregion specific
+NH_clim_ssp245_harv_increased	management-area.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/management-area_PLACEHOLDER.tif	BLOCKED	PLACEHOLDER pending Solarik MA definitions; 30 m, needs the 270 m run grid
+NH_clim_ssp245_harv_increased	stands.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/stands.tif	BLOCKED	30 m, needs the 270 m run grid
+NH_clim_ssp245_harv_increased	harvest_rate	0.035 PartialHarvest	READY	S-L 2025 study mean 0.022; increased +60 pct
+NH_clim_ssp245_harv_increased	base-wind.txt	Lorimer and White 2003 regime, as scenario_factorial.sh	READY	Original Wind never run on these trees; untested
+NH_clim_ssp245_harv_perseus	species.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/species_20260929.txt	READY	
+NH_clim_ssp245_harv_perseus	SpeciesData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SpeciesData_20260929.csv	READY	
+NH_clim_ssp245_harv_perseus	ecoregions.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/ecoregions_20260929.txt	READY	
+NH_clim_ssp245_harv_perseus	ecoregions.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/ecoregions.tif	READY	270 m, gated 1 Oct
+NH_clim_ssp245_harv_perseus	initial-communities.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/initial-communities.tif	READY	MapCode set identical under raw, unit fix and anchoring (anchor keeps every row, pmax 1)
+NH_clim_ssp245_harv_perseus	initial-communities.csv	cohort_biomass_by_mapcode[_fiadb].csv	PENDING	decisions 1 and 2
+NH_clim_ssp245_harv_perseus	SppEcoregionData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SppEcoregionData_fia_20260929.csv (active ecoregions)	READY	
+NH_clim_ssp245_harv_perseus	climate.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/HadGEM3_ssp245_NH_l3.csv	READY	synthetic delta table (stage five)
+NH_clim_ssp245_harv_perseus	SppEcoregionData_climate	/fs/scratch/PUOM0008/crsfaaron/landis2/states/NH/pnet2/HadGEM3-GC31-LL_ssp245/SppEcoregionData_NH_HadGEM3-GC31-LL_ssp245.csv	BLOCKED	no PnET-II tables; with Monthly_AverageAllYears and static parameters this cell equals its baseline twin
+NH_clim_ssp245_harv_perseus	AET	placeholder 600 mm, all ecoregions	READY	inherited from scenario_factorial.sh and the smoke; not ecoregion specific
+NH_clim_ssp245_harv_perseus	management-area.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/management-area_PLACEHOLDER.tif	BLOCKED	PLACEHOLDER pending Solarik MA definitions; 30 m, needs the 270 m run grid
+NH_clim_ssp245_harv_perseus	stands.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/stands.tif	BLOCKED	30 m, needs the 270 m run grid
+NH_clim_ssp245_harv_perseus	harvest_rate	0.022 PerseusBA50	READY	S-L 2025 study mean 0.022; increased +60 pct
+NH_clim_ssp245_harv_perseus	base-wind.txt	Lorimer and White 2003 regime, as scenario_factorial.sh	READY	Original Wind never run on these trees; untested
+NH_clim_ssp585_harv_none	species.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/species_20260929.txt	READY	
+NH_clim_ssp585_harv_none	SpeciesData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SpeciesData_20260929.csv	READY	
+NH_clim_ssp585_harv_none	ecoregions.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/ecoregions_20260929.txt	READY	
+NH_clim_ssp585_harv_none	ecoregions.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/ecoregions.tif	READY	270 m, gated 1 Oct
+NH_clim_ssp585_harv_none	initial-communities.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/initial-communities.tif	READY	MapCode set identical under raw, unit fix and anchoring (anchor keeps every row, pmax 1)
+NH_clim_ssp585_harv_none	initial-communities.csv	cohort_biomass_by_mapcode[_fiadb].csv	PENDING	decisions 1 and 2
+NH_clim_ssp585_harv_none	SppEcoregionData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SppEcoregionData_fia_20260929.csv (active ecoregions)	READY	
+NH_clim_ssp585_harv_none	climate.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/HadGEM3_ssp585_NH_l3.csv	READY	synthetic delta table (stage five)
+NH_clim_ssp585_harv_none	SppEcoregionData_climate	/fs/scratch/PUOM0008/crsfaaron/landis2/states/NH/pnet2/HadGEM3-GC31-LL_ssp585/SppEcoregionData_NH_HadGEM3-GC31-LL_ssp585.csv	BLOCKED	no PnET-II tables; with Monthly_AverageAllYears and static parameters this cell equals its baseline twin
+NH_clim_ssp585_harv_none	AET	placeholder 600 mm, all ecoregions	READY	inherited from scenario_factorial.sh and the smoke; not ecoregion specific
+NH_clim_ssp585_harv_none	base-wind.txt	Lorimer and White 2003 regime, as scenario_factorial.sh	READY	Original Wind never run on these trees; untested
+NH_clim_ssp585_harv_baseline	species.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/species_20260929.txt	READY	
+NH_clim_ssp585_harv_baseline	SpeciesData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SpeciesData_20260929.csv	READY	
+NH_clim_ssp585_harv_baseline	ecoregions.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/ecoregions_20260929.txt	READY	
+NH_clim_ssp585_harv_baseline	ecoregions.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/ecoregions.tif	READY	270 m, gated 1 Oct
+NH_clim_ssp585_harv_baseline	initial-communities.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/initial-communities.tif	READY	MapCode set identical under raw, unit fix and anchoring (anchor keeps every row, pmax 1)
+NH_clim_ssp585_harv_baseline	initial-communities.csv	cohort_biomass_by_mapcode[_fiadb].csv	PENDING	decisions 1 and 2
+NH_clim_ssp585_harv_baseline	SppEcoregionData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SppEcoregionData_fia_20260929.csv (active ecoregions)	READY	
+NH_clim_ssp585_harv_baseline	climate.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/HadGEM3_ssp585_NH_l3.csv	READY	synthetic delta table (stage five)
+NH_clim_ssp585_harv_baseline	SppEcoregionData_climate	/fs/scratch/PUOM0008/crsfaaron/landis2/states/NH/pnet2/HadGEM3-GC31-LL_ssp585/SppEcoregionData_NH_HadGEM3-GC31-LL_ssp585.csv	BLOCKED	no PnET-II tables; with Monthly_AverageAllYears and static parameters this cell equals its baseline twin
+NH_clim_ssp585_harv_baseline	AET	placeholder 600 mm, all ecoregions	READY	inherited from scenario_factorial.sh and the smoke; not ecoregion specific
+NH_clim_ssp585_harv_baseline	management-area.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/management-area_PLACEHOLDER.tif	BLOCKED	PLACEHOLDER pending Solarik MA definitions; 30 m, needs the 270 m run grid
+NH_clim_ssp585_harv_baseline	stands.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/stands.tif	BLOCKED	30 m, needs the 270 m run grid
+NH_clim_ssp585_harv_baseline	harvest_rate	0.022 PartialHarvest	READY	S-L 2025 study mean 0.022; increased +60 pct
+NH_clim_ssp585_harv_baseline	base-wind.txt	Lorimer and White 2003 regime, as scenario_factorial.sh	READY	Original Wind never run on these trees; untested
+NH_clim_ssp585_harv_increased	species.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/species_20260929.txt	READY	
+NH_clim_ssp585_harv_increased	SpeciesData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SpeciesData_20260929.csv	READY	
+NH_clim_ssp585_harv_increased	ecoregions.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/ecoregions_20260929.txt	READY	
+NH_clim_ssp585_harv_increased	ecoregions.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/ecoregions.tif	READY	270 m, gated 1 Oct
+NH_clim_ssp585_harv_increased	initial-communities.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/initial-communities.tif	READY	MapCode set identical under raw, unit fix and anchoring (anchor keeps every row, pmax 1)
+NH_clim_ssp585_harv_increased	initial-communities.csv	cohort_biomass_by_mapcode[_fiadb].csv	PENDING	decisions 1 and 2
+NH_clim_ssp585_harv_increased	SppEcoregionData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SppEcoregionData_fia_20260929.csv (active ecoregions)	READY	
+NH_clim_ssp585_harv_increased	climate.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/HadGEM3_ssp585_NH_l3.csv	READY	synthetic delta table (stage five)
+NH_clim_ssp585_harv_increased	SppEcoregionData_climate	/fs/scratch/PUOM0008/crsfaaron/landis2/states/NH/pnet2/HadGEM3-GC31-LL_ssp585/SppEcoregionData_NH_HadGEM3-GC31-LL_ssp585.csv	BLOCKED	no PnET-II tables; with Monthly_AverageAllYears and static parameters this cell equals its baseline twin
+NH_clim_ssp585_harv_increased	AET	placeholder 600 mm, all ecoregions	READY	inherited from scenario_factorial.sh and the smoke; not ecoregion specific
+NH_clim_ssp585_harv_increased	management-area.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/management-area_PLACEHOLDER.tif	BLOCKED	PLACEHOLDER pending Solarik MA definitions; 30 m, needs the 270 m run grid
+NH_clim_ssp585_harv_increased	stands.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/stands.tif	BLOCKED	30 m, needs the 270 m run grid
+NH_clim_ssp585_harv_increased	harvest_rate	0.035 PartialHarvest	READY	S-L 2025 study mean 0.022; increased +60 pct
+NH_clim_ssp585_harv_increased	base-wind.txt	Lorimer and White 2003 regime, as scenario_factorial.sh	READY	Original Wind never run on these trees; untested
+NH_clim_ssp585_harv_perseus	species.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/species_20260929.txt	READY	
+NH_clim_ssp585_harv_perseus	SpeciesData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SpeciesData_20260929.csv	READY	
+NH_clim_ssp585_harv_perseus	ecoregions.txt	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/ecoregions_20260929.txt	READY	
+NH_clim_ssp585_harv_perseus	ecoregions.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/ecoregions.tif	READY	270 m, gated 1 Oct
+NH_clim_ssp585_harv_perseus	initial-communities.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/runs/smoke_20261001_d10/initial-communities.tif	READY	MapCode set identical under raw, unit fix and anchoring (anchor keeps every row, pmax 1)
+NH_clim_ssp585_harv_perseus	initial-communities.csv	cohort_biomass_by_mapcode[_fiadb].csv	PENDING	decisions 1 and 2
+NH_clim_ssp585_harv_perseus	SppEcoregionData.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/SppEcoregionData_fia_20260929.csv (active ecoregions)	READY	
+NH_clim_ssp585_harv_perseus	climate.csv	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/HadGEM3_ssp585_NH_l3.csv	READY	synthetic delta table (stage five)
+NH_clim_ssp585_harv_perseus	SppEcoregionData_climate	/fs/scratch/PUOM0008/crsfaaron/landis2/states/NH/pnet2/HadGEM3-GC31-LL_ssp585/SppEcoregionData_NH_HadGEM3-GC31-LL_ssp585.csv	BLOCKED	no PnET-II tables; with Monthly_AverageAllYears and static parameters this cell equals its baseline twin
+NH_clim_ssp585_harv_perseus	AET	placeholder 600 mm, all ecoregions	READY	inherited from scenario_factorial.sh and the smoke; not ecoregion specific
+NH_clim_ssp585_harv_perseus	management-area.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/management-area_PLACEHOLDER.tif	BLOCKED	PLACEHOLDER pending Solarik MA definitions; 30 m, needs the 270 m run grid
+NH_clim_ssp585_harv_perseus	stands.tif	/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/NH/inputs/stands.tif	BLOCKED	30 m, needs the 270 m run grid
+NH_clim_ssp585_harv_perseus	harvest_rate	0.022 PerseusBA50	READY	S-L 2025 study mean 0.022; increased +60 pct
+NH_clim_ssp585_harv_perseus	base-wind.txt	Lorimer and White 2003 regime, as scenario_factorial.sh	READY	Original Wind never run on these trees; untested

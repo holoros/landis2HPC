@@ -1,0 +1,23 @@
+LandisData  Species
+>> NH species.txt generated 2026-09-29 (scripts_20260929/stage4_species.R).
+>> Copied from the NE template (~/landis2_fb/states/ME/inputs/species.txt); species set equals SppEcoregionData_fia.csv.
+
+>>                      Sexual    Seed Disperal Dist  Vegetative   Sprout Age  Post-Fire
+>> Name      Longevity  Maturity  Effective  Maximum  Reprod Prob  Min   Max   Regen
+>> ----      ---------  --------  ---------  -------  -----------  ----------  --------
+
+BF	200	30	200	265	0	0	0	none
+SM	400	30	300	365	0.4	10	60	none
+BE	400	40	60	90	0.9	10	100	resprout
+RS	400	30	200	265	0	0	0	none
+WS	400	30	200	265	0	0	0	none
+BS	400	30	200	265	0	0	0	none
+CE	400	25	120	160	0	0	0	none
+YB	300	40	300	365	0.1	10	60	none
+RM	200	20	300	365	0.9	10	60	none
+IH	160	15	300	365	0.8	10	60	resprout
+PINE	300	20	120	160	0	0	0	none
+ASH	200	20	200	265	0	0	0	none
+HE	400	20	200	265	0	0	0	none
+RO	400	25	30	100	0.5	0	80	resprout
+HICK	300	25	30	100	0.5	0	60	resprout

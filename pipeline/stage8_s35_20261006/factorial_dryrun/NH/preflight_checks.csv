@@ -1,0 +1,11 @@
+item,check,value,state
+stands.tif,res_m,30x30,NH
+stands.tif,same_grid_as_eco30,TRUE,NH
+stands.tif,same_grid_as_run270,FALSE,NH
+stands.tif,n_distinct_values,38175989,NH
+management-area_PLACEHOLDER.tif,res_m,30x30,NH
+management-area_PLACEHOLDER.tif,same_grid_as_eco30,TRUE,NH
+management-area_PLACEHOLDER.tif,same_grid_as_run270,FALSE,NH
+management-area_PLACEHOLDER.tif,n_distinct_values,1,NH
+baseline_table,species_x_eco_coverage,1,NH
+baseline_table,rows,30,NH

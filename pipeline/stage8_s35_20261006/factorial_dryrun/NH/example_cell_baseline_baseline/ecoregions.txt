@@ -1,0 +1,6 @@
+LandisData	"Ecoregions"
+
+>>Active	MapCode	Name	Description
+no	0	nodata	"non-forest"
+yes	58	58	"Northeastern Highlands"
+yes	59	59	"Northeastern Coastal Zone"

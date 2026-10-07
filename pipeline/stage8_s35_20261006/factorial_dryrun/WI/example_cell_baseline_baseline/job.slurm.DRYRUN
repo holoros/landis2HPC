@@ -1,0 +1,12 @@
+#!/bin/bash
+# DRY RUN ARTEFACT. Do not submit until IC_PENDING.txt and every BLOCKED row in ../manifest.tsv is closed.
+#SBATCH --account=PUOM0008 --job-name=WI_bas_bas --time=08:00:00
+#SBATCH --nodes=1 --cpus-per-task=8 --mem=96G
+#SBATCH --output=/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/WI/runs/factorial_dryrun_20261003/WI_clim_baseline_harv_baseline/slurm-%j.out --error=/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/WI/runs/factorial_dryrun_20261003/WI_clim_baseline_harv_baseline/slurm-%j.err
+cd /fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/WI/runs/factorial_dryrun_20261003/WI_clim_baseline_harv_baseline
+apptainer exec --bind /fs/scratch/PUOM0008:/fs/scratch/PUOM0008 \
+  --bind /fs/scratch/PUOM0008/crsfaaron/landis2/patches/Landis.Console.dll:/bin/LANDIS_Linux/build/Release/Landis.Console.dll \
+  --bind /fs/scratch/PUOM0008/crsfaaron/landis2/patches/Landis.Utilities.dll:/bin/LANDIS_Linux/build/Release/Landis.Utilities.dll \
+  --bind /fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/WI/runs/factorial_dryrun_20261003/WI_clim_baseline_harv_baseline:/fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/WI/runs/factorial_dryrun_20261003/WI_clim_baseline_harv_baseline --pwd /fs/scratch/PUOM0008/crsfaaron/landis2/states_fb_20260930/WI/runs/factorial_dryrun_20261003/WI_clim_baseline_harv_baseline \
+  /fs/scratch/PUOM0008/crsfaaron/landis2/images/landis-ii_v8_allext_v1.0.sif dotnet /bin/LANDIS_Linux/build/Release/Landis.Console.dll scenario.txt
+echo "LANDIS_EXIT=$?"

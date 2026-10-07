@@ -1,0 +1,5 @@
+time	state	stage	gate	value	threshold	result	note
+2026-10-06 17:34:10	NH	stage7_eco82	ecos_equal_active	58 59 	58 59 	PASS	drop inert Dryad ecoregion 82 rows (Aaron, 6 Oct, recommendation)
+2026-10-06 17:34:10	NH	stage7_eco82	species_unchanged	15	15	PASS	
+2026-10-06 17:34:10	VT	stage7_eco82	ecos_equal_active	58 59 83 	58 59 83 	PASS	drop inert Dryad ecoregion 82 rows (Aaron, 6 Oct, recommendation)
+2026-10-06 17:34:10	VT	stage7_eco82	species_unchanged	15	15	PASS	

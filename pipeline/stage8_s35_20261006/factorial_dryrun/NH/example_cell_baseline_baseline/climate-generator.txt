@@ -1,0 +1,7 @@
+LandisData "Climate Config"
+ClimateTimeSeries          Monthly_AverageAllYears
+ClimateFile                climate.csv
+SpinUpClimateTimeSeries    Monthly_AverageAllYears
+SpinUpClimateFile          climate.csv
+GenerateClimateOutputFiles no
+UsingFireClimate           no
