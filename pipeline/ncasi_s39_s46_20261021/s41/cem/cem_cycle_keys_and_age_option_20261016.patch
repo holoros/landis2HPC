@@ -1,0 +1,31 @@
+--- a/R/06_projection_engine.R
++++ b/R/06_projection_engine.R
+@@ -657,6 +657,10 @@
+   .row_term <- function(stdorg) if (is.null(plant_term)) rep(terminal_age, length(stdorg)) else dplyr::if_else(dplyr::coalesce(stdorg, 0L) == 1L, as.numeric(plant_term), as.numeric(terminal_age))
+   .row_gstart <- function(stdorg) if (is.null(plant_term)) rep(growth_start_age, length(stdorg)) else dplyr::if_else(dplyr::coalesce(stdorg, 0L) == 1L, as.numeric(plant_gstart), as.numeric(growth_start_age))
+   sat_for_age <- function(age, term = terminal_age, gstart = growth_start_age) {
++    # M1 model change option (s41, 16 Oct 2026): with CEM_NO_AGE_SAT=1 the
++    # age saturation ramp is disabled; donors are already matched on the
++    # current age class each cycle (Van Deusen and Roesch 2013).
++    if (identical(Sys.getenv("CEM_NO_AGE_SAT"), "1")) return(rep(1, length(age)))
+     term  <- pmax(term, gstart + 5)
+     age   <- pmin(pmax(coalesce(age, 0), 0), term)
+     pmax(0, pmin(1, (term - age) / (term - gstart)))
+@@ -1063,6 +1067,17 @@
+         n_species, dom_spcd, var_val,
+         LAT, LON, ELEV, PLT_CN
+       )
++    # F2 fix (s41, 16 Oct 2026): carry site constant matching keys into the
++    # next cycle. The transmute above dropped them, so from cycle 2 the
++    # ecoregion key was 0 and CEM passes 1 and 2 never matched.
++    .keys <- intersect(c("us_l3code", "us_l3name", "asym_agb"), names(subjects))
++    if (length(.keys) > 0) {
++      current_subjects <- current_subjects |>
++        dplyr::left_join(subjects |>
++          dplyr::select(STATECD, COUNTYCD, PLOT, CONDID, dplyr::all_of(.keys)) |>
++          dplyr::distinct(STATECD, COUNTYCD, PLOT, CONDID, .keep_all = TRUE),
++          by = c("STATECD", "COUNTYCD", "PLOT", "CONDID"))
++    }
+   }
+ 
+   # Combine results across cycles

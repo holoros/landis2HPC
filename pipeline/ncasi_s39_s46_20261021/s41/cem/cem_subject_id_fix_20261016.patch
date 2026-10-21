@@ -1,0 +1,38 @@
+--- a/R/02_cem_matching.R
++++ b/R/02_cem_matching.R
+@@ -243,7 +243,7 @@
+ 
+   # For each subject, find all matching donors
+   matched_pairs <- subj_c |>
+-    mutate(subject_row = row_number()) |>
++    mutate(subject_row = if (".cem_sid" %in% names(subj_c)) .cem_sid else row_number()) |>  # F1
+     inner_join(
+       {  # R-prodW: carry donor asymptotic AGB for soft productivity weighting
+         .dk <- don_c |> mutate(donor_idx = row_number())
+@@ -258,12 +258,12 @@
+   # Identify matched and unmatched subjects
+   matched_subject_rows <- unique(matched_pairs$subject_row)
+   unmatched_subjects <- subj_c |>
+-    mutate(subject_row = row_number()) |>
++    mutate(subject_row = if (".cem_sid" %in% names(subj_c)) .cem_sid else row_number()) |>  # F1
+     filter(!(subject_row %in% matched_subject_rows)) |>
+     select(-subject_row, -starts_with("cem_"))
+ 
+   matched_subjects <- subj_c |>
+-    mutate(subject_row = row_number()) |>
++    mutate(subject_row = if (".cem_sid" %in% names(subj_c)) .cem_sid else row_number()) |>  # F1
+     filter(subject_row %in% matched_subject_rows) |>
+     select(-subject_row, -starts_with("cem_"))
+ 
+@@ -343,6 +343,11 @@
+       mutate(CONDPROP_UNADJ = coalesce(CONDPROP_UNADJ, CONDPROP_C * 0.25))
+   }
+ 
++  # F1 fix (s41, 16 Oct 2026): one global subject id, assigned once before the
++  # three passes. subject_row was row_number() inside each pass, so ids from
++  # passes 2 and 3 collided with pass 1 and the one-row-per-subject_row
++  # selection dropped subjects at random.
++  subjects <- subjects |> mutate(.cem_sid = row_number())
+   all_match_pairs <- tibble()
+   remaining <- subjects
+   iteration_results <- list()

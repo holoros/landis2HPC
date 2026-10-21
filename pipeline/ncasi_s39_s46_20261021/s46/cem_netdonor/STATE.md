@@ -1,0 +1,70 @@
+# s46 Track K (amended, v6 to v10) STATE: CEM disturbance module net of donor mortality
+Label: post unblinding follow-on, not gate eligible
+Spec: /mnt/user-data/outputs/2026-10-20_ncasi-january-preregistration_PLAN.md; precedence v10 > v9 > v8 > v7 > v6 > v5 > v4 > v3 > v2 > original.
+Cap: 200 core hours total including 23.9 used in s45 (so 176.1 available in s46).
+Prior: s45/cem_netdonor (engine_k, engine_kref, netting fns, unit tests, snum335, k20ref). s43/cem_ablation (engine_c, c00base).
+## Step 1 (20 Oct) md5 set of F1/F2 patched UNFIXED engine that produced the s43 baseline (v10 item 3)
+- Engine = s43/cem_ablation/engine_c (non output files, 45 files incl. .bak copies): out/md5set_s43_engine_c.txt (file md5 0a2b3724cef6bee490c743a9dcbd9a7b). s45 engine_kref set is byte identical (same file md5).
+- Active files: 00_config 026a9152777b11274e6a27c2c6cf5080; 01_data_prep 568a7864dd13ba2e57daac38546f60a6; 02_cem_matching 866202996b71821b750f207198c7c4c8; 03_harvest_choice eebe1b625676118a0bf79a3050ff959d; 04_planting b9840ef986f7629b4482eccf48e12618; 05_scenario_biasing f012a9e82c3a02898c56e09e8a4cf285; 06_projection_engine 16f2e2ecb9dc524000ca022862a956f0; 07 3f3e455ca17990788b8a80f6790abfcc; 08_climate 68ba5ba68b5615a070a5ed789082706e; 09 0833d372cf4e4e96994c0d9e9efd1b2a; 10_state_expansion 80d79348e4d24d598ca60c74e7730724; 11_economic_harvest f5f8638806f8ef3a49626c72dea8a611; run_projection.R 976d836b63d4241be840b422a14b26ac.
+- Symlinked production config (39 files, followed): out/md5set_config_symlinked.txt (file md5 f038ba041e6e56e6de742ae74369b99c); no config file modified since 19 Oct 06:00 (before s43 baseline). data/ symlink not hashed (production data, read only).
+- Driver flags: s43 run_ablation_s43c.slurm c00base = s45 run_k_s45.slurm k20ref.
+## Step 2 (20 Oct) three unfixed reruns, identical seeds
+- engine_unf = copy of s45 engine_kref (R/, run_projection.R, .here; config, data symlinks). md5 of its full non output md5 listing 0a2b3724cef6bee490c743a9dcbd9a7b = s43 engine_c set.
+- Driver run_k_s46.slurm md5 b145a25cdf5308a85faef8536bcbd8ae; flags identical to s45 run_k_s45.slurm (only echo and grep lines differ). 8 cpus, 80G, as s45 k20ref.
+- Engine job 15729434 tasks 0-17 (u3, u4, u5 x 6 states) submitted. Five draws per cell = s43 c00base, s45 k20ref, u3, u4, u5.
+## Step 3 (20 Oct) diagnosis of every random draw through cycle 2 (v6 K1, v7 K5) and fix (v6 K2, v7 K3)
+Engine = engine_unf (= s43 engine_c). Order within a cycle of project_one_cycle (06): CEM match, donor selection, harvest decision, harvest intensity, Maine clearcut split (ME only), planting, growth, SDImax cap, disturbance. Sims run sequentially (06 L1125 for loop; --cores parsed but unused).
+Random draw sites (file:line, current seeding):
+- D1 05_scenario_biasing.R L335-346 apply_scenario_bias, BAU branch (called 06 L228, seed arg cfg$seed + 1000*cycle + sim): runif(n()) per candidate within group_by(subject_row), slice_max(rv, with_ties = FALSE). UNSEEDED: the seed argument is ignored in the BAU branch. Sim 1 cycle 1 is the first RNG use in the R process (no set.seed earlier), so it draws from R's startup seed (time and PID): NON DETERMINISTIC. All later sims and cycle 2 inherit the state left by the previous seeded site (disturbance of the previous cycle), so they are deterministic but not seeded from their own site. Consistent with s45 NH diag (s45kD2): same donor share sim 1 0.389 (ref vs null), 0.380 (ref vs s43); pooled all sims 0.969 = about (19 + 0.39)/20.
+- D2 06 L258 economic harvest runif, set.seed(seed + 2000c + s). Inactive (--no_econ).
+- D3 06 L286 fixed harvest decision runif(n()), set.seed(seed + 7919c + s). Seeded.
+- D4 03_harvest_choice.R L412 harvest intensity rnorm(n()), no own set.seed; inherits D3 stream (after the D3 uniforms). Deterministic; unchanged.
+- D5 11_economic_harvest.R L205-206 split_partial_clearcut (ME only, --use_maine_econ), set.seed(seed + cycle_year) with seed = cfg$seed + 11c + s (06 L380). Seeded.
+- D6 04_planting_model.R L131-136 apply_planting_decision runif, set.seed(cfg$seed + 3000c + s) (06 L412). Seeded.
+- D7 06 L587-612 disturbance sbw, wind, fire runif(n), set.seed(seed + 1373c + 7s). Seeded.
+- D8 06 L1137-1144 bootstrap sample.int, seeded; inactive (no --bootstrap_plots).
+- Not reached by the engine: 02 L456-465 select_matches (seeded, never called); 05 L86-110 and L129-164 biased and multi event selection (seeded, BAU never calls them); 07 L71 timber supply (--skip_supply). 01, 08, 10 have no RNG; brms SDImax is a lookup (no posterior draws).
+- Seed values with cfg$seed 42, cycles 1-2, sims 1-20: D1 1043-1062, 2043-2062; D3 7962-7981, 15881-15900; D5 base 54-73, 65-84 plus cycle year; D6 3043-3062, 6043-6062; D7 1422-1555, 2795-2928. No collision among active sites (D2 inactive site would coincide with D1 cycle 2).
+Order dependent steps (before -> after):
+- O1 D1 draw assignment: uniforms assigned in all_matches row order within subject (bind order of CEM iterations, then inner_join order, donor_idx increasing) -> rows sorted by (subject_row, donor_idx, cem_iteration) before the same draw. Selection rule unchanged both times: largest rv, first row on a tie (slice_max with_ties = FALSE).
+- O2 D3, D4, D6, D7 assign draws in projected row order, which is the selection output order (group sorted by subject_row) -> unchanged (stable once D1 is).
+- O3 10_state_expansion.R L89 slice_max(END_INVYR, with_ties = FALSE) on file order of evaluation tables, no RNG -> unchanged.
+Fix (engine copy engine_fix = engine_unf + patch; production untouched): diff fix_determinism_s46.diff (md5 b69d705a8bb8409226e00f248ff0cf15). In 05 BAU branch: set.seed(seed) using the seed the engine already passes (cfg$seed + 1000 cycle + sim; recorded derivation), plus arrange(subject_row, donor_idx, cem_iteration) before the unchanged draw. run_projection.R: guarded CEM_SEED_OFFSET (default unset = original) for the different seed test only. md5: 05 143f8fc1fa1870ee8eabfb85630335ed, run_projection 71ed78e9a62e4f711fe7c4c563968a5a; full set out/md5set_engine_fix.txt (md5 381860832428337461fd470d90e3d986). Stream distinctness: distinct set.seed per site, cycle and sim (list above); distinct stream positions per subject within a site.
+## Step 4 jobs submitted
+- f20a 15729539 (tasks 18-23, 8 cpu 80G), f20b 15729540 (tasks 24-29, 8 cpu 80G): determinism pair, separate jobs, same request.
+- f20c 15729541 (tasks 30-35, 10 cpu 48G): core count diagnostic.
+- f20s 15729542 (tasks 36-41): different seed, CEM_SEED_OFFSET 104729 (run seed 104771).
+- Correction to the D5 seed values above: cycle_year = baseline_year + 5c, so D5 seed = 42 + 11c + s + 2020 + 5c = 2062 + 16c + s: cycle 1 2079-2098, cycle 2 2095-2114 (2010 window: 2069-2088, 2085-2104). Pre existing collision WITHIN D5 (ME clearcut split): cycle 1 sims 17-20 reuse the seeds of cycle 2 sims 1-4. It is seeded and deterministic, and is not changed (changing it would alter seeded model draws beyond the v6 K2 fix); disclosed as a deviation from full stream distinctness at a pre existing site. No D5 collision with D1, D3, D6, D7.
+- engine_fixk = engine_fix + s45 engine_k R/06_projection_engine.R (6090af0759856192fc6b1cfbe2b1a3db, one guarded netting line) + R/16_netdonor_fns.R (741ef3d74fda66dee6851d5ca8b4b4c5, no RNG). Diff vs engine_fix: engine_fixk_vs_fix.diff. Netting donor tables reused from s45 work/ (snum 335 check passed there).
+- Scripts: score_k_s46.slurm 160ce99a0777a63ba099c468db9f9929; persim_s46.R ef619edafe68fecaccf602049950667c (= frozen s43c reg scorer lines 1-203 verbatim + per sim ratio appendix); nd_md5cmp_s46.R 01862200ec90099c3be0242c20a7f19a; nd_summary_s46.R 05e69d7eb4f28cd5f755623d4dead823 (s45 copy, T path only); persim_ref_s46.slurm (k20ref per sim) job 15729697.
+- Scoring job 15729706 tasks 0-41 (afterok on all five engine jobs).
+- persim job 15729697 FAILED on a code bug (cut at line 203 omitted the pt line 204, object pt undefined); no output. persim_s46.R rebuilt as lines 1-204 verbatim + appendix, md5 95c6829d7e4e94e61caabcf74dbf5823 (replaces the md5 above). Resubmitted as job 15729772. Scoring job 15729706 reads the rebuilt file at run time.
+## Step 4 results (20 Oct ~22:00)
+- All 42 engine tasks (u3, u4, u5, f20a, f20b, f20c, f20s) rc=0. k20ref per sim job 15729772 COMPLETED (persim mean equals gate ratio).
+- DETERMINISM TEST (v6 K3): f20b vs f20a per subject archive identical by object md5 and by file md5 in all six states (identical() TRUE). PASS. out/md5cmp_f20b_vs_f20a_<ST>_...csv
+- CORE COUNT DIAGNOSTIC (v7 K5): determinism pair ran at 17 allocated cpus each (--cores 17; OSC allocates 17 for 80G); f20c at 10 cpus (48G) is identical to f20a by object and file md5 in all six states.
+- DIFFERENT SEED TEST (v7 K4, v8 K3): f20s (run seed 104771) differs from f20a by md5 in all six states (max abs proj_drybio diff 4.5e5 to 6.0e5 lb per acre units). PASS.
+- STREAM F TEST (v8 K3, v9 K2): between sim variance of f20a vs designated reference s45 k20ref, df (19,19), two sided, Bonferroni alpha 0.05/18 = 0.00278: 0 of 18 rejections; smallest p 0.107 (VT gross, F 2.136); F ratios 0.470 to 2.136. Critical values 0.2354 and 4.2482; detectable variance ratio at 80 percent power 6.29 (or 0.159). PASS. out/stream_Ftest_s46_...csv
+- GEOMETRIC MEAN CHECK (v10 item 2, bounds 0.632 to 1.587): gross 1.2858, mortality 0.8888, net 1.0008. PASS. out/stream_geomean_s46_...csv
+## Step 5 (20 Oct) baseline recheck (v10 item 1), verdict stop (v9 K3), flags. nd_recheck_s46.R; out/recheck_s46_...csv, console out/recheck_s46_console.txt
+- Five draws per cell: s43 c00base, s45 k20ref, s46 u3, u4, u5 (registered scorer, version A ratio). t(1 - 0.025/24, 4) = 7.0957. s_sim from k20ref 20 sims.
+- Recheck: 24 of 24 cells inside the interval (stock: five draws identical, s_sim 0, fixed equal exactly in all six states). Largest |fixed - mean5| / half width 0.361. PASS.
+- 0.0025 flags (reported, not a stop, v9 K1): 13 of 24 cells beyond 0.0025 from the five draw mean: ME gross, mort; NH gross, mort, net; VT gross, mort, net; MI gross, mort, net; WI net; MN net.
+- Verdict stop (v9 K3): 0 cells changed (fixed on the other side of a band edge from at least 4 of 5 draws). PASS. Instability flags (band edge within five draw range widened 0.0055): 0 cells. Fixed baseline within 0.0055 of a band edge: 0 cells.
+- Drift of fixed vs s43 (v8 K5): largest |drift| 0.0197 (NH net); larger than the v6 K4 expectation of about 0.0055 (an expectation, not a criterion; the binding criterion is the v10 interval).
+- ALL STEP 4 AND 5 TESTS PASS -> step 6.
+- Step 6: null run k20null job 15730011 (tasks 42-47, engine_fixk, CEM_NETDONOR=1, CEM_NETDONOR_NULL=1); md5 vs f20a by score_k2_s46.slurm (md5 fd8ad45272e8ddd4e6cfa5fc0a18e94d; = score_k_s46.slurm plus an f20a netted scorer entry, tasks 66-71).
+- Core hours to this point (sacct CPUTimeRAW, jobs 15729434, 539, 540, 541, 542, 697, 706, 772): 276838 core s = 76.9 core h; with s45 23.9 = 100.8 of 200. Remaining engine jobs will request 10 cpu 48G (2020) and 12 cpu 56G (2010) instead of 8 cpu 80G (17 allocated) to save core hours; accounting only (engine single threaded; f20c showed identical output at 10 cpus). MaxRSS of f20a tasks 8.6 to 36.9 GB.
+- NULL TEST (v3 item 2 against fixed baseline, v6 K5): k20null vs f20a identical by object md5 and file md5 in all six states (identical() TRUE). PASS. out/md5cmp_k20null_vs_f20a_<ST>_...csv
+- Track K runs: k20net job 15730209 (tasks 48-53, 10 cpu 48G); k10ref + k10net job 15730210 (tasks 54-65, 12 cpu 56G); scoring job 15730211 (tasks 48-65, afterok); f20a netted scoring job 15730212 (tasks 66-71).
+- Track K engine tasks 48-65 all rc=0 (k20net, k10ref, k10net). f20a netted scoring job 15730212 done.
+- Mechanism summary (nd_summary_s46.R) FAILED in the scoring job on a code bug: NA kill basis B (proj_drybio NA, no live trees; 11973 NH rows) made the class sums NA. Fix: B and pre_drybio_ag NA set to 0 after load, the registered scorer's NA convention. nd_summary_s46.R md5 now 6b2a437706b9a3dee40109cf33032bc6. Registered and netted scores in that job completed (STEP_D_DONE). Summary rerun job 15730675 (summ_s46.slurm, tasks 0-11).
+## Step 6 results (20 Oct ~22:40). Table script nd_trackk_table_s46.R; out/trackK_ratios_s46_...csv, out/trackK_console_s46.txt, netfrac_/valuation_/coverage_<ST>_<cfg>_...csv, donor_class_share_s46_...csv
+- Track K (k20net, 2020 window; k10net, 2010 window) vs fixed baselines (f20a; k10ref), registered and netted scorers. Mode: by agent (classes 10, 50, 30), floored per class per subject and cycle.
+- No state passes under either scorer in either window (mortality and net fail everywhere under the registered scorer). v2 K8 wording case does not arise.
+- Changes from the fixed baseline are small: 2020 registered mortality -0.0161 (NH) to +0.0027 (WI); net -0.0030 to +0.0036; gross -0.0030 to +0.0008; stock 0 by construction. Far smaller than the s43 disturbance off effect (registered mortality -0.116 to -0.239).
+- Mechanism: fraction of module loss removed with per subject floors 0.0099 (ME) to 0.0245 (WI) in 2020, 0.0121 to 0.0283 in 2010; aggregate (no floors) 0.465 (ME) and 0.888 to 1.000 elsewhere. Netting at the subject and cycle level removes little because module kills fall on subjects whose own donors record little agent mortality in that class.
+- ME module class 10 (all budworm by construction) share of module loss 0.506 (2020), 0.194 (2010). Donor class 10 share among classes 10, 30, 50 on the matched subjects reported in donor_class_share csv (ME 0.153 2020, 0.115 2010).
+- Valuation (v7 K6, v8 K7): end of cycle kill value over midpoint value 1.026 to 1.050 (2020), 1.027 to 1.054 (2010), so kills are overstated by 2.6 to 5.4 percent against midpoint valuation, and that overstatement enters the netting.
+- Core hours: s46 sacct total 400493 core s = 111.2 core h (15 jobs); with s45 23.9 = 135.2 of the 200 cap.
+- STATUS: COMPLETE. All pre run tests passed; Track K run in both windows with both scorers.

@@ -1,0 +1,30 @@
+diff -ru engine_unf/R/05_scenario_biasing.R engine_fix/R/05_scenario_biasing.R
+--- engine_unf/R/05_scenario_biasing.R	2026-05-30 06:05:30.098030000 -0400
++++ engine_fix/R/05_scenario_biasing.R	2026-10-20 21:46:10.852769000 -0400
+@@ -334,8 +334,13 @@
+ 
+   if (is.null(bias_params) || all(unlist(bias_params$Q_values) == 1.0)) {
+     # BAU scenario: random (optionally productivity-weighted) selection
++    # s46 determinism fix (Track K amendment v6 K2, v7 K3): seed this draw site from the
++    # seed argument the engine already passes (cfg$seed + cycle_num * 1000 + sim_id), which
++    # the original BAU branch ignored, and sort candidates before the unchanged random draw.
++    set.seed(seed)
+     return(
+       matches |>
++        arrange(subject_row, donor_idx, dplyr::across(dplyr::any_of("cem_iteration"))) |>
+         group_by(subject_row) |>
+         mutate(rv = if (use_pw) {
+                  w <- exp(-0.5 * ((donor_asym - asym_agb) / bw_pw)^2)
+--- engine_unf/run_projection.R	2026-10-16 02:59:34.310427688 -0400
++++ engine_fix/run_projection.R	2026-10-20 21:46:10.853572000 -0400
+@@ -294,6 +294,10 @@
+     CONFIG$use_disturbance <- TRUE
+     cat("Episodic disturbance module enabled (SBW + wind + fire) (R6)\n")
+   }
++  if (nzchar(Sys.getenv("CEM_SEED_OFFSET"))) {  # s46 different seed test only (default unset = original seed)
++    CONFIG$seed <- CONFIG$seed + as.integer(Sys.getenv("CEM_SEED_OFFSET"))
++    cat(sprintf("s46 seed offset: run seed %d\n", CONFIG$seed))
++  }
+   if (isTRUE(cli_args$use_species_climate)) {
+     CONFIG$use_species_climate <- TRUE
+     cat("Species-specific climate response enabled (D'Amato 2011 + Iverson 2008) (R4)\n")

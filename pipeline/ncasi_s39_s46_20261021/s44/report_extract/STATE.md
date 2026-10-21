@@ -1,0 +1,12 @@
+# STATE report_extract s44
+- step0: folder created
+- step1 LANDIS ME read: s44/landis_me_promote/out/behav_gate_memn_seeds.csv (seed20261020 1.0015/0.9038/0.9648/0.8667/0.9436 PASS; control seed1234 same as repro43c). find job 15721542 submitted
+- step1 MN: base s43/landis_memn/out/behav_gate_memn_s43b.csv anch_d10_mn_pe0.1; best grid a1.3_b3 same file
+- step1 NH/VT: landis2/states_fb_20260930/gates/behav_gate_confirm_20261015c.csv (no stock col)
+- step2 FVS: s41/fvs/fvs_mortrecal_holdout_results_20261015.csv; plotsplit s43/fvs_plotsplit/fvsps_holdout_results_20261019.csv read
+- step2 FVS done; stock not scored (fvs/fvs_gate_summary_20261015b.md line 42); MI CI s43/fvs_mi_ci/fvsci_boot_results_20261019b.csv
+- step3 CBM registered: cbm/rerun_v2_20261015/cbm_gate_results_v4_20261015.csv (FVS_FIAW_NEW noharv) read
+- step3 s42 FIAYC: s42/cbm_fiayc/s42fy_gate_table_20261016.csv read
+- step4 CEM: baseline s41/cem/out/cem_gate_{ST}_f2gate_20261016e.csv; alloff s43/cem_ablation/s43c_ablation_ratio_wide.csv read
+- step1 MI/WI confirm: landis2/states_fb_20260930/gates/behav_gate_runs_20261015g.csv (MI) and h (WI) read
+- step5 OSM ME s41/osm/osm_gate_results_me_20261016.csv read; no NH/VT OSM gate files found. sacct confirms 15533909/15533982 s39, 15536510 s40_miconf, 15536778 s40_wiconf. ALL STEPS DONE 20 Oct; report handed back.

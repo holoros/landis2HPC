@@ -1,0 +1,12 @@
+diff -ru -x output engine_fix/R/06_projection_engine.R engine_fixk/R/06_projection_engine.R
+--- engine_fix/R/06_projection_engine.R	2026-10-19 06:58:59.250158965 -0400
++++ engine_fixk/R/06_projection_engine.R	2026-10-20 21:47:40.623782000 -0400
+@@ -619,6 +619,7 @@
+     wind_red <- ifelse(wind_hit, 0.80, 1.0)  # retain 80%
+     fire_red <- ifelse(fire_hit, 0.40, 1.0)  # retain 40%
+     total_red <- sbw_red * wind_red * fire_red
++    if (Sys.getenv("CEM_NETDONOR") == "1") total_red <- nd_apply_in_engine(df, sbw_red, wind_red, fire_red, total_red, cfg, cycle_num, sim_id)  # s45 Track K netting (default off = original)
+ 
+     df <- df |>
+       dplyr::mutate(
+Only in engine_fixk/R: 16_netdonor_fns.R
